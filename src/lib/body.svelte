@@ -3,7 +3,7 @@
 </script>
 
 <div class="body center-text">
-	<div class="card p-4 variant-glass-secondary">
+	<div class="card p-4 variant-glass-tertiary">
 		<div class="card p-4">
 				<h2><b>Dice Breakers:</b></h2>							
 					<p>A conversation starter app for people who enjoy introspection or getting to know others. Select whichever categories work for your group and roll the dice to break the ice!</p><br>
