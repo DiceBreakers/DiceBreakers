@@ -1,17 +1,17 @@
 <script>
-    import Header from '$lib/header.svelte'
+    import Header from '$lib/headerSM.svelte'
     import Footer from '$lib/footer.svelte'
+	import Game from '$lib/game.svelte';
 </script>
 
 
-<section class="bg_gradient">
+<div class="bg_gradient">
 <Header />
-	<div class="text-center">
-		<button class="btn variant-filled-success">Roll the Dice</button>
-	</div>
-	<br>
+</div>
+<Game />
+<div class="bg_gradient">
 <Footer />
-</section>
+</div>
 <style>
 
 </style>

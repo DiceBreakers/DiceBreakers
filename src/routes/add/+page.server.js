@@ -30,6 +30,6 @@ export const actions = {
 			throw error(err.status, "The robots didn't like something about that...");
 		}
 
-		throw redirect(303, '/add');
+		throw redirect(303, '/add#addPrompt');
 	}
 };
