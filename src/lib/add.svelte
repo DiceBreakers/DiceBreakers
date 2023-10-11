@@ -1,33 +1,107 @@
-<script>
-    import '../app.postcss'
+<script lang="ts">
+	import '../app.postcss';
 	import { catList } from './components/catList.svelte';
-
-</script>
-
-<section id="addPrompt">
-		<div class="card p-4">
-			<div class="card p-4 variant-glass-secondary">
-			<form action="?/create" method="POST"
-			>
-				<label class="label">
-					<div class="body margin"><h1>Add a Prompt:</h1></div>
-					<textarea name="prompt" class="textarea" rows="2" placeholder="Enter Prompt" />
+	import SuccessMessage from './components/successMessage.svelte';
+	import { onMount } from 'svelte';
+	import { writable } from 'svelte/store';
+  
+	// Define the type for catItem
+	type CatItem = {
+	  value: string;
+	  label: string;
+	  checked: boolean;
+	};
+  
+	let showSuccessMessage = false; // Declare the showSuccessMessage variable
+	let promptText = '';
+	let selectedCategories = writable<CatItem[]>([]); // Create a writable store for selected categories
+  
+	onMount(() => {
+	  // Initialize selectedCategories when the component mounts
+	  catList.subscribe((list: CatItem[]) => {
+		selectedCategories.set(list);
+	  });
+	});
+  
+	async function handleSubmit(event: Event) {
+	  event.preventDefault();
+  
+	  const formData = new FormData();
+	  formData.append('prompt', promptText);
+  
+	  selectedCategories.subscribe((list: CatItem[]) => {
+		list.forEach(catItem => {
+		  if (catItem.checked) {
+			formData.append('categories', catItem.value);
+		  }
+		});
+	  });
+  
+	  try {
+		const response = await fetch('/add?/create', {
+		  method: 'POST',
+		  body: formData,
+		});
+  
+		if (response.ok) {
+		  console.log('Prompt submitted successfully!');
+		  showSuccessMessage = true;
+  
+		  // Reset the checkboxes using the catList store
+		  selectedCategories.update(list => {
+			return list.map(catItem => ({
+			  ...catItem,
+			  checked: false,
+			}));
+		  });
+  
+		  // Optionally, reset the form fields after a delay
+		  setTimeout(() => {
+			promptText = ''; // Reset the prompt text
+		  }, 3000); // Reset after 3 seconds
+		} else {
+		  console.error('Failed to submit prompt.');
+		}
+	  } catch (error) {
+		console.error('An error occurred:', error);
+	  }
+	}
+  </script>
+  
+  {#if showSuccessMessage}
+	<SuccessMessage />
+  {/if}
+  
+  <section id="addPrompt">
+	<div class="card p-4">
+	  <div class="card p-4 variant-glass-secondary">
+		<form on:submit={handleSubmit}>
+		  <label class="label">
+			<div class="body margin"><h1>Add a Prompt:</h1></div>
+			<textarea name="prompt" bind:value={promptText} class="textarea" rows="2" placeholder="Enter Prompt" />
+		  </label>
+		  <label class="label">
+			<div class="body"><h2>Check Applicable Categories:</h2></div>
+			<ul class="columns">
+			  {#each $selectedCategories as catItem, index}
+			  <li>
+				<label class="flex">
+				  <input name='categories' bind:checked={catItem.checked} class="checkbox" type="checkbox" value={catItem.value}/>
+				  {catItem.label}
 				</label>
-				<label class="label">
-					<div class="body"><h2>Check Applicable Categories:</h2></div>
-				<ul class="columns">
-					{#each catList as catItem}
-					<li><label class="flex"><input name="categories" class="checkbox" type="checkbox" value={catItem.value}/>{catItem.label}</label></li>
-					{/each}
-					</ul>
-				</label>
-				<div class="text-center">
-				<button class="btn variant-filled-primary">Submit</button>
-				</div>
-			</form>
-			</div>
-		</div>
-</section>		
+			  </li>
+			  {/each}
+			</ul>
+		  </label>
+		  <div class="text-center">
+			<button class="btn variant-filled-primary" type="submit">Submit</button>
+		  </div>
+		</form>
+	  </div>
+	</div>
+  </section>
+  
+  
 			
 <style>
     .card {

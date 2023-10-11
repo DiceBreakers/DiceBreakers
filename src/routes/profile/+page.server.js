@@ -1,11 +1,5 @@
 import { error, redirect } from '@sveltejs/kit'
 
-export const load = ({ locals }) => {
-	if (!locals.pb.authStore.isValid) {
-		throw redirect(303, '/login');
-	}
-};
-
 export const actions = {
   updateProfile: async ({ request, locals }) => {
     let data = await request.formData()
@@ -59,7 +53,7 @@ export const actions = {
             };
           } catch (err) {
             console.log('Error: ', err);
-            throw error(400, "That username might already exist, or it has some characters that aren't allowed. Or maybe something else went wrong, I'm a noob");
+            throw error(400, "That username might already exist, or it has some characters that aren't allowed. Try something else or reach out for some help.");
           }
         }
         console.log('Error: ', err);

@@ -8,10 +8,6 @@
 <div class="body center-text">
 	<div class="card p-4 variant-glass-secondary">
 		<div class="card p-4">
-			<form action="?/updateProfile" method="POST">
-				<h2><Input id="name" label="Display Name:" value={$currentUser?.name}/></h2>
-				<button class="btn btn-sm variant-filled-primary">Change Name</button>
-			</form>
 			<form action="?/updateUsername" method="POST">
 				<h2><Input id="username" label="Username:" value={$currentUser?.username}/></h2>
 				<button class="btn btn-sm variant-filled-primary">Change Username</button>

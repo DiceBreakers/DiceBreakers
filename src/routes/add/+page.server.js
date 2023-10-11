@@ -1,35 +1,35 @@
 import { error, redirect } from '@sveltejs/kit';
-import { append } from 'svelte/internal';
-
-export const load = ({ locals }) => {
-	if (!locals.pb.authStore.isValid) {
-		throw redirect(303, '/login');
-	}
-};
 
 export const actions = {
-	create: async ({ request, locals }) => {
-		const data = await request.formData();
+  create: async ({ request, locals }) => {
+    if (request.method !== 'POST') {
+		console.log('Error: ', err);
+		throw error(err.status, "The robots didn't like something about that...");
+    }
 
-		data.append('author', locals.user.id);
+    // Handle the POST request for form submission
+    const data = await request.formData();
 
-		const prompt = data.get('prompt')?? '';
-		const categories = data.getAll('categories')?? '';
-		const author = data.get('author')?? '';
+    const prompt = data.get('prompt') ?? '';
+    const categories = data.getAll('categories') ?? '';
+    const author = (locals.user?.id) ?? '';
+    const postPublic = (locals.user?.postPublic) ?? '';
 
-		const addPrompt = {
-			"prompt": prompt,
-			"categories": categories,
-			"author": author,
-		};
+    const addPrompt = {
+      prompt: prompt,
+      categories: categories,
+      author: author,
+      postPublic: postPublic,
+    };
 
-		try {
-			const record = await locals.pb.collection('prompts').create(addPrompt);
-		} catch (err) {
-			console.log('Error: ', err);
-			throw error(err.status, "The robots didn't like something about that...");
-		}
+    try {
+      const record = await locals.pb.collection('prompts').create(addPrompt);
+      // Handle success, e.g., return a success response
+    } catch (err) {
+      console.log('Error: ', err);
+      throw error(err.status, "The robots didn't like something about that...");
+    }
 
-		throw redirect(303, '/add#addPrompt');
-	}
+    throw redirect(303, '/add#addPrompt'); // Redirect to the desired location
+  },
 };
