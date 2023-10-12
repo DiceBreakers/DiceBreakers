@@ -15,7 +15,9 @@
 
 {#if showMenu}
 <div class="backdrop" on:click|self={toggleMenu} on:keydown|self={toggleMenu} transition:fade>
-  <nav class="nav menu" transition:slide={{ duration:800, axis:'x'}}>
+  <nav class="nav menu"
+  in:slide={{ duration:800, axis:'x'}}
+  out:slide={{ delay:800, duration:800, axis:'x'}}>
     <ul class="item">
 <!-- user logged in -->
         {#if $currentUser}

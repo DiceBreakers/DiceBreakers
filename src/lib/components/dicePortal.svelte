@@ -39,7 +39,7 @@
     .dice {  
         position: fixed;
         top: 60%; /* Vertical center of the viewport */
-        left: 30%; /* Horizontally center */
+        left: 50%; /* Horizontally center */
         transform: translate(-50%, -50%); /* Center both vertically and horizontally */
         z-index: 1000;
     }

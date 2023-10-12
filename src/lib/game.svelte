@@ -4,6 +4,10 @@
 	import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
+	import { fade } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
+	import { quintOut } from 'svelte/easing';
+	import { slide } from 'svelte/transition';
 	import DicePortal from '$lib/components/dicePortal.svelte';
 
     let rollDice = true;
@@ -25,7 +29,7 @@
 	let selectedCategories = writable<CatItem[]>([]);
 	let currentPrompt = "";
 	let currentAuthor = "";
-	let promptIndex = 0;
+	let promptIndex = 1;
 	let generatedPrompts: { prompt: string; author: string }[] = [];
 	
 	onMount(() => {
@@ -112,13 +116,17 @@ function displayNextPrompt() {
 		<svelte:fragment slot="lead"><img src="favicon.png" alt="Dice Icon" width="21px" /></svelte:fragment>
 		<svelte:fragment slot="summary">Play</svelte:fragment>
 		<svelte:fragment slot="content">
-			<div class="text-center margin">
+			{#key promptIndex}
+			<div class="text-center margin"
+			in:slide={{ delay: 3750, duration: 1000, easing: quintOut, axis: 'x' }}
+			out:slide={{ delay: 100, duration: 500, easing: quintOut, axis: 'x' }}>
 				<div id="prompt">
-				  {currentPrompt}	
-				</div>	
+				  {currentPrompt}</div>				
 				<button class="btn variant-filled-primary margin" on:click={displayNextPrompt}>Roll the Dice</button>
-				<div class="right">{currentAuthor}</div>
-			  </div>
+				<div class="right">
+				{currentAuthor}</div>
+				</div>
+			{/key}
 		</svelte:fragment>
 	  </AccordionItem>
 	</Accordion>
