@@ -82,11 +82,11 @@ function displayNextPrompt() {
 	<Accordion autocollapse>
 	  <AccordionItem open>
 		<svelte:fragment slot="lead"><i class="fa-solid fa-lg fa-gear" style="color: #1673c5;"></i></svelte:fragment>
-		<svelte:fragment slot="summary">Game Settings</svelte:fragment>
+		<svelte:fragment slot="summary">Categories</svelte:fragment>
 		<svelte:fragment slot="content">
-		  <form on:submit={generate}>
+		  <form>
 			<label class="label">
-			  <div class="body"><h2>Pick your categories:</h2></div>
+			  <div class="body"><h2>Select categories:</h2></div>
 			  <ul class="columns">
 				{#each $selectedCategories as catItem, index}
 				<li>
@@ -104,24 +104,20 @@ function displayNextPrompt() {
 				{/each}
 			  </ul>
 			</label>
-			<div class="text-center">
-			  <button type="submit" class="btn variant-filled-primary">Generate</button>
-			</div>
 		  </form>
 		</svelte:fragment>
 	  </AccordionItem>
-	  <AccordionItem>
+	  <AccordionItem on:toggle={generate}>
 		<svelte:fragment slot="lead"><img src="favicon.png" alt="Dice Icon" width="21px" /></svelte:fragment>
 		<svelte:fragment slot="summary">Play</svelte:fragment>
 		<svelte:fragment slot="content">
-			<div class="text-center">
-				<ul>
-				  <li>{currentPrompt}</li>
-				  <li>Author: {currentAuthor}</li>
-				</ul>
-				<button class="btn variant-filled-primary" on:click={displayNextPrompt}>Roll the Dice</button>
+			<div class="text-center margin">
+				<div id="prompt">
+				  {currentPrompt}	
+				</div>	
+				<button class="btn variant-filled-primary margin" on:click={displayNextPrompt}>Roll the Dice</button>
+				<div class="right">Author: {currentAuthor}</div>
 			  </div>
-			  
 		</svelte:fragment>
 	  </AccordionItem>
 	</Accordion>
@@ -130,12 +126,17 @@ function displayNextPrompt() {
 			
 			
 <style>
+		
+	.margin {
+		margin:2em;
+	}
+
     .card {
         padding: 1rem;
     }
 
-	.body h2 {
-		font-size: large;
+	.right {
+		text-align: right;
 	}
 
 	ul.columns  { 
