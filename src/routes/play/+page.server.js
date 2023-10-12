@@ -16,7 +16,7 @@ export const actions = {
       filter: `(categories~"${categoriesString}") && postPublic = true`,
       expand: 'author',
       fields: 'expand.author.username,prompt',
-      sort: '-created',
+      sort: '@random',
 			skipTotal: 1,
         });
 

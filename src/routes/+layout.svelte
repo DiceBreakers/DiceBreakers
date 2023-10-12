@@ -5,9 +5,11 @@
     let showMenu = false;
 </script>
 
+<div class="bg">
 <Menu {showMenu}/>
 <div>
   <slot />
+</div>
 </div>
 
 <style>

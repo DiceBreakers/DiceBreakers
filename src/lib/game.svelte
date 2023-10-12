@@ -95,24 +95,16 @@ function displayNextPrompt() {
 		<svelte:fragment slot="content">
 		  <form>
 			<label class="label">
-			  <div class="body"><h2>Select categories:</h2></div>
-			  <ul class="columns">
-				{#each $selectedCategories as catItem, index}
-				<li>
-				  <label class="flex">
-					<input
-					  id={catItem.label}
-					  class="checkbox"
-					  type="checkbox"
-					  bind:checked={catItem.checked}
-					  value={catItem.value}
-					/>
+				<div class="body"><h2>Check Applicable Categories:</h2></div>
+				<div class="categories-grid">
+				  {#each $selectedCategories as catItem, index}
+				  <label class="category-item">
+					<input name='categories' bind:checked={catItem.checked} class="checkbox" type="checkbox" value={catItem.value}/>
 					{catItem.label}
 				  </label>
-				</li>
-				{/each}
-			  </ul>
-			</label>
+				  {/each}
+				</div>
+			  </label>
 		  </form>
 		</svelte:fragment>
 	  </AccordionItem>
@@ -150,21 +142,5 @@ function displayNextPrompt() {
 	.right {
 		text-align: right;
 	}
-
-	ul.columns  { 
- 		margin: 0; 
-  		padding: 0; 
-  		margin-left: 10px; 
-  		list-style: none; 
-	} 
-
-	ul.columns li input { 
-  		margin-right: .25em; 
-	} 
-
-	ul.columns li { 
-		display:inline-block;
-		width:10em;
-	} 
 
 </style>

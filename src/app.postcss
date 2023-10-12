@@ -10,6 +10,10 @@
 	font-display: swap;
 }
 
+	.bg {
+		background-color: #e3f7fd;
+	}
+
 	.bg_gradient {
 		width: 100%;
         height: 100%;
@@ -20,6 +24,32 @@
 	    background-position: center center;
 		background-repeat: no-repeat;
 		background-attachment: fixed;
+	}
+
+	.categories-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+	grid-gap: 10px;
+	/* You can adjust the minmax value and gap as needed */
+	}
+
+	.category-item {
+	display: flex;
+	align-items: center;
+	}
+
+	/* Media query for small screens */
+	@media (max-width: 768px) {
+	.categories-grid {
+		grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+		/* Adjust values for smaller screens */
+	}
+	}
+
+	.card {
+		max-width:800px;
+ 	 	justify-content: center;
+		margin: auto;
 	}
 
 	.header {

@@ -78,24 +78,22 @@
 	  <div class="card p-4 variant-glass-secondary">
 		<form on:submit={handleSubmit}>
 		  <label class="label">
-			<div class="body margin"><h1>Add a Prompt:</h1></div>
+			<div class="body padding"><h1>Add a Prompt:</h1></div>
 			<textarea name="prompt" bind:value={promptText} class="textarea" rows="2" placeholder="Enter Prompt" />
 		  </label>
 		  <label class="label">
 			<div class="body"><h2>Check Applicable Categories:</h2></div>
-			<ul class="columns">
+			<div class="categories-grid">
 			  {#each $selectedCategories as catItem, index}
-			  <li>
-				<label class="flex">
-				  <input name='categories' bind:checked={catItem.checked} class="checkbox" type="checkbox" value={catItem.value}/>
-				  {catItem.label}
-				</label>
-			  </li>
+			  <label class="category-item">
+				<input name='categories' bind:checked={catItem.checked} class="checkbox" type="checkbox" value={catItem.value}/>
+				{catItem.label}
+			  </label>
 			  {/each}
-			</ul>
+			</div>
 		  </label>
 		  <div class="text-center">
-			<button class="btn variant-filled-primary" type="submit">Submit</button>
+			<button class="btn variant-filled-primary margin" type="submit">Submit</button>
 		  </div>
 		</form>
 	  </div>
@@ -109,28 +107,16 @@
         padding: 1rem;
     }
 
-	.margin {
+	.padding {
 		padding: 15px;
+	}
+
+	.margin {
+		margin:2em;
 	}
 
 	.body h2 {
 		font-size: large;
 	}
-
-	ul.columns  { 
- 		margin: 0; 
-  		padding: 0; 
-  		margin-left: 10px; 
-  		list-style: none; 
-	} 
-
-	ul.columns li input { 
-  		margin-right: .25em; 
-	} 
-
-	ul.columns li { 
-		display:inline-block;
-		width:10em;
-	} 
 
 </style>
