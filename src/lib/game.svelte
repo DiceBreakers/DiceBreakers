@@ -4,7 +4,18 @@
 	import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
-	
+	import DicePortal from '$lib/components/dicePortal.svelte';
+
+    let rollDice = true;
+
+    function toggleDice() {
+        rollDice = !rollDice;
+        setTimeout(() => {
+            rollDice = false;
+        }, 4000); // Set rollDice back to false after 4000 milliseconds (4 seconds)
+    }
+
+
 	type CatItem = {
 	  value: string;
 	  label: string;
@@ -18,15 +29,16 @@
 	let generatedPrompts: { prompt: string; author: string }[] = [];
 	
 	onMount(() => {
+			toggleDice();
 	  catList.subscribe((list: CatItem[]) => {
 		selectedCategories.set(list);
 	  });
 	});
 	
 	async function generate(event: Event) {
-  event.preventDefault();
+  		event.preventDefault();
 
-  const formData = new FormData();
+  	const formData = new FormData();
 
   selectedCategories.subscribe((list: CatItem[]) => {
     list.forEach(catItem => {
@@ -45,7 +57,6 @@
 	if (response.ok) {
   const serverData = await response.json();
   const rawData = JSON.parse(serverData.data);
-
   // The prompt data is inside the array, so let's access it directly
   const promptData = JSON.parse(rawData[1]);
 
@@ -67,6 +78,7 @@
 
 	
 function displayNextPrompt() {
+	toggleDice();
   if (promptIndex < generatedPrompts.length) {
     const { prompt, author} = generatedPrompts[promptIndex];
     currentPrompt = prompt;
@@ -121,6 +133,9 @@ function displayNextPrompt() {
 		</svelte:fragment>
 	  </AccordionItem>
 	</Accordion>
+	{#if rollDice}
+		<DicePortal />
+	{/if}
   </div>
   
 			
