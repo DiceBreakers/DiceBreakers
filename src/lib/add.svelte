@@ -84,7 +84,7 @@
 		  <label class="label">
 			<div class="body"><h2>Check Applicable Categories:</h2></div>
 			<div class="categories-grid">
-			  {#each $selectedCategories as catItem, index}
+			  {#each $selectedCategories as catItem}
 			  <label class="category-item">
 				<input name='categories' bind:checked={catItem.checked} class="checkbox" type="checkbox" value={catItem.value}/>
 				{catItem.label}

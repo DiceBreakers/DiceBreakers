@@ -10,5 +10,8 @@
 </div>
 
 <style>
-
+    .header {
+        height: 280px; 
+        margin-top: -10px;
+    }
 </style>

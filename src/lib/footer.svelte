@@ -25,6 +25,8 @@
 <style>
     .footer {
         text-align: center;
+        height: 120px;
+        margin-top: -60px; /* Adjust this value as needed */
     }
     .footer a {
     padding: 15px;
