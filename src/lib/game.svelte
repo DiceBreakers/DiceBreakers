@@ -65,9 +65,6 @@
     author: obj.author,
   }));
 
-
-      // Display the first prompt when generated
-      displayNextPrompt();
     } else {
       console.error('Failed to generate prompts.');
     }
@@ -80,9 +77,9 @@
 function displayNextPrompt() {
 	toggleDice();
   if (promptIndex < generatedPrompts.length) {
-    const { prompt, author} = generatedPrompts[promptIndex];
-    currentPrompt = prompt;
-    currentAuthor = author; // Assuming you have a variable for displaying the author
+	const { prompt, author } = generatedPrompts[promptIndex];
+		currentPrompt = prompt;
+		currentAuthor = "Author: " + author; // Assuming you have a variable for displaying the author
     promptIndex++;
   } else {
     currentPrompt = "No more prompts"; // Optional message when there are no more prompts
@@ -128,7 +125,7 @@ function displayNextPrompt() {
 				  {currentPrompt}	
 				</div>	
 				<button class="btn variant-filled-primary margin" on:click={displayNextPrompt}>Roll the Dice</button>
-				<div class="right">Author: {currentAuthor}</div>
+				<div class="right">{currentAuthor}</div>
 			  </div>
 		</svelte:fragment>
 	  </AccordionItem>
