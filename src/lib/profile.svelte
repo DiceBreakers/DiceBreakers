@@ -17,10 +17,12 @@
 				<button class="btn btn-sm variant-filled-primary">Change Email</button>
 			</form>
 			<form action="?/updatePassword" method="POST">
-				<h2><Input label="Current Password:" id="oldPassword" type="password" required /></h2>				
-				<h2><Input label="New Password:" id="password"  type="password" required /></h2>
+				<div class="heading"><h1>Change Password?</h1></div>
+				<h2><Input label="Current:" id="oldPassword" type="password" required /></h2>				
+				<h2><Input label="New:" id="password" type="password" required /></h2>
 				<h2><Input label="Confirm:" id="passwordConfirm" type="password" required /></h2>
 				<button class="btn btn-sm variant-filled-primary">Change Password</button>
+				<a href="/reset" class="button btn btn-sm varient-filled-primary">Forgot pw?</a>
 			</form>
 		</div>
 	</div>	
@@ -33,4 +35,10 @@
 	.btn {
         margin-bottom: 15px;
     }
+
+	.heading {
+		padding:1em
+	}
+
+
 </style>

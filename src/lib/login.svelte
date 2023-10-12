@@ -1,6 +1,13 @@
 <script>
 	import { applyAction, enhance } from '$app/forms'
     import { pb } from '$lib/pocketbase'
+
+	export let showMenu = false;
+
+    const closeMenu = () => {
+        showMenu = false;
+    }
+
 </script>
 <div class="center">
 <h2>Login:</h2>
@@ -17,6 +24,7 @@
 		<input type="email" name="email" placeholder="Email" class="input" />
 	  <input type="password" name="password" placeholder="Password" class="input" />
 	  <button class="btn btn-sm variant-filled-primary">Login</button>
+	  <a on:click={closeMenu} href="/reset" class="button btn btn-sm varient-filled-primary">Forgot pw?</a>
   </form>
   <h2>or register:</h2>
   <form

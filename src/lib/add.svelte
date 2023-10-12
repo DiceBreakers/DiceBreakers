@@ -55,10 +55,11 @@
 			}));
 		  });
   
-		  // Optionally, reset the form fields after a delay
+		  promptText = ''; // Reset the prompt text
+
 		  setTimeout(() => {
-			promptText = ''; // Reset the prompt text
-		  }, 3000); // Reset after 3 seconds
+			showSuccessMessage = false;
+		  }, 1500);
 		} else {
 		  console.error('Failed to submit prompt.');
 		}

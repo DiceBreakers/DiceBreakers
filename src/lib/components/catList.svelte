@@ -79,7 +79,7 @@
 		},
 		{
 			value: 'activities',
-			label: 'Activies',
+			label: 'Activities',
 			checked: false,
 		},
 		{
