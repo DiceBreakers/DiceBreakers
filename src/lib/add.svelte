@@ -1,15 +1,26 @@
 <script lang="ts">
 	import '../app.postcss';
 	import { catList } from './components/catList.svelte';
-	import SuccessMessage from './components/successMessage.svelte';
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
+	import SuccessMessage from './components/successMessage.svelte';
+	import { popup } from '@skeletonlabs/skeleton';
+	import type { PopupSettings } from '@skeletonlabs/skeleton';
+
+	const Hover: PopupSettings = {
+	event: 'hover',
+	target: 'popupHover',
+	placement: 'top'
+};
+
+
   
 	// Define the type for catItem
 	type CatItem = {
 	  value: string;
 	  label: string;
 	  checked: boolean;
+	  tooltip: string
 	};
   
 	let showSuccessMessage = false; // Declare the showSuccessMessage variable
@@ -81,17 +92,24 @@
 			<div class="body padding"><h1>Add a Prompt:</h1></div>
 			<textarea name="prompt" bind:value={promptText} class="textarea" rows="2" placeholder="Enter Prompt" />
 		  </label>
-		  <label class="label">
-			<div class="body"><h2>Check Applicable Categories:</h2></div>
-			<div class="categories-grid">
-			  {#each $selectedCategories as catItem}
-			  <label class="category-item">
-				<input name='categories' bind:checked={catItem.checked} class="checkbox" type="checkbox" value={catItem.value}/>
-				{catItem.label}
-			  </label>
-			  {/each}
-			</div>
-		  </label>
+		  <form>
+			<label class="label">
+			  <div class="body"><h2>Check Applicable Categories:</h2></div>
+			  <div class="categories-grid">
+				{#each $selectedCategories as catItem, i}
+				<label class="category-item">
+				  <input name='categories' bind:checked={catItem.checked}
+				   class="checkbox" type="checkbox" value={catItem.value} title={catItem.tooltip}>
+				  <span>{catItem.label}
+				  <div class="fa-solid fa-circle-info"
+					use:popup={{ event: 'hover', target: 'loopExample-' + i,
+					placement: 'top' }}></div></span>
+					<div class="popup" data-popup="loopExample-{i}">{catItem.tooltip}</div>
+				</label>
+				{/each}
+			  </div>
+			</label>
+		  </form>
 		  <div class="text-center">
 			<button class="btn variant-filled-primary margin" type="submit">Submit</button>
 		  </div>
@@ -99,13 +117,20 @@
 	  </div>
 	</div>
   </section>
-  
+
   
 			
 <style>
     .card {
         padding: 1rem;
     }
+
+	.popup {
+		background-color: #0b3861;
+		color: #8FE0F7;
+		padding: 5px;
+		border-radius: 5px;
+	}
 
 	.padding {
 		padding: 15px;

@@ -4,11 +4,17 @@
 	import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
-	import { fade } from 'svelte/transition';
-	import { fly } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 	import { slide } from 'svelte/transition';
 	import DicePortal from '$lib/components/dicePortal.svelte';
+	import { popup } from '@skeletonlabs/skeleton';
+	import type { PopupSettings } from '@skeletonlabs/skeleton';
+
+	const Hover: PopupSettings = {
+	event: 'hover',
+	target: 'popupHover',
+	placement: 'top'
+};
 
     let rollDice = true;
 
@@ -24,12 +30,13 @@
 	  value: string;
 	  label: string;
 	  checked: boolean;
+	  tooltip: string;
 	};
 	
 	let selectedCategories = writable<CatItem[]>([]);
 	let currentPrompt = "";
 	let currentAuthor = "";
-	let promptIndex = 1;
+	let promptIndex = 0;
 	let generatedPrompts: { prompt: string; author: string }[] = [];
 	
 	onMount(() => {
@@ -41,6 +48,7 @@
 	
 	async function generate(event: Event) {
   		event.preventDefault();
+		toggleDice();
 
   	const formData = new FormData();
 
@@ -68,6 +76,7 @@
     prompt: obj.prompt,
     author: obj.author,
   }));
+  displayFirstPrompt();
 
     } else {
       console.error('Failed to generate prompts.');
@@ -77,6 +86,17 @@
   }
 }
 
+function displayFirstPrompt() {
+  if (promptIndex < generatedPrompts.length) {
+	const { prompt, author } = generatedPrompts[promptIndex];
+		currentPrompt = prompt;
+		currentAuthor = "Author: " + author; // Assuming you have a variable for displaying the author
+    promptIndex++;
+  } else {
+    currentPrompt = '';
+	currentAuthor = ''; // Optional message when there are no more prompts
+  }
+}
 	
 function displayNextPrompt() {
 	toggleDice();
@@ -86,7 +106,8 @@ function displayNextPrompt() {
 		currentAuthor = "Author: " + author; // Assuming you have a variable for displaying the author
     promptIndex++;
   } else {
-    currentPrompt = "No more prompts"; // Optional message when there are no more prompts
+    currentPrompt = '';
+	currentAuthor = ''; // Optional message when there are no more prompts
   }
 }
   </script>
@@ -101,12 +122,17 @@ function displayNextPrompt() {
 			<label class="label">
 				<div class="body"><h2>Check Applicable Categories:</h2></div>
 				<div class="categories-grid">
-				  {#each $selectedCategories as catItem}
-				  <label class="category-item">
-					<input name='categories' bind:checked={catItem.checked} class="checkbox" type="checkbox" value={catItem.value}/>
-					{catItem.label}
-				  </label>
-				  {/each}
+					{#each $selectedCategories as catItem, i}
+					<label class="category-item">
+					  <input name='categories' bind:checked={catItem.checked}
+					   class="checkbox" type="checkbox" value={catItem.value} title={catItem.tooltip}>
+					  <span>{catItem.label}
+					  <div class="fa-solid fa-circle-info"
+						use:popup={{ event: 'hover', target: 'loopExample-' + i,
+						placement: 'top' }}></div></span>
+						<div class="popup" data-popup="loopExample-{i}">{catItem.tooltip}</div>
+					</label>
+					{/each}
 				</div>
 			  </label>
 		  </form>
@@ -118,7 +144,7 @@ function displayNextPrompt() {
 		<svelte:fragment slot="content">
 			{#key promptIndex}
 			<div class="text-center margin"
-			in:slide={{ delay: 3750, duration: 1000, easing: quintOut, axis: 'x' }}
+			in:slide={{ delay: 3600, duration: 1000, easing: quintOut, axis: 'x' }}
 			out:slide={{ delay: 100, duration: 500, easing: quintOut, axis: 'x' }}>
 				<div id="prompt">
 				  {currentPrompt}</div>				
@@ -149,6 +175,13 @@ function displayNextPrompt() {
 
 	.right {
 		text-align: right;
+	}
+
+	.popup {
+		background-color: #0b3861;
+		color: #8FE0F7;
+		padding: 5px;
+		border-radius: 5px;
 	}
 
 </style>
