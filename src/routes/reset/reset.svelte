@@ -1,6 +1,7 @@
 <script>
+    import SuccessMessage from "../../lib/components/successMessage.svelte";
 	let form;
-    import SuccessMessage from "./components/successMessage.svelte";
+
 </script>
 
 <div class="flex flex-col items-center h-full w-full">
@@ -9,7 +10,7 @@
 	</h2>
 	<p class="text-center mt-1">We'll send you an email with a link to reset your password.</p>
 	<form
-		action="?/resetPassword"
+		action="?/resetPasswordInit"
 		method="POST"
 		class="flex flex-col items-center space-y-2 w-full pt-4"
 	>

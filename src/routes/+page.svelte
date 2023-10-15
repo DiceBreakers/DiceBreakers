@@ -1,8 +1,8 @@
 <script>
-  import Header from '$lib/header.svelte'
-  import Body from '$lib/body.svelte'
-  import About from '$lib/about.svelte'
-  import Footer from '$lib/footer.svelte'
+  import Header from '$lib/components/header.svelte'
+  import Body from './body.svelte'
+  import About from './about.svelte'
+  import Footer from '$lib/components/footer.svelte'
 </script>
 
 

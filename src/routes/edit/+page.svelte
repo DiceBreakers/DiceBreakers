@@ -1,7 +1,7 @@
 <script>
-  import Header from '$lib/header.svelte'
-  import Edit from '$lib/edit.svelte';
-  import Footer from '$lib/footer.svelte'
+  import Header from '$lib/components/header.svelte'
+  import Edit from './edit.svelte';
+  import Footer from '$lib/components/footer.svelte'
 </script>
 
 

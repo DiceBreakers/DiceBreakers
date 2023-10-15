@@ -5,8 +5,10 @@
 
 /* modern theme */
 @font-face {
-	font-family: 'Quicksand';
-	src: url('/fonts/Quicksand.ttf');
+	/* Reference name */
+	font-family: 'Oswald';
+	/* For multiple files use commas, ex: url(), url(), ... */
+	src: url('/fonts/Osawald-VariableFont_opsz,wght.ttf');
 	font-display: swap;
 }
 
@@ -26,9 +28,33 @@
 		background-attachment: fixed;
 	}
 
-	.fa-circle-info {
-		margin: 2px;
+
+	.checkboxSize {
+/* Double-sized Checkboxes */
+		-ms-transform: scale(.8); /* IE */
+		-moz-transform: scale(.8); /* FF */
+		-webkit-transform: scale(.8); /* Safari and Chrome */
+		-o-transform: scale(.8); /* Opera */
+		transform: scale(.8);
+		margin-right: 2px; /* Increase the spacing to separate checkboxes */
 	}
+
+	.checkboxSM {		
+ 
+/* Additional styling for checkboxes (optional) */
+		display: flex; /* Align label and checkbox horizontally */
+		align-items: center; /* Center vertically */
+		font-size: max(12px, 1vmax);
+		font-weight: bold;
+	}
+
+	.popup {
+		background-color: #0b3861;
+		color: #8FE0F7;
+		padding: 5px;
+		border-radius: 5px;
+	}
+
 
 	.categories-grid {
 	display: grid;
@@ -54,6 +80,10 @@
 		max-width:800px;
  	 	justify-content: center;
 		margin: auto;
+	}
+
+	.fa-circle-info {
+		margin: 2px;
 	}
 
 	.header {

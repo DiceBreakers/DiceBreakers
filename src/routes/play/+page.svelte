@@ -1,7 +1,7 @@
 <script>
-    import Header from '$lib/headerSM.svelte'
-    import Footer from '$lib/footer.svelte'
-    import Game from '$lib/game.svelte';
+    import Header from '$lib/components/headerSM.svelte'
+    import Footer from '$lib/components/footer.svelte'
+    import Game from './game.svelte';
 
 </script>
 

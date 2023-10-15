@@ -1,9 +1,8 @@
 <script lang="ts">
-	import '../app.postcss';
-	import { catList } from './components/catList.svelte';
+	import { catList } from '../../lib/components/catList.svelte';
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
-	import SuccessMessage from './components/successMessage.svelte';
+	import SuccessMessage from '../../lib/components/successMessage.svelte';
 	import { popup } from '@skeletonlabs/skeleton';
 	import type { PopupSettings } from '@skeletonlabs/skeleton';
 
@@ -12,9 +11,7 @@
 	target: 'popupHover',
 	placement: 'top'
 };
-
-
-  
+ 
 	// Define the type for catItem
 	type CatItem = {
 	  value: string;
@@ -84,6 +81,7 @@
 	<SuccessMessage />
   {/if}
   
+
   <section id="addPrompt">
 	<div class="card p-4">
 	  <div class="card p-4 variant-glass-secondary">
@@ -99,11 +97,11 @@
 				{#each $selectedCategories as catItem, i}
 				<label class="category-item">
 				  <input name='categories' bind:checked={catItem.checked}
-				   class="checkbox" type="checkbox" value={catItem.value} title={catItem.tooltip}>
-				  <span>{catItem.label}
+				   class="checkbox checkboxSize" type="checkbox" value={catItem.value} title={catItem.tooltip}>
+				  <span class="checkboxSM">{catItem.label}</span>
 				  <div class="fa-solid fa-circle-info"
 					use:popup={{ event: 'hover', target: 'loopExample-' + i,
-					placement: 'top' }}></div></span>
+					placement: 'top' }}></div>
 					<div class="popup" data-popup="loopExample-{i}">{catItem.tooltip}</div>
 				</label>
 				{/each}
@@ -121,16 +119,10 @@
   
 			
 <style>
+
     .card {
         padding: 1rem;
     }
-
-	.popup {
-		background-color: #0b3861;
-		color: #8FE0F7;
-		padding: 5px;
-		border-radius: 5px;
-	}
 
 	.padding {
 		padding: 15px;

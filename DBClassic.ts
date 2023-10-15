@@ -5,8 +5,8 @@ export const CustomDBClassic: CustomThemeConfig = {
     name: 'DBClassic',
     properties: {
 		// =~= Theme Properties =~=
-		"--theme-font-family-base": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-		"--theme-font-family-heading": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
+		"--theme-font-family-base": "Oswald",
+		"--theme-font-family-heading": "Oswald",
 		"--theme-font-color-base": "11 56 97",
 		"--theme-font-color-dark": "255 255 255",
 		"--theme-rounded-base": "2px",

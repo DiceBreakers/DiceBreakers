@@ -1,9 +1,8 @@
 <script>
-    import { fade, slide, scale } from 'svelte/transition'
+    import { fade, slide } from 'svelte/transition'
     import { applyAction, enhance } from '$app/forms'
     import { pb } from '$lib/pocketbase'
     import { currentUser } from '$lib/stores/user'
-    import '../app.postcss'
     import Login from './login.svelte'
 
     export let showMenu = false;

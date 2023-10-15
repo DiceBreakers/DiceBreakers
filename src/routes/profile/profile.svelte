@@ -1,5 +1,5 @@
 <script>
-	import Input from "./components/input.svelte";
+	import Input from "../../lib/components/input.svelte";
     import { currentUser } from '$lib/stores/user'
 
 	// - unused? - export let data
@@ -18,9 +18,9 @@
 			</form>
 			<form action="?/updatePassword" method="POST">
 				<div class="heading"><h1>Change Password?</h1></div>
-				<h2><Input label="Current:" id="oldPassword" type="password" required /></h2>				
-				<h2><Input label="New:" id="password" type="password" required /></h2>
-				<h2><Input label="Confirm:" id="passwordConfirm" type="password" required /></h2>
+				<h2><Input label="Current Password" placeholder="Current Password" id="oldPassword" type="password" required /></h2>				
+				<h2><Input label="New Password" placeholder="New Password" id="password" type="password" required /></h2>
+				<h2><Input label="Confirm New Password" placeholder="Confirm New Password" id="passwordConfirm" type="password" required /></h2>
 				<button class="btn btn-sm variant-filled-primary">Change Password</button>
 				<a href="/reset" class="button btn btn-sm varient-filled-primary">Forgot pw?</a>
 			</form>

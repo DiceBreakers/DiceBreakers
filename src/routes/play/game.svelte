@@ -1,6 +1,5 @@
 <script lang="ts">
-	import '../app.postcss';
-	import { catList } from './components/catList.svelte';
+	import { catList } from '../../lib/components/catList.svelte';
 	import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
@@ -125,8 +124,8 @@ function displayNextPrompt() {
 					{#each $selectedCategories as catItem, i}
 					<label class="category-item">
 					  <input name='categories' bind:checked={catItem.checked}
-					   class="checkbox" type="checkbox" value={catItem.value} title={catItem.tooltip}>
-					  <span>{catItem.label}
+					   class="checkbox checkboxSize" type="checkbox" value={catItem.value} title={catItem.tooltip}>
+					  <span class="checkboxSM">{catItem.label}
 					  <div class="fa-solid fa-circle-info"
 						use:popup={{ event: 'hover', target: 'loopExample-' + i,
 						placement: 'top' }}></div></span>
@@ -175,13 +174,6 @@ function displayNextPrompt() {
 
 	.right {
 		text-align: right;
-	}
-
-	.popup {
-		background-color: #0b3861;
-		color: #8FE0F7;
-		padding: 5px;
-		border-radius: 5px;
 	}
 
 </style>

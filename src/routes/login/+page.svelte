@@ -1,8 +1,8 @@
 <script>
-  import Header from '$lib/header.svelte'
-  import Login from '$lib/login.svelte'
-  import Footer from '$lib/footer.svelte'
-  import Menu from '$lib/menu.svelte';
+  import Header from '$lib/components/header.svelte'
+  import Login from '$lib/components/login.svelte'
+  import Footer from '$lib/components/footer.svelte'
+  import Menu from '$lib/components/menu.svelte';
 
 </script>
 

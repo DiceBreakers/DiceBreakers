@@ -1,7 +1,7 @@
 <script>
-  import Header from '$lib/header.svelte'
-  import AddPrompt from '$lib/add.svelte';
-  import Footer from '$lib/footer.svelte'
+  import Header from '$lib/components/header.svelte'
+  import AddPrompt from './add.svelte';
+  import Footer from '$lib/components/footer.svelte'
 </script>
 
 
