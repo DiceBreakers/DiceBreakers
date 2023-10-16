@@ -36,7 +36,7 @@
 			value: 'heavy',
 			label: 'Heavy',
 			checked: false,
-			tooltip: 'This category could hit a bit harder...',
+			tooltip: 'These prompts could touch on heavy or sensitive topics.',
 		},
 		{
 			value: 'kids',

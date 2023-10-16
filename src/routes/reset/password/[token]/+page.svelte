@@ -12,7 +12,6 @@
   onMount(() => {
     token = data.props.token;
     console.log({ token });
-    console.log('data:', data)
   });
 
 </script>

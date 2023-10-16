@@ -47,9 +47,9 @@
 {/if}
 <div class="navToggle" on:click={toggleMenu} on:keydown={toggleMenu}>
     {#if showMenu}
-    <img src="x.svg" alt="Account Icon" class="icon" transition:slide={{ duration:800, axis:'y'}}/>
+    <img src="/x.svg" alt="Account Icon" class="icon" transition:slide={{ duration:800, axis:'y'}}/>
     {:else}
-    <img src="account.svg" alt="Account Icon" class="icon" transition:slide={{ duration:800, axis:'y'}} />
+    <img src="/account.svg" alt="Account Icon" class="icon" transition:slide={{ duration:800, axis:'y'}} />
     {/if}
 </div>
 
