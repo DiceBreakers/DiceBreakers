@@ -22,7 +22,7 @@
 
   
   <div class="dice">
-  <LottiePlayer class="dice"
+  <LottiePlayer
     src="/dicePortal.json"
     autoplay="{true}"
     loop="{true}"
