@@ -15,14 +15,15 @@
 	placement: 'top'
 };
 
-    let rollDice = false;
+    let rollDice = true;
 
-	function toggleDice() {
+    function toggleDice() {
         rollDice = !rollDice;
         setTimeout(() => {
             rollDice = false;
         }, 4000); // Set rollDice back to false after 4000 milliseconds (4 seconds)
     }
+
 
 	type CatItem = {
 	  value: string;
@@ -32,21 +33,17 @@
 	};
 	
 	let selectedCategories = writable<CatItem[]>([]);
-	let primaryCategories = writable<CatItem[]>([]);
-	let additionalCategories = writable<CatItem[]>([]);
 	let currentPrompt = "";
 	let currentAuthor = "";
 	let promptIndex = 0;
 	let generatedPrompts: { prompt: string; author: string }[] = [];
 	
 	onMount(() => {
-        catList.subscribe((list: CatItem[]) => {
-            selectedCategories.set(list);
-            const categories = list;
-            primaryCategories.set(categories.slice(0, 6)); // Adjust the number as needed
-            additionalCategories.set(categories.slice(6));
-        });
-    });
+			toggleDice();
+	  catList.subscribe((list: CatItem[]) => {
+		selectedCategories.set(list);
+	  });
+	});
 	
 	async function generate(event: Event) {
   		event.preventDefault();
@@ -113,22 +110,18 @@ function displayNextPrompt() {
   }
 }
   </script>
-
-  
   
   <div class="card p-4">
 	<Accordion autocollapse>
 	  <AccordionItem open>
 		<svelte:fragment slot="lead"><i class="fa-solid fa-lg fa-gear" style="color: #1673c5;"></i></svelte:fragment>
-		<svelte:fragment slot="summary">Game Settings:</svelte:fragment>
+		<svelte:fragment slot="summary">Categories</svelte:fragment>
 		<svelte:fragment slot="content">
-			<Accordion autocollapse>
-				<AccordionItem open>
-					<svelte:fragment slot="summary">Primary Categories:</svelte:fragment>
-					<svelte:fragment slot="content">
+		  <form>
 			<label class="label">
+				<div class="body"><h2>Check Applicable Categories:</h2></div>
 				<div class="categories-grid">
-					{#each $primaryCategories as catItem, i}
+					{#each $selectedCategories as catItem, i}
 					<label class="category-item">
 					  <input name='categories' bind:checked={catItem.checked}
 					   class="checkbox checkboxSize" type="checkbox" value={catItem.value} title={catItem.tooltip}>
@@ -141,30 +134,8 @@ function displayNextPrompt() {
 					{/each}
 				</div>
 			  </label>
-			</svelte:fragment>
-			</AccordionItem>
-			<AccordionItem>
-				<svelte:fragment slot="summary">Oddly Specific Categories:</svelte:fragment>
-				<svelte:fragment slot="content">
-				<label class="label">
-					<div class="categories-grid">
-						{#each $additionalCategories as catItem, i}
-						<label class="category-item">
-						  <input name='categories' bind:checked={catItem.checked}
-						   class="checkbox checkboxSize" type="checkbox" value={catItem.value} title={catItem.tooltip}>
-						  <span class="checkboxSM">{catItem.label}
-						  <div class="fa-solid fa-circle-info"
-							use:popup={{ event: 'hover', target: 'loopExample-' + i,
-							placement: 'top' }}></div></span>
-							<div class="popup" data-popup="loopExample-{i}">{catItem.tooltip}</div>
-						</label>
-						{/each}
-					</div>
-				  </label>
-				</svelte:fragment>
-			</AccordionItem>
-		</Accordion>
-	</svelte:fragment>
+		  </form>
+		</svelte:fragment>
 	  </AccordionItem>
 	  <AccordionItem on:toggle={generate}>
 		<svelte:fragment slot="lead"><img src="favicon.png" alt="Dice Icon" width="21px" /></svelte:fragment>

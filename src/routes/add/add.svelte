@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { catList } from '../../lib/components/catList.svelte';
+	import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 	import SuccessMessage from '../../lib/components/successMessage.svelte';
@@ -22,14 +23,18 @@
   
 	let showSuccessMessage = false; // Declare the showSuccessMessage variable
 	let promptText = '';
-	let selectedCategories = writable<CatItem[]>([]); // Create a writable store for selected categories
-  
+	let selectedCategories = writable<CatItem[]>([]);
+	let primaryCategories = writable<CatItem[]>([]);
+	let additionalCategories = writable<CatItem[]>([]);
+
 	onMount(() => {
-	  // Initialize selectedCategories when the component mounts
-	  catList.subscribe((list: CatItem[]) => {
-		selectedCategories.set(list);
-	  });
-	});
+        catList.subscribe((list: CatItem[]) => {
+            selectedCategories.set(list);
+            const categories = list;
+            primaryCategories.set(categories.slice(0, 6)); // Adjust the number as needed
+            additionalCategories.set(categories.slice(6));
+        });
+    });
   
 	async function handleSubmit(event: Event) {
 	  event.preventDefault();
@@ -90,24 +95,48 @@
 			<div class="body padding"><h1>Add a Prompt:</h1></div>
 			<textarea name="prompt" bind:value={promptText} class="textarea" rows="2" placeholder="Enter Prompt" />
 		  </label>
-		  <form>
-			<label class="label">
-			  <div class="body"><h2>Check Applicable Categories:</h2></div>
-			  <div class="categories-grid">
-				{#each $selectedCategories as catItem, i}
+		  <Accordion>
+			<AccordionItem open>
+				<svelte:fragment slot="summary">Primary Categories:</svelte:fragment>
+				<svelte:fragment slot="content">
+		<label class="label">
+			<div class="categories-grid">
+				{#each $primaryCategories as catItem, i}
 				<label class="category-item">
 				  <input name='categories' bind:checked={catItem.checked}
 				   class="checkbox checkboxSize" type="checkbox" value={catItem.value} title={catItem.tooltip}>
-				  <span class="checkboxSM">{catItem.label}</span>
+				  <span class="checkboxSM">{catItem.label}
 				  <div class="fa-solid fa-circle-info"
 					use:popup={{ event: 'hover', target: 'loopExample-' + i,
-					placement: 'top' }}></div>
+					placement: 'top' }}></div></span>
 					<div class="popup" data-popup="loopExample-{i}">{catItem.tooltip}</div>
 				</label>
 				{/each}
-			  </div>
-			</label>
-		  </form>
+			</div>
+		  </label>
+		</svelte:fragment>
+		</AccordionItem>
+		<AccordionItem>
+			<svelte:fragment slot="summary">Oddly Specific Categories:</svelte:fragment>
+			<svelte:fragment slot="content">
+			<label class="label">
+				<div class="categories-grid">
+					{#each $additionalCategories as catItem, i}
+					<label class="category-item">
+					  <input name='categories' bind:checked={catItem.checked}
+					   class="checkbox checkboxSize" type="checkbox" value={catItem.value} title={catItem.tooltip}>
+					  <span class="checkboxSM">{catItem.label}
+					  <div class="fa-solid fa-circle-info"
+						use:popup={{ event: 'hover', target: 'loopExample-' + i,
+						placement: 'top' }}></div></span>
+						<div class="popup" data-popup="loopExample-{i}">{catItem.tooltip}</div>
+					</label>
+					{/each}
+				</div>
+			  </label>
+			</svelte:fragment>
+		</AccordionItem>
+	</Accordion>
 		  <div class="text-center">
 			<button class="btn variant-filled-primary margin" type="submit">Submit</button>
 		  </div>
@@ -130,10 +159,6 @@
 
 	.margin {
 		margin:2em;
-	}
-
-	.body h2 {
-		font-size: large;
 	}
 
 </style>

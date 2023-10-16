@@ -25,7 +25,7 @@
   <LottiePlayer
     src="/dicePortal.json"
     autoplay="{true}"
-    loop="{true}"
+    loop="{false}"
     controls="{false}"
     renderer="svg"
     background="transparent"
