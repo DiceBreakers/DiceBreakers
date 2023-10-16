@@ -104,6 +104,12 @@
 			checked: false,
 			tooltip: 'This, or that?',
 		},
+		{
+			value: 'quotes',
+			label: 'Quotes',
+			checked: false,
+			tooltip: 'Ponder and discuss some famous quotes.',
+		},
 	]);
 
 	
