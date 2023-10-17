@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { catList } from '../../lib/components/catList.svelte';
 	import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { quintOut } from 'svelte/easing';
-	import { slide } from 'svelte/transition';
-	import DicePortal from '$lib/components/dicePortal.svelte';
+	import { slide, fade } from 'svelte/transition';
+	import DicePortal from './dicePortal.svelte';
+	import { catList } from './catList.svelte';
 	import { popup } from '@skeletonlabs/skeleton';
 	import type { PopupSettings } from '@skeletonlabs/skeleton';
 
@@ -31,6 +31,7 @@
 	let currentAuthor = "";
 	let promptIndex = 0;
 	let generatedPrompts: { prompt: string; author: string }[] = [];
+	let animationPlayed = false;
 	
 	onMount(() => {
         catList.subscribe((list: CatItem[]) => {
@@ -42,11 +43,15 @@
     });
 
 	function toggleDice() {
-        rollDice = !rollDice;
-        setTimeout(() => {
-            rollDice = false;
-        }, 4000); // Set rollDice back to false after 4000 milliseconds (4 seconds)
+    rollDice = !rollDice;
+    if (!animationPlayed) {
+      animationPlayed = true; // Set animationPlayed to true when the animation is triggered
     }
+    setTimeout(() => {
+      rollDice = false;
+    }, 4000);
+  }
+
 	
 	async function generate(event: Event) {
   		event.preventDefault();
@@ -63,7 +68,7 @@
   });
 
   try {
-    const response = await fetch('/play?/generate', {
+    const response = await fetch('?/generate', {
       method: 'POST',
       body: formData,
     });
@@ -120,7 +125,7 @@ function displayNextPrompt() {
 	<Accordion autocollapse>
 	  <AccordionItem open>
 		<svelte:fragment slot="lead"><i class="fa-solid fa-lg fa-gear" style="color: #1673c5;"></i></svelte:fragment>
-		<svelte:fragment slot="summary">Game Settings:</svelte:fragment>
+		<svelte:fragment slot="summary">Settings:</svelte:fragment>
 		<svelte:fragment slot="content">
 			<Accordion autocollapse>
 				<AccordionItem open>
@@ -170,23 +175,27 @@ function displayNextPrompt() {
 		<svelte:fragment slot="lead"><img src="favicon.png" alt="Dice Icon" width="21px" /></svelte:fragment>
 		<svelte:fragment slot="summary">Play</svelte:fragment>
 		<svelte:fragment slot="content">
+			<div class="game"
+			in:fade={{ delay: 1000, duration: 100 }}>
+			{#if rollDice}
+				<DicePortal />
+			{/if}
 			{#key promptIndex}
-			<div class="text-center margin prompt"
+			<div class="prompts text-center"
 			in:slide={{ delay: 3600, duration: 1000, easing: quintOut, axis: 'x' }}
-			out:slide={{ delay: 100, duration: 500, easing: quintOut, axis: 'x' }}>
-				<div id="prompt">
-				  {currentPrompt}</div>				
+			out:slide={{ duration: 500, easing: quintOut, axis: 'x' }}>
+				<div id="prompt">{currentPrompt}</div>
+				{#if animationPlayed}
 				<button class="btn variant-filled-primary margin" on:click={displayNextPrompt}>Roll the Dice</button>
-				<div class="right">
-				{currentAuthor}</div>
-				</div>
+				{/if}
+				<div class="right">{currentAuthor}</div>
+	  		</div>
 			{/key}
-		</svelte:fragment>
+			</div>
+		  </svelte:fragment>
 	  </AccordionItem>
 	</Accordion>
-	{#if rollDice}
-		<DicePortal />
-	{/if}
+
   </div>
   
 			
@@ -197,16 +206,16 @@ function displayNextPrompt() {
 		margin:2em;
 	}
 
-    .card {
-        padding: 1rem;
-    }
-
 	.right {
 		text-align: right;
 	}
 
-	.prompt {
-		height: 200px;
+	.game {
+		position: relative;
+		display: flex;
+    	justify-content: center; /* Center horizontally */
+		align-items: center; /* Center vertically */
+  		height: 40vh;
 	}
 
 </style>

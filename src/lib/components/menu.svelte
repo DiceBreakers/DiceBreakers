@@ -13,7 +13,7 @@
 </script>
 
 {#if showMenu}
-<div class="backdrop" on:click|self={toggleMenu} on:keydown|self={toggleMenu} transition:fade>
+<div class="backdrop" role="button" tabindex="0" on:click|self={toggleMenu} on:keydown|self={toggleMenu} transition:fade>
   <nav class="nav menu"
   in:slide={{ duration:800, axis:'x'}}
   out:slide={{ delay:800, duration:800, axis:'x'}}>
@@ -22,7 +22,7 @@
         {#if $currentUser}
         <li><a href="add" on:click={toggleMenu}>Add Custom Prompts</a></li>
         <li><a href="edit" on:click={toggleMenu}>Edit Your Prompts</a></li>
-        <br><li><a href="play" on:click={toggleMenu}>Play!</a></li>
+        <br><li><a href="/#game" on:click={toggleMenu}>Play!</a></li>
         <li class="topMarginL"><a href="/" on:click={toggleMenu}>Home</a></li>
         <br><li><a href="profile" on:click={toggleMenu}>Account Settings</a></li>
             <form method="POST" action="/logout" use:enhance={() => {
@@ -45,7 +45,7 @@
 </nav>
 </div>
 {/if}
-<div class="navToggle" on:click={toggleMenu} on:keydown={toggleMenu}>
+<div class="navToggle" role="button" tabindex="0" on:click={toggleMenu} on:keydown={toggleMenu}>
     {#if showMenu}
     <img src="/x.svg" alt="Account Icon" class="icon" transition:slide={{ duration:800, axis:'y'}}/>
     {:else}

@@ -1,6 +1,7 @@
 <!-- App.svelte -->
 <script>
     import { LottiePlayer } from '@lottiefiles/svelte-lottie-player';
+    import { fade } from 'svelte/transition';
   
     let controlsLayout = [
       'previousFrame',
@@ -23,7 +24,7 @@
   
   <div class="dice">
   <LottiePlayer
-    src="/dicePortal.json"
+    src="./dicePortal.json"
     autoplay="{true}"
     loop="{false}"
     controls="{false}"
@@ -37,10 +38,11 @@
 
   <style>
     .dice {  
-        position: fixed;
-        top: 60%; /* Vertical center of the viewport */
-        left: 50%; /* Horizontally center */
+        position: sticky;
+        left: 50%;
+        margin-top: 300px;
         transform: translate(-50%, -50%); /* Center both vertically and horizontally */
         z-index: 1000;
+        
     }
   </style>

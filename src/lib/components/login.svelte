@@ -21,10 +21,10 @@
 		await applyAction(result)
 	  }
 	}}>
-		<input type="email" name="email" placeholder="Email" class="input" />
-	  <input type="password" name="password" placeholder="Password" class="input" />
-	  <button class="btn btn-sm variant-filled-primary">Login</button>
-	  <a on:click={closeMenu} href="/reset" class="button btn btn-sm">Forgot pw?</a>
+		<input type="email" name="email" placeholder="Email" class="input" autocomplete="email" />
+		<input type="password" name="password" placeholder="Password" class="input" />
+		<button class="btn btn-sm variant-filled-primary">Login</button>
+		<a on:click={closeMenu} href="/reset" class="button btn btn-sm">Forgot pw?</a>
   </form>
   <h2>or register:</h2>
   <form

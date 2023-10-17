@@ -1,8 +1,3 @@
-<script>
-
-</script>
-
-
 <div class="body center-text">
 	<div class="card p-4 variant-glass-tertiary">
 		<div class="card p-4">
@@ -23,15 +18,6 @@
 <!-- Custom Conversation Starter Google Sheet -->
 		<div class="card p-4 variant-glass-tertiary">
 				<div class="card p-4">
-					<header>
-						<h2><b>Variations:</b></h2>
-					</header>
-					<div>  
-					Nothing but time: Everyone answers<br/>
-					Quick Fire: Roller answers<br/>
-					Targeted: Roller's choice<br/>
-					Solo: Journal for yourself, or <a href="https://old.reddit.com/r/DiceBreakers/"><b>join us on Reddit!</b></a>
-					</div>
 					<header>
 						<h2><b>Physical Game:</b></h2>
 					</header>

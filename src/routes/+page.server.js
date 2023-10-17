@@ -7,7 +7,6 @@ export const actions = {
 
     try {
 
-        // Convert the category value to a string and then replace double quotes
         const categoriesString = selectedCategories.toString().replace(/,/g, '"||categories~"');
 
 		let generatedPrompts = [];
@@ -22,7 +21,7 @@ export const actions = {
 
 		generatedPrompts = records.map((record) => ({
 			prompt: record.prompt,
-			author: record.expand.author.username,
+			author: record.expand?.author.username,
 		  }));
       
 
