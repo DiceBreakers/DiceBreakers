@@ -17,13 +17,6 @@
 
     let rollDice = false;
 
-	function toggleDice() {
-        rollDice = !rollDice;
-        setTimeout(() => {
-            rollDice = false;
-        }, 4000); // Set rollDice back to false after 4000 milliseconds (4 seconds)
-    }
-
 	type CatItem = {
 	  value: string;
 	  label: string;
@@ -47,6 +40,13 @@
             additionalCategories.set(categories.slice(6));
         });
     });
+
+	function toggleDice() {
+        rollDice = !rollDice;
+        setTimeout(() => {
+            rollDice = false;
+        }, 4000); // Set rollDice back to false after 4000 milliseconds (4 seconds)
+    }
 	
 	async function generate(event: Event) {
   		event.preventDefault();
@@ -171,7 +171,7 @@ function displayNextPrompt() {
 		<svelte:fragment slot="summary">Play</svelte:fragment>
 		<svelte:fragment slot="content">
 			{#key promptIndex}
-			<div class="text-center margin"
+			<div class="text-center margin prompt"
 			in:slide={{ delay: 3600, duration: 1000, easing: quintOut, axis: 'x' }}
 			out:slide={{ delay: 100, duration: 500, easing: quintOut, axis: 'x' }}>
 				<div id="prompt">
@@ -203,6 +203,10 @@ function displayNextPrompt() {
 
 	.right {
 		text-align: right;
+	}
+
+	.prompt {
+		height: 200px;
 	}
 
 </style>

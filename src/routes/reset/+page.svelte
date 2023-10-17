@@ -5,6 +5,7 @@
 
   </script>
   
+
   <div class="bg_gradient">
       <Header />
   </div>
@@ -12,7 +13,7 @@
     <Reset />
   </div>
   <div class="bg_gradient">
-      <Footer />
+    <Footer />
   </div>
   
   <style>
