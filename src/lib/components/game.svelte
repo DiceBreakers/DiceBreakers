@@ -30,6 +30,7 @@
 	let currentPrompt = "";
 	let currentAuthor = "";
 	let promptIndex = 0;
+	let adjustedI;
 	let generatedPrompts: { prompt: string; author: string }[] = [];
 	let animationPlayed = false;
 	
@@ -37,7 +38,7 @@
         catList.subscribe((list: CatItem[]) => {
             selectedCategories.set(list);
             const categories = list;
-            primaryCategories.set(categories.slice(0, 6)); // Adjust the number as needed
+            primaryCategories.set(categories.slice(0, 6));
             additionalCategories.set(categories.slice(6));
         });
     });
@@ -76,7 +77,6 @@
 	if (response.ok) {
   const serverData = await response.json();
   const rawData = JSON.parse(serverData.data);
-  // The prompt data is inside the array, so let's access it directly
   const promptData = JSON.parse(rawData[1]);
 
   generatedPrompts = promptData.map(obj => ({
@@ -133,15 +133,15 @@ function displayNextPrompt() {
 					<svelte:fragment slot="content">
 			<label class="label">
 				<div class="categories-grid">
-					{#each $primaryCategories as catItem, i}
+					{#each $primaryCategories as catItem}
 					<label class="category-item">
 					  <input name='categories' bind:checked={catItem.checked}
 					   class="checkbox checkboxSize" type="checkbox" value={catItem.value} title={catItem.tooltip}>
 					  <span class="checkboxSM">{catItem.label}
-					  <div class="fa-solid fa-circle-info"
-						use:popup={{ event: 'hover', target: 'loopExample-' + i,
+						<div class="fa-solid fa-circle-info"
+						use:popup={{ event: 'hover', target: 'loopExample-' + catItem.value,
 						placement: 'top' }}></div></span>
-						<div class="popup" data-popup="loopExample-{i}">{catItem.tooltip}</div>
+						<div class="popup" data-popup="loopExample-{catItem.value}">{catItem.tooltip}</div>
 					</label>
 					{/each}
 				</div>
@@ -153,15 +153,15 @@ function displayNextPrompt() {
 				<svelte:fragment slot="content">
 				<label class="label">
 					<div class="categories-grid">
-						{#each $additionalCategories as catItem, i}
+						{#each $additionalCategories as catItem}
 						<label class="category-item">
 						  <input name='categories' bind:checked={catItem.checked}
 						   class="checkbox checkboxSize" type="checkbox" value={catItem.value} title={catItem.tooltip}>
 						  <span class="checkboxSM">{catItem.label}
-						  <div class="fa-solid fa-circle-info"
-							use:popup={{ event: 'hover', target: 'loopExample-' + i,
+							<div class="fa-solid fa-circle-info"
+							use:popup={{ event: 'hover', target: 'loopExample-' + catItem.value,
 							placement: 'top' }}></div></span>
-							<div class="popup" data-popup="loopExample-{i}">{catItem.tooltip}</div>
+							<div class="popup" data-popup="loopExample-{catItem.value}">{catItem.tooltip}</div>
 						</label>
 						{/each}
 					</div>

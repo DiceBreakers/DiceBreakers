@@ -101,15 +101,15 @@
 				<svelte:fragment slot="content">
 		<label class="label">
 			<div class="categories-grid">
-				{#each $primaryCategories as catItem, i}
+				{#each $primaryCategories as catItem}
 				<label class="category-item">
 				  <input name='categories' bind:checked={catItem.checked}
 				   class="checkbox checkboxSize" type="checkbox" value={catItem.value} title={catItem.tooltip}>
 				  <span class="checkboxSM">{catItem.label}
-				  <div class="fa-solid fa-circle-info"
-					use:popup={{ event: 'hover', target: 'loopExample-' + i,
+					<div class="fa-solid fa-circle-info"
+					use:popup={{ event: 'hover', target: 'loopExample-' + catItem.value,
 					placement: 'top' }}></div></span>
-					<div class="popup" data-popup="loopExample-{i}">{catItem.tooltip}</div>
+					<div class="popup" data-popup="loopExample-{catItem.value}">{catItem.tooltip}</div>
 				</label>
 				{/each}
 			</div>
@@ -121,15 +121,15 @@
 			<svelte:fragment slot="content">
 			<label class="label">
 				<div class="categories-grid">
-					{#each $additionalCategories as catItem, i}
+					{#each $additionalCategories as catItem}
 					<label class="category-item">
 					  <input name='categories' bind:checked={catItem.checked}
 					   class="checkbox checkboxSize" type="checkbox" value={catItem.value} title={catItem.tooltip}>
 					  <span class="checkboxSM">{catItem.label}
-					  <div class="fa-solid fa-circle-info"
-						use:popup={{ event: 'hover', target: 'loopExample-' + i,
+						<div class="fa-solid fa-circle-info"
+						use:popup={{ event: 'hover', target: 'loopExample-' + catItem.value,
 						placement: 'top' }}></div></span>
-						<div class="popup" data-popup="loopExample-{i}">{catItem.tooltip}</div>
+						<div class="popup" data-popup="loopExample-{catItem.value}">{catItem.tooltip}</div>
 					</label>
 					{/each}
 				</div>
