@@ -3,6 +3,7 @@
 	import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
+	import { readable } from 'svelte/store';
 	import SuccessMessage from '../../lib/components/successMessage.svelte';
 	import { popup } from '@skeletonlabs/skeleton';
 	import type { PopupSettings } from '@skeletonlabs/skeleton';
@@ -88,7 +89,6 @@
   
 
   <section id="addPrompt">
-	<div class="card p-4">
 	  <div class="card p-4 variant-glass-secondary">
 		<form on:submit={handleSubmit}>
 		  <label class="label">
@@ -103,7 +103,7 @@
 			<div class="categories-grid">
 				{#each $primaryCategories as catItem}
 				<label class="category-item">
-				  <input name='categories' bind:checked={catItem.checked}
+				  <input name='categories' checked={catItem.checked}
 				   class="checkbox checkboxSize" type="checkbox" value={catItem.value} title={catItem.tooltip}>
 				  <span class="checkboxSM">{catItem.label}
 					<div class="fa-solid fa-circle-info"
@@ -123,7 +123,7 @@
 				<div class="categories-grid">
 					{#each $additionalCategories as catItem}
 					<label class="category-item">
-					  <input name='categories' bind:checked={catItem.checked}
+					  <input name='categories' checked={catItem.checked}
 					   class="checkbox checkboxSize" type="checkbox" value={catItem.value} title={catItem.tooltip}>
 					  <span class="checkboxSM">{catItem.label}
 						<div class="fa-solid fa-circle-info"
@@ -142,16 +142,11 @@
 		  </div>
 		</form>
 	  </div>
-	</div>
   </section>
 
   
 			
 <style>
-
-    .card {
-        padding: 1rem;
-    }
 
 	.padding {
 		padding: 15px;

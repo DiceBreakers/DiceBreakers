@@ -16,7 +16,6 @@ export const actions = {
       expand: 'author',
       fields: 'expand.author.username,prompt',
       sort: '@random',
-			skipTotal: 1,
         });
 
 		generatedPrompts = records.map((record) => ({

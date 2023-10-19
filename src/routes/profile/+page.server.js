@@ -6,9 +6,9 @@ export const actions = {
 
     try {
       const { name } = await locals.pb.collection('users').update(locals?.user?.id, data);
-	  if (locals.user?.name !== null) {
-		locals.user.name = name;
-	  }
+      if (locals.user && locals.user.name !== null) {
+        locals.user.name = name;
+      }
 	} catch (err) {
       console.log('Error: ', err);
 
@@ -46,8 +46,10 @@ export const actions = {
           try {
             const { username } = await locals.pb
               .collection('users')
-              .update(locals.user.id, { username: data.username });
-            locals.user.username = username;
+              .update(locals.user?.id, { username: data.username });
+              if (locals.user && locals.user.username !== null) {
+                locals.user.username = username;
+              }
             return {
               success: true
             };

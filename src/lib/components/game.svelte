@@ -3,7 +3,7 @@
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { quintOut } from 'svelte/easing';
-	import { slide, fade } from 'svelte/transition';
+	import { slide } from 'svelte/transition';
 	import DicePortal from './dicePortal.svelte';
 	import { catList } from './catList.svelte';
 	import { popup } from '@skeletonlabs/skeleton';
@@ -15,7 +15,7 @@
 	placement: 'top'
 };
 
-    let rollDice = false;
+
 
 	type CatItem = {
 	  value: string;
@@ -30,9 +30,9 @@
 	let currentPrompt = "";
 	let currentAuthor = "";
 	let promptIndex = 0;
-	let adjustedI;
 	let generatedPrompts: { prompt: string; author: string }[] = [];
 	let animationPlayed = false;
+	let rollDice = false;
 	
 	onMount(() => {
         catList.subscribe((list: CatItem[]) => {
@@ -45,15 +45,32 @@
 
 	function toggleDice() {
     rollDice = !rollDice;
-    if (!animationPlayed) {
-      animationPlayed = true; // Set animationPlayed to true when the animation is triggered
-    }
-    setTimeout(() => {
-      rollDice = false;
-    }, 4000);
+    	setTimeout(() => {
+			if (!animationPlayed) {
+      			animationPlayed = true;
+   			}
+      		rollDice = false;
+    	}, 3800);
   }
 
-	
+  	function resetAnimation() {
+		animationPlayed = false;
+		currentPrompt = '';
+		currentAuthor = '';
+		promptIndex = 0;
+	}
+
+	function displayFirstPrompt() {
+  if (promptIndex < generatedPrompts.length) {
+	const { prompt, author } = generatedPrompts[promptIndex];
+		currentPrompt = prompt;
+		currentAuthor = "Author: " + author; // Assuming you have a variable for displaying the author
+    promptIndex++;
+  } else {
+    currentPrompt = '';
+	currentAuthor = 'We seem to have run out of prompts. Choose more categories to reshuffle!';
+  }
+}
 	async function generate(event: Event) {
   		event.preventDefault();
 		toggleDice();
@@ -93,17 +110,7 @@
   }
 }
 
-function displayFirstPrompt() {
-  if (promptIndex < generatedPrompts.length) {
-	const { prompt, author } = generatedPrompts[promptIndex];
-		currentPrompt = prompt;
-		currentAuthor = "Author: " + author; // Assuming you have a variable for displaying the author
-    promptIndex++;
-  } else {
-    currentPrompt = '';
-	currentAuthor = ''; // Optional message when there are no more prompts
-  }
-}
+
 	
 function displayNextPrompt() {
 	toggleDice();
@@ -123,12 +130,12 @@ function displayNextPrompt() {
   
   <div class="card p-4">
 	<Accordion autocollapse>
-	  <AccordionItem open>
+	  <AccordionItem open on:click={resetAnimation}> 
 		<svelte:fragment slot="lead"><i class="fa-solid fa-lg fa-gear" style="color: #1673c5;"></i></svelte:fragment>
 		<svelte:fragment slot="summary">Settings:</svelte:fragment>
 		<svelte:fragment slot="content">
 			<Accordion autocollapse>
-				<AccordionItem open>
+				<AccordionItem open on:click={resetAnimation}>
 					<svelte:fragment slot="summary">Primary Categories:</svelte:fragment>
 					<svelte:fragment slot="content">
 			<label class="label">
@@ -148,7 +155,7 @@ function displayNextPrompt() {
 			  </label>
 			</svelte:fragment>
 			</AccordionItem>
-			<AccordionItem>
+			<AccordionItem on:click={resetAnimation}>
 				<svelte:fragment slot="summary">Oddly Specific Categories:</svelte:fragment>
 				<svelte:fragment slot="content">
 				<label class="label">
@@ -175,8 +182,7 @@ function displayNextPrompt() {
 		<svelte:fragment slot="lead"><img src="favicon.png" alt="Dice Icon" width="21px" /></svelte:fragment>
 		<svelte:fragment slot="summary">Play</svelte:fragment>
 		<svelte:fragment slot="content">
-			<div class="game"
-			in:fade={{ delay: 1000, duration: 100 }}>
+			<div class="game">
 			{#if rollDice}
 				<DicePortal />
 			{/if}
@@ -185,7 +191,7 @@ function displayNextPrompt() {
 			in:slide={{ delay: 3600, duration: 1000, easing: quintOut, axis: 'x' }}
 			out:slide={{ duration: 500, easing: quintOut, axis: 'x' }}>
 				<div id="prompt">{currentPrompt}</div>
-				{#if animationPlayed}
+				{#if animationPlayed = true}
 				<button class="btn variant-filled-primary margin" on:click={displayNextPrompt}>Roll the Dice</button>
 				{/if}
 				<div class="right">{currentAuthor}</div>
@@ -195,7 +201,6 @@ function displayNextPrompt() {
 		  </svelte:fragment>
 	  </AccordionItem>
 	</Accordion>
-
   </div>
   
 			
