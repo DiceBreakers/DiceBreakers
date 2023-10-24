@@ -2,7 +2,7 @@
 
   import { onMount } from 'svelte';
   import Header from '$lib/components/header.svelte';
-  import SuccessMessage from "$lib/components/successMessage.svelte";
+  import ServerMessage from "$lib/components/serverMessage.svelte";
   import Footer from '$lib/components/footer.svelte';
   let form;
   let token;
@@ -39,7 +39,7 @@
         <button type="submit" class="btn btn-sm variant-filled-primary">Complete Password Reset</button>
       </div>
       {#if form?.success}
-              <SuccessMessage />
+              <ServerMessage />
       {/if}
     </form>
   </div>

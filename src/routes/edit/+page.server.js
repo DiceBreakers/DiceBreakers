@@ -13,13 +13,14 @@ export const actions = {
           if (locals.user && locals.user.name !== null) {
           let records = await locals.pb.collection('prompts').getFullList({
         filter: `(categories~"${categoriesString}") && author.username = "${locals.user.username}"`,
-        fields: 'categories,prompt',
+        fields: 'categories,prompt,id',
         sort: '-created',
           });
         
           userPrompts = records.map((record) => ({
               prompt: record.prompt,
               categories: record.categories,
+              id: record.id,
             }));
         };
   

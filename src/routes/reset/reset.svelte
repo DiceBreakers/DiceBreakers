@@ -1,5 +1,5 @@
 <script>
-    import SuccessMessage from "../../lib/components/successMessage.svelte";
+    import ServerMessage from "../../lib/components/serverMessage.svelte";
 	let form;
 
 </script>
@@ -24,7 +24,7 @@
 			<button type="submit" class="btn btn-sm variant-filled-primary">Request Password Reset</button>
 		</div>
 		{#if form?.success}
-            <SuccessMessage />
+            <ServerMessage />
 		{/if}
 	</form>
 </div>

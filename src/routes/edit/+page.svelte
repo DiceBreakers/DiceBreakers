@@ -1,6 +1,6 @@
 <script>
   import Header from '$lib/components/header.svelte'
-  import Edit from './edit.svelte';
+  import ListPrompts from './listPrompts.svelte';
   import Footer from '$lib/components/footer.svelte'
 </script>
 
@@ -10,7 +10,7 @@
 	<Header />
 
 </div>
-	<Edit />
+	<ListPrompts />
 
 <div class="bg_gradient">
 	<Footer />

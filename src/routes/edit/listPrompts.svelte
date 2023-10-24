@@ -12,7 +12,7 @@
 	import type { PopupSettings } from '@skeletonlabs/skeleton';
 
 
-	let userPrompts: { prompt: string; categories: string[] }[] = [];
+	let userPrompts: { prompt: string; categories: string[]; id: string }[] = [];
 
 	const Hover: PopupSettings = {
 	event: 'hover',
@@ -65,6 +65,7 @@
   userPrompts = promptData.map(obj => ({
     prompt: obj.prompt,
     categories: obj.categories,
+	id: obj.id,
   }));
   console.log('userPrompts:', userPrompts)
 
@@ -96,7 +97,7 @@
 			<label class="category-item">
 				<input
 				name='categories'
-				checked={catItem.checked}
+				bind:checked={catItem.checked}
 				class="checkbox checkboxSize"
 				type="checkbox"
 				value={catItem.value}
@@ -124,7 +125,7 @@
 				{#if userPrompts !== null}
 					<ul>
   					{#each userPrompts as userPrompt}
-					  <li><a href="/"><i class="mr fa-solid fa-pencil" style="color: #1673c5;"></i>
+					  <li><a href="/" id={userPrompt.id}><i class="mr fa-solid fa-pencil" style="color: #1673c5;"></i>
 						{userPrompt.prompt}</a></li>
   					{/each}
 					</ul>
