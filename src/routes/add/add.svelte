@@ -3,7 +3,6 @@
 	import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
-	import { readable } from 'svelte/store';
 	import ServerMessage from '../../lib/components/serverMessage.svelte';
 	import { popup } from '@skeletonlabs/skeleton';
 	import type { PopupSettings } from '@skeletonlabs/skeleton';
