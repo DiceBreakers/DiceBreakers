@@ -2,7 +2,6 @@
 	import Input from "../../lib/components/input.svelte";
     import { currentUser } from '$lib/stores/user'
 
-	// - unused? - export let data
 </script>
 
 <div class="body center-text">

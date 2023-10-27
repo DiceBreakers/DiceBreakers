@@ -29,7 +29,7 @@ export const actions = {
       };
     } catch (err) {
       console.error('Error: ', err);
-      throw error(err.status, "The robots didn't like something about that...");
+      throw error(400, "The robots didn't like something about that...");
     }
   },
 };

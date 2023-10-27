@@ -110,8 +110,6 @@
   }
 }
 
-
-	
 function displayNextPrompt() {
 	toggleDice();
   if (promptIndex < generatedPrompts.length) {
@@ -125,8 +123,6 @@ function displayNextPrompt() {
   }
 }
   </script>
-
-  
   
   <div class="card p-4">
 	<Accordion autocollapse>

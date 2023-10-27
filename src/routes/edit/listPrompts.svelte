@@ -5,8 +5,6 @@
 	import { catList } from '$lib/components/catList.svelte';
 	import { popup } from '@skeletonlabs/skeleton';
 	import type { PopupSettings } from '@skeletonlabs/skeleton';
-	import { slide } from 'svelte/transition';
-	import { quintOut } from 'svelte/easing';
 	import ServerMessage from '$lib/components/serverMessage.svelte';
 
 	type CatItem = {
@@ -23,10 +21,16 @@
 		id: string;
 	};
 
-	const Hover: PopupSettings = {
+	const hover: PopupSettings = {
 		event: 'hover',
 		target: 'popupHover',
 		placement: 'top'
+	};
+
+	const deletePopup: PopupSettings = {
+		event: 'click',
+		target: 'deletePopup',
+		placement: 'left',
 	};
 
 	let selectedCategories = writable<CatItem[]>([]);
@@ -41,6 +45,7 @@
 	let perPage = writable(10);
 
 	let showSuccessMessage = false;
+	let showDeleteMessage = false;
 	let showFailureMessage = false;
 	let currentPagePromptsLength = 0;
 	let promptText = '';
@@ -52,6 +57,7 @@
 	} | null = null;
 
 	async function pullPrompts() {
+		editingPrompt = null;
   		const formData = new FormData();
 	  	filterCategories.subscribe((list: CatItem[]) => {
     		list.forEach(catItem => {
@@ -130,7 +136,6 @@
 		});
 		pullPrompts();
 	}
-
   
 	function nextPage() {
  		currentPage.update((currentPageValue) => currentPageValue + 1);
@@ -141,39 +146,32 @@
 	}
 
 	function handleEditPrompt(userPrompt) {
-    editPrompt(userPrompt);
-}
-
-	function clearEditPrompt() {
-		editingPrompt = null
+   		editPrompt(userPrompt);
 	}
-
+	
 	function editPrompt(userPrompt) {
 		if (editingPrompt !== null) {
 			editingPrompt = null;
 		}
+			promptText = userPrompt.prompt;
+			selectedCategories.update(categories => {
+				return categories.map(catItem => {
+					catItem.checked = userPrompt.categories.includes(catItem.value);
+					return catItem;
+					});
+    			});
 
-    // Set the new editingPrompt
-    promptText = userPrompt.prompt;
-    selectedCategories.update(categories => {
-        return categories.map(catItem => {
-            catItem.checked = userPrompt.categories.includes(catItem.value);
-            return catItem;
-        });
-    });
+			editingPrompt = {
+				promptText: userPrompt.prompt,
+				selectedCategories: userPrompt.categories,
+				promptId: userPrompt.id,
+			};
 
-    editingPrompt = {
-        promptText: userPrompt.prompt,
-        selectedCategories: userPrompt.categories,
-        promptId: userPrompt.id,
-    };
+		selectedPrompts.update(prompts => [...prompts, userPrompt]);
+	}
 
-    // Add the userPrompt to the selectedPrompts array
-    selectedPrompts.update(prompts => [...prompts, userPrompt]);
-}
-
-async function submitUpdate(event: Event) {
-    if (!editingPrompt) return; // Don't proceed if there's no editingPrompt
+async function updatePrompt(event: Event) {
+    if (!editingPrompt) return;
 
     const formData = new FormData();
     formData.append('prompt', editingPrompt.promptText);
@@ -196,11 +194,7 @@ async function submitUpdate(event: Event) {
         if (response.ok) {
             console.log('Prompt updated successfully!');
             showSuccessMessage = true;
-            editingPrompt = {
-                promptText: 'Select a prompt to edit...',
-                selectedCategories: [],
-                promptId: '',
-            };
+			editingPrompt = null;
             setTimeout(() => {
                 showSuccessMessage = false;
             }, 1500);
@@ -220,6 +214,42 @@ async function submitUpdate(event: Event) {
     }
 }
 
+async function deletePrompt(event: Event) {
+    if (!editingPrompt) return;
+
+    const formData = new FormData();
+    formData.append('pId', editingPrompt.promptId);
+
+    try {
+        const response = await fetch('/edit?/delete', {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (response.ok) {
+            console.log('Prompt deleted successfully!');
+            showDeleteMessage = true;
+			editingPrompt = null;
+            setTimeout(() => {
+                showDeleteMessage = false;
+            }, 1500);
+        } else {
+            console.error('Failed to delete prompt.');
+            showFailureMessage = true;
+            setTimeout(() => {
+                showFailureMessage = false;
+            }, 1500);
+        }
+    } catch (error) {
+        console.error('An error occurred:', error);
+        showFailureMessage = true;
+        setTimeout(() => {
+            showFailureMessage = false;
+        }, 1500);
+    }
+}
+
+
 </script>
   
 {#if showSuccessMessage}
@@ -228,6 +258,10 @@ async function submitUpdate(event: Event) {
 
 {#if showFailureMessage}
 	<ServerMessage isError={true} messageText="Something is broken :-(" />
+{/if}
+
+{#if showDeleteMessage}
+	<ServerMessage isError={true} messageText="Prompt Deleted" />
 {/if}
 
 <div class="card">
@@ -293,7 +327,7 @@ async function submitUpdate(event: Event) {
 	</Accordion>
 </svelte:fragment>
 </AccordionItem>
-	  <AccordionItem open on:click={clearEditPrompt}>
+	  <AccordionItem open on:click={pullPrompts}>
 		<svelte:fragment slot="lead"><img src="favicon.png" alt="Dice Icon" width="21px" /></svelte:fragment>
 		<svelte:fragment slot="summary">Prompts:</svelte:fragment>
 		<svelte:fragment slot="content">
@@ -308,16 +342,16 @@ async function submitUpdate(event: Event) {
 					</a>
 				  </li>
 				{/each}
-			  </ul>
+			  </ul>		
 			</div>
 			<div class="pages">
 			  <ul>
 				{#if $currentPage > 0}
 					<button on:click={prevPage} class="badge variant-filled-primary" style="float: left;">Previous</button>
 			  	{/if}
-				{#if Math.ceil(currentPagePromptsLength / $perPage) > 0}
-				 	<button on:click={nextPage} class="badge variant-filled-primary" style="float: right;">Next</button>
-				{/if}
+				{#if $currentPage < Math.ceil(currentPagePromptsLength / $perPage) - 1}
+				  	<button on:click={nextPage} class="badge variant-filled-primary" style="float: right;">Next</button>
+			  	{/if}
 			  </ul>
 			</div>
 			{/if}
@@ -331,7 +365,7 @@ async function submitUpdate(event: Event) {
 		<svelte:fragment slot="content">
 		  <section id="editPrompt">
 			<div class="card p-4 variant-glass-secondary">
-			  <form on:submit={submitUpdate}>
+			  <form>
 				<label class="label">
 				  		<textarea name="prompt" id="prompt" bind:value={editingPrompt.promptText} class="textarea" rows="2" />
 				</label>
@@ -393,7 +427,15 @@ async function submitUpdate(event: Event) {
 				</Accordion>
 				<input type="hidden" name="promptId" id="promptId" bind:value={editingPrompt.promptId} />
 				<div class="text-center">
-				  <button class="btn variant-filled-primary margin" type="submit">Submit</button>
+				  <button class="btn variant-filled-primary margin" on:click={updatePrompt}>Submit</button>
+				  <button use:popup={deletePopup} style="float: right;" class="delete">
+					<i class="mr fa-solid fa-trash-can" style="color: #1673c5;"></i>
+					</button>
+				  <div class="card p-4 w-36 shadow-xl" data-popup="deletePopup">
+					<div>Confirm Delete?</div>
+					<button class="btn variant-filled-primary margin" on:click={deletePrompt}>Delete</button>
+					<div class="arrow bg-surface-100-800-token" />
+				</div>	
 				</div>
 			  </form>
 			</div>
@@ -415,6 +457,10 @@ async function submitUpdate(event: Event) {
 
  .margin {
 	margin: 20px;
+ }
+
+ .delete {
+	margin-top: 40px;
  }
 
  .pages {

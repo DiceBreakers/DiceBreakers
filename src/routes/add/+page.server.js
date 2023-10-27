@@ -3,33 +3,37 @@ import { error, redirect } from '@sveltejs/kit';
 export const actions = {
   create: async ({ request, locals }) => {
     if (request.method !== 'POST') {
-		console.log('Error: ', err);
-		throw error(err.status, "The robots didn't like something about that...");
+      // If it's not a POST request, return an error response
+      throw error(405, "Method Not Allowed");
     }
-
-    // Handle the POST request for form submission
-    const data = await request.formData();
-
-    const prompt = data.get('prompt') ?? '';
-    const categories = data.getAll('categories') ?? '';
-    const author = (locals.user?.id) ?? '';
-    const postPublic = (locals.user?.postPublic) ?? '';
-
-    const addPrompt = {
-      prompt: prompt,
-      categories: categories,
-      author: author,
-      postPublic: postPublic,
-    };
 
     try {
-      const record = await locals.pb.collection('prompts').create(addPrompt);
-      // Handle success, e.g., return a success response
-    } catch (err) {
-      console.log('Error: ', err);
-      throw error(err.status, "The robots didn't like something about that...");
-    }
+      const data = await request.formData();
 
-    throw redirect(303, '/add#addPrompt'); // Redirect to the desired location
+      const prompt = data.get('prompt') || '';
+      const categories = data.getAll('categories') || [];
+      const author = locals.user?.id || '';
+      const postPublic = locals.user?.postPublic || '';
+
+      const addPrompt = {
+        prompt,
+        categories,
+        author,
+        postPublic,
+      };
+
+      const record = await locals.pb.collection('prompts').create(addPrompt);
+
+      // Handle success
+      return {
+        status: 201, // Created status code
+        body: { record }, // Return the newly created record
+      };
+    } catch (err) {
+      console.error('Error:', err);
+
+      // Handle errors and return an appropriate error response
+      throw error(500, "Internal Server Error");
+    }
   },
 };
