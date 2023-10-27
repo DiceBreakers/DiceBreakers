@@ -13,7 +13,7 @@
     </div>
     <div class="legal">
     <ul>
-        <a href="Legal.html" title="Legal, Privacy Policy, and Cookies">Legal/Privacy/Cookies</a>
+        <a href="/legal" title="Legal, Privacy Policy, and Cookies">Legal/Privacy/Cookies</a>
         <i class="fa-regular fa-copyright" /> Dice Breakers
         <a href="mailto: Admin@DiceBreakers.app" class="fa-regular fa-envelope"> </a>
     </ul>
