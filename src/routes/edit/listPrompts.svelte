@@ -349,9 +349,9 @@ async function deletePrompt(event: Event) {
 				{#if $currentPage > 0}
 					<button on:click={prevPage} class="badge variant-filled-primary" style="float: left;">Previous</button>
 			  	{/if}
-				{#if $currentPage < Math.ceil(currentPagePromptsLength / $perPage) - 1}
+				{#if Math.ceil(currentPagePromptsLength / $perPage) > 0}
 				  	<button on:click={nextPage} class="badge variant-filled-primary" style="float: right;">Next</button>
-			  	{/if}
+				{/if}
 			  </ul>
 			</div>
 			{/if}
