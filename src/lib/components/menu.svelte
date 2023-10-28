@@ -20,11 +20,10 @@
     <ul class="item">
 <!-- user logged in -->
         {#if $currentUser}
-        <li><a href="add" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Add Custom Prompts</a></li>
-        <li><a href="edit" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Edit Your Prompts</a></li>
-        <li><a href="/#game" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Play!</a></li>
-        <li class="topMarginL"><a href="/" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Home</a></li>
-        <li><a href="profile" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Account Settings</a></li>
+        <li><a href="add" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Add Prompts</a></li>
+        <li><a href="edit" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Edit Prompts</a></li>
+        <li><a href="/#game" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Play</a></li>
+        <li class="topMarginL"><a href="profile" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Account Settings</a></li>
             <form method="POST" action="/logout" use:enhance={() => {
                 return async ({ result }) => {
                   pb.authStore.clear()
@@ -71,13 +70,13 @@
     }
 
 .nav {
-    height: 500px;
+    height: 450px;
     position: fixed;
     right: 0;
     width: 90%;
     max-width: 500px;
-    border-radius: 3px;
-    background-color: #8FE0F7;
+    border-radius: 5px;
+    background: linear-gradient(135deg, #8FE0F7 15%, #1883E0);
     z-index: 2000;
     font-weight: 600;
 }

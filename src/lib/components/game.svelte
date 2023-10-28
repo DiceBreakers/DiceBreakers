@@ -3,7 +3,7 @@
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { quintOut } from 'svelte/easing';
-	import { slide } from 'svelte/transition';
+	import { slide, fade } from 'svelte/transition';
 	import DicePortal from './dicePortal.svelte';
 	import { catList } from './catList.svelte';
 	import { popup } from '@skeletonlabs/skeleton';
@@ -31,8 +31,7 @@
 	let currentAuthor = "";
 	let promptIndex = 0;
 	let generatedPrompts: { prompt: string; author: string }[] = [];
-	let animationPlayed = false;
-	let rollDice = false;
+	let isRolling = false;
 	
 	onMount(() => {
         catList.subscribe((list: CatItem[]) => {
@@ -44,17 +43,13 @@
     });
 
 	function toggleDice() {
-    rollDice = !rollDice;
-    	setTimeout(() => {
-			if (!animationPlayed) {
-      			animationPlayed = true;
-   			}
-      		rollDice = false;
-    	}, 3800);
+    isRolling = true;
+    setTimeout(() => {
+      isRolling = false;
+    }, 3800);
   }
 
   	function resetAnimation() {
-		animationPlayed = false;
 		currentPrompt = '';
 		currentAuthor = '';
 		promptIndex = 0;
@@ -130,7 +125,7 @@ function displayNextPrompt() {
 		<svelte:fragment slot="lead"><i class="fa-solid fa-lg fa-gear" style="color: #1673c5;"></i></svelte:fragment>
 		<svelte:fragment slot="summary">Settings:</svelte:fragment>
 		<svelte:fragment slot="content">
-			<Accordion autocollapse>
+			<Accordion>
 				<AccordionItem open on:click={resetAnimation}>
 					<svelte:fragment slot="summary">Primary Categories:</svelte:fragment>
 					<svelte:fragment slot="content">
@@ -179,21 +174,18 @@ function displayNextPrompt() {
 		<svelte:fragment slot="summary">Play</svelte:fragment>
 		<svelte:fragment slot="content">
 			<div class="game">
-			{#if rollDice}
-				<DicePortal />
-			{/if}
-			{#key promptIndex}
-			<div class="prompts text-center"
-			in:slide={{ delay: 3600, duration: 1000, easing: quintOut, axis: 'x' }}
-			out:slide={{ duration: 500, easing: quintOut, axis: 'x' }}>
-				<div id="prompt">{currentPrompt}</div>
-				{#if animationPlayed = true}
-				<button class="btn variant-filled-primary margin" on:click={displayNextPrompt}>Roll the Dice</button>
-				{/if}
-				<div class="right">{currentAuthor}</div>
-	  		</div>
-			{/key}
-			</div>
+				{#if isRolling}
+					<DicePortal />
+			  	{:else}
+					<div in:slide={{ duration: 500 }} out:slide={{ duration: 500 }}>
+						<div class="prompts text-center">
+							<div id="prompt">{currentPrompt}</div>
+								<button class="btn variant-filled-primary margin" on:click={displayNextPrompt}>Roll the Dice</button>
+							<div class="right">{currentAuthor}</div>
+						</div>
+					</div>
+			  	{/if}
+			</div>			  
 		  </svelte:fragment>
 	  </AccordionItem>
 	</Accordion>

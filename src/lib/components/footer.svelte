@@ -5,17 +5,17 @@
 <div class="footer">
     <div class="icons">
     <ul class="fa-brands fa-xl">
-        <a href="https://old.reddit.com/r/DiceBreakers" class="fa-reddit-alien"> </a>
-        <a href="https://www.instagram.com" class="fa-instagram"> </a>
-        <a href="https://www.twitter.com" class="fa-twitter"> </a>
-        <a href="https://www.facebook.com" class="fa-facebook-f"> </a>
+        <a href="https://old.reddit.com/r/DiceBreakers" class="fa-reddit-alien" title="reddit"> </a>
+        <a href="https://www.instagram.com" class="fa-instagram" title="instagram"> </a>
+        <a href="https://www.twitter.com" class="fa-twitter" title="twitter"> </a>
+        <a href="https://www.facebook.com" class="fa-facebook-f" title="facebook"> </a>
     </ul>
     </div>
     <div class="legal">
     <ul>
-        <a href="/legal" title="Legal, Privacy Policy, and Cookies">Legal/Privacy/Cookies</a>
-        <i class="fa-regular fa-copyright" /> Dice Breakers
-        <a href="mailto: Admin@DiceBreakers.app" class="fa-regular fa-envelope"> </a>
+        <a href="/legal" title="Terms of Service, Privacy Policy, and Cookies">TOS/Privacy/Cookies</a>
+        <i class="fa-regular fa-copyright" title="Copyright Dice Breakers"/>DiceBreakers
+        <a href="mailto: Admin@DiceBreakers.app" class="fa-regular fa-envelope" title="Email Us"> </a>
     </ul>
     </div>
 </div>
@@ -25,21 +25,21 @@
     .footer {
         justify-content: center;
         height: 0px;
-        margin-top: -50px;
         text-align: center;
+        margin-top: -25px;
     }
     .footer ul {
         margin: auto;
-        text-align: center; /* Center the items within each ul */
+        text-align: center;
     }
     .footer a {
-    	padding: 15px;
+    	padding: 10px;
     }
     .legal {
-        padding-top: 30px;        
+        padding-top: 40px;        
     }
     .footer ul i {
-        margin-left: 50px;
+        margin-left: 40px;
     }
 
 </style>
