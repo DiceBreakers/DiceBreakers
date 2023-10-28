@@ -20,11 +20,11 @@
     <ul class="item">
 <!-- user logged in -->
         {#if $currentUser}
-        <li><a href="add" on:click={toggleMenu}>Add Custom Prompts</a></li>
-        <li><a href="edit" on:click={toggleMenu}>Edit Your Prompts</a></li>
-        <br><li><a href="/#game" on:click={toggleMenu}>Play!</a></li>
-        <li class="topMarginL"><a href="/" on:click={toggleMenu}>Home</a></li>
-        <br><li><a href="profile" on:click={toggleMenu}>Account Settings</a></li>
+        <li><a href="add" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Add Custom Prompts</a></li>
+        <li><a href="edit" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Edit Your Prompts</a></li>
+        <li><a href="/#game" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Play!</a></li>
+        <li class="topMarginL"><a href="/" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Home</a></li>
+        <li><a href="profile" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Account Settings</a></li>
             <form method="POST" action="/logout" use:enhance={() => {
                 return async ({ result }) => {
                   pb.authStore.clear()
@@ -32,7 +32,7 @@
                 }
               }}
             >
-              <button class="topMarginS">Log out</button>
+              <button class="topMarginS btn btn-sm variant-filled-primary">Log out</button>
             </form>
     <!-- user logged out -->
         {:else}
@@ -87,11 +87,15 @@
 }
 
 .topMarginL {
-    margin-top: 240px;
+    margin-top: 120px;
 }
 
 .topMarginS {
     margin-top: 20px;
+}
+
+.btn {
+  margin: 10px;
 }
 
 .navToggle {
