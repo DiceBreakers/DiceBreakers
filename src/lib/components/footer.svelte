@@ -13,7 +13,7 @@
     </div>
     <div class="legal">
     <ul>
-        <a href="/legal" title="Terms of Service, Privacy Policy, and Cookies">TOS/Privacy/Cookies</a>
+        <a href="/legal" title="Terms of Service, Privacy Policy, and Cookies">Terms of Service</a>
         <i class="fa-regular fa-copyright" title="Copyright Dice Breakers"/>DiceBreakers
         <a href="mailto: Admin@DiceBreakers.app" class="fa-regular fa-envelope" title="Email Us"> </a>
     </ul>
@@ -39,7 +39,7 @@
         padding-top: 40px;        
     }
     .footer ul i {
-        margin-left: 40px;
+        margin-left: 20px;
     }
 
 </style>
