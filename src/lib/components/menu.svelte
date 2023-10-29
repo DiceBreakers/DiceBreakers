@@ -3,7 +3,7 @@
     import { applyAction, enhance } from '$app/forms'
     import { pb } from '$lib/pocketbase'
     import { currentUser } from '$lib/stores/user'
-    import Login from './login.svelte'
+    import Login from '../../routes/login/login.svelte';
 
     export let showMenu = false;
 

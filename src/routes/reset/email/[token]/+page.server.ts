@@ -1,5 +1,6 @@
 
 import type { Actions, Load } from '@sveltejs/kit';
+import { goto } from '$app/navigation';
 import crypto from 'crypto';
 import { SECRET_SIGNATURE } from '$env/static/private';
 import { error } from '@sveltejs/kit';
@@ -43,6 +44,8 @@ export const actions: Actions = {
         data.token,
         data.password,
       );
+
+      goto('/login');
 
       return {
         success: true

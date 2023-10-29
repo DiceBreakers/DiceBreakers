@@ -26,28 +26,23 @@
 		<button class="btn btn-sm variant-filled-primary">Login</button>
 		<a on:click={closeMenu} href="/reset" class="button btn btn-sm">Forgot pw?</a>
   </form>
-  <h2>or register:</h2>
-  <form
-  method="POST"
-  action="/register"
-  class="card item"
-  use:enhance={() => {
-	return async ({ result }) => {
-	  pb.authStore.loadFromCookie(document.cookie)
-	  await applyAction(result)
-	}
-  }}>
-	<input type="email" name="email" placeholder="Email" class="input" />
-	<input type="password" name="password" placeholder="Password" class="input" />
-	<input type="password" name="passwordConfirm" placeholder="Confirm Password" class="input" />
-	<button class="btn btn-sm variant-filled-primary">Register</button>
-</form>
+  	<div class="register btn btn-lg variant-filled-secondary">
+  		<a href="/register" title="Register Here"><strong>Click here to register!</strong></a>
+	</div>
 </div>
 
 <style>
+	.btn {
+		margin: 5px;
+	}
+
 	.center {
-  margin: auto;
-  display: block;
-  max-width: 700px;
-}
+		margin: auto;
+		display: block;
+		max-width: 700px;
+	}
+
+	.register {
+		margin-top: 180px;
+	}
 </style>

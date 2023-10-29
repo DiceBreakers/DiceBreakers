@@ -1,6 +1,6 @@
 <script>
   import Header from '$lib/components/header.svelte'
-  import Login from './login.svelte'
+  import Register from './register.svelte';
   import Footer from '$lib/components/footer.svelte'
 
 </script>
@@ -10,7 +10,7 @@
 	<Header />
 </div>
 <div class="body card p-4 variant-glass-secondary">
-  <Login />
+  <Register />
 </div>
 <div class="bg_gradient">
 	<Footer />

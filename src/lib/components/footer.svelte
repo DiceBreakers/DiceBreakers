@@ -14,7 +14,7 @@
     <div class="legal">
     <ul>
         <a href="/legal" title="Terms of Service, Privacy Policy, and Cookies">Terms of Service</a>
-        <i class="fa-regular fa-copyright" title="Copyright Dice Breakers"/>DiceBreakers
+        <i class="fa-regular fa-copyright" title="Copyright Dice Breakers"/> DiceBreakers
         <a href="mailto: Admin@DiceBreakers.app" class="fa-regular fa-envelope" title="Email Us"> </a>
     </ul>
     </div>

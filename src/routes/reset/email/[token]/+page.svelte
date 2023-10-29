@@ -8,7 +8,6 @@
   let token;
   export let data;
 
-  // Use onMount to access the token when the component is fully initialized
   onMount(() => {
     token = data.props.token;
     console.log({ token });
@@ -38,7 +37,7 @@
         <button type="submit" class="btn btn-sm variant-filled-primary">Complete Email Change</button>
       </div>
       {#if form?.success}
-              <ServerMessage />
+              <ServerMessage messageText="New Email Confirmed" />
       {/if}
     </form>
   </div>

@@ -9,6 +9,11 @@ export const actions: Actions = {
       email: string
       password: string
       passwordConfirm: string
+      TOS: string;
+    };
+
+    if (!data.TOS) {
+      return;
     }
 
     try {
