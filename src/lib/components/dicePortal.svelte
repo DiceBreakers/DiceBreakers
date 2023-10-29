@@ -1,7 +1,6 @@
 <!-- App.svelte -->
 <script>
   import { LottiePlayer } from '@lottiefiles/svelte-lottie-player';
-  import { fade } from 'svelte/transition';
 
   let controlsLayout = [
     'previousFrame',
@@ -21,7 +20,7 @@
 
 <div class="dice">
 <LottiePlayer
-  src="./dicePortal.json"
+  src="./funDice.json"
   autoplay="{true}"
   loop="{false}"
   controls="{false}"
