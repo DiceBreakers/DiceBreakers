@@ -10,10 +10,8 @@
 <div class="bg_gradient">
 <Header />
 </div>
-<Body />
-<div id="game">
 <Game />
-</div>
+<Body />
 <About />
 <div class="bg_gradient">
 <Footer />

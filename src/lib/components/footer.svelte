@@ -33,7 +33,7 @@
         text-align: center;
     }
     .footer a {
-    	padding: 10px;
+    	padding: 5px;
     }
     .legal {
         padding-top: 40px;        

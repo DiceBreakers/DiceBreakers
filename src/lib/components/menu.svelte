@@ -22,7 +22,7 @@
         {#if $currentUser}
         <li><a href="add" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Add Prompts</a></li>
         <li><a href="edit" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Edit Prompts</a></li>
-        <li><a href="/#game" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Play</a></li>
+        <li><a href="/" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Play</a></li>
         <li class="topMarginL"><a href="profile" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Account Settings</a></li>
             <form method="POST" action="/logout" use:enhance={() => {
                 return async ({ result }) => {

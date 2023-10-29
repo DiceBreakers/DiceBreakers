@@ -177,7 +177,7 @@ function displayNextPrompt() {
 				{#if isRolling}
 					<DicePortal />
 			  	{:else}
-					<div in:slide={{ duration: 500 }} out:slide={{ duration: 500 }}>
+					<div in:slide={{ duration: 1000 }} out:slide={{ duration: 250 }}>
 						<div class="prompts text-center">
 							<div id="prompt">{currentPrompt}</div>
 								<button class="btn variant-filled-primary margin" on:click={displayNextPrompt}>Roll the Dice</button>
