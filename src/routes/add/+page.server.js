@@ -3,7 +3,6 @@ import { error } from '@sveltejs/kit';
 export const actions = {
   create: async ({ request, locals }) => {
     if (request.method !== 'POST') {
-      // If it's not a POST request, return an error response
       throw error(405, "Method Not Allowed");
     }
 

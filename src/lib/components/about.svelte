@@ -1,7 +1,3 @@
-	<script>
-
-    </script>
-    
         <div class="vsmall align-center">
             I'm told I need more words on my home page to describe what this site is for, but I really like how clean it looks, so here is some comically small, white writing.
             I hope this makes the search engine overlords happy! Dice Breakers started as game I made up that used a google sheet and some dice to pick activities when friends and I were indecisive.

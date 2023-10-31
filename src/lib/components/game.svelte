@@ -2,20 +2,21 @@
 	import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
 	import { onMount, createEventDispatcher } from 'svelte';
 	import { writable } from 'svelte/store';
-	import { quintOut } from 'svelte/easing';
-	import { slide, fade } from 'svelte/transition';
+	import { fade } from 'svelte/transition';
 	import DicePortal from './dicePortal.svelte';
 	import { catList } from './catList.svelte';
 	import { popup } from '@skeletonlabs/skeleton';
 	import type { PopupSettings } from '@skeletonlabs/skeleton';
+	import ServerMessage from '$lib/components/serverMessage.svelte';
+
+	let showSuccessMessage = false;
+	let showFailureMessage = false;
 
 	const Hover: PopupSettings = {
 	event: 'hover',
 	target: 'popupHover',
 	placement: 'top'
 };
-
-
 
 	type CatItem = {
 	  value: string;
@@ -27,10 +28,12 @@
 	let selectedCategories = writable<CatItem[]>([]);
 	let primaryCategories = writable<CatItem[]>([]);
 	let additionalCategories = writable<CatItem[]>([]);
-	let currentPrompt = "";
-	let currentAuthor = "";
+	let currentPrompt = '';
+	let currentAuthor = '';
+	let currentId = '';
+	let currentFav = false;
 	let promptIndex = 0;
-	let generatedPrompts: { prompt: string; author: string }[] = [];
+	let generatedPrompts: { prompt: string; author: string; id: string; isFav: boolean; }[] = [];
 	let isRolling = false;
 	
 	onMount(() => {
@@ -52,18 +55,23 @@
   	function resetAnimation() {
 		currentPrompt = '';
 		currentAuthor = '';
+		currentId = '',
 		promptIndex = 0;
+		currentFav = false;
 	}
 
 	function displayFirstPrompt() {
   if (promptIndex < generatedPrompts.length) {
-	const { prompt, author } = generatedPrompts[promptIndex];
+	const { prompt, author, id } = generatedPrompts[promptIndex];
 		currentPrompt = prompt;
-		currentAuthor = "Author: " + author; // Assuming you have a variable for displaying the author
+		currentAuthor = author;
+		currentId = id;
+		const currentPromptIndex = generatedPrompts.findIndex(prompt => prompt.id === currentId);
+    	currentFav = currentPromptIndex >= 0 && generatedPrompts[currentPromptIndex].isFav;
     promptIndex++;
   } else {
     currentPrompt = '';
-	currentAuthor = 'We seem to have run out of prompts. Choose more categories to reshuffle!';
+	currentAuthor = 'Check the categories to roll new prompts!';
   }
 }
 	async function generate(event: Event) {
@@ -94,6 +102,8 @@
   generatedPrompts = promptData.map(obj => ({
     prompt: obj.prompt,
     author: obj.author,
+	id: obj.id,
+	isFav: obj.isFavAuthor,
   }));
   displayFirstPrompt();
 
@@ -107,30 +117,62 @@
 
 function displayNextPrompt() {
 	toggleDice();
-  if (promptIndex < generatedPrompts.length) {
-	const { prompt, author } = generatedPrompts[promptIndex];
-		currentPrompt = prompt;
-		currentAuthor = "Author: " + author;
-    promptIndex++;
-  } else {
-    currentPrompt = '';
-	currentAuthor = '';
-  }
+	displayFirstPrompt();
 }
 
-const images = ['bulb0.png', 'bulb1.png', 'bulb2.png'];
+async function favToggle(event: Event) {
+	currentFav = !currentFav;
+    if (!currentId) return;
 
-let currentImageIndex = 0;
+	const promptIndex = generatedPrompts.findIndex(prompt => prompt.id === currentId);
+  		if (promptIndex >= 0) {
+    		generatedPrompts[promptIndex].isFav = currentFav;
+ 		}
 
-// Create an event dispatcher to emit events
+    const formData = new FormData();
+    formData.append('id', currentId);
+
+    try {
+        const response = await fetch('?/favAuthor', {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (response.ok) {
+            console.log('Favorite Toggled Successfully');
+            showSuccessMessage = true;
+            setTimeout(() => {
+                showSuccessMessage = false;
+            }, 1500);
+        } else {
+            console.error('Something broke :-(');
+            showFailureMessage = true;
+            setTimeout(() => {
+                showFailureMessage = false;
+            }, 1500);
+        }
+    } catch (error) {
+        console.error('An error occurred:', error);
+        showFailureMessage = true;
+        setTimeout(() => {
+            showFailureMessage = false;
+        }, 1500);
+    }
+}
+
+const bulbs = ['bulb0.png', 'bulb1.png', 'bulb2.png'];
+
+let bulbIndex = 0;
+
 const dispatch = createEventDispatcher();
 
-// Function to cycle to the next image
-const nextImage = () => {
-  currentImageIndex = (currentImageIndex + 1) % images.length;
-  dispatch('imageChanged', images[currentImageIndex]);
+const nextBulb = () => {
+	bulbIndex = (bulbIndex + 1) % bulbs.length;
+	dispatch('bulbChanged', bulbs[bulbIndex]);
 };
-  </script>
+
+
+</script>
   
   <div class="card p-4">
 	<Accordion autocollapse>
@@ -190,14 +232,22 @@ const nextImage = () => {
 				{#if isRolling}
 					<DicePortal />
 			  	{:else}
-					<div in:slide={{ duration: 1000 }}>
+					<div in:fade={{ duration: 1000 }}>
 						<div class="prompts">
 							<div class="center">
-								<div class="bulb"><button on:click={nextImage}><img src={images[currentImageIndex]} alt="Bulb Rating"></button></div>
+								<div class="bulb"><button on:click={nextBulb}><img src={bulbs[bulbIndex]} alt="Bulb Rating"></button></div>
 								<div id="prompt">{currentPrompt}</div>
-									<button class="btn variant-filled-primary margin" on:click={displayNextPrompt}>Roll the Dice</button>
+								<button class="btn variant-filled-primary margin" on:click={displayNextPrompt}>Roll the Dice</button>
 							</div>
-							<div class="right"><span>{currentAuthor}</span></div>
+							<div class="right"><b>{currentAuthor}</b> 
+								<button on:click={favToggle}>
+									{#if currentFav}
+										<i class="fa-solid fa-xl fa-star" style="color: #fecb0e;"></i>
+									{:else}
+										<i class="fa-regular fa-xl fa-star" style="color: #0d4576;"></i>
+									{/if}
+								</button>
+							</div>
 						</div>
 					</div>
 			  	{/if}

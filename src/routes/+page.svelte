@@ -16,7 +16,3 @@
 <div class="bg_gradient">
 <Footer />
 </div>
-
-<style>
-
-</style>

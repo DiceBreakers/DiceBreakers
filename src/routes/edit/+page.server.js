@@ -4,8 +4,6 @@ export const actions = {
     pullPrompts: async ({ request, locals }) => {
       const data = await request.formData();
       const selectedCategories = data.getAll('filterCategories') ?? [];
-
-      console.log(selectedCategories)
   
       try {
   
@@ -41,16 +39,11 @@ export const actions = {
       throw error(400, "The robots didn't like something about that...");
       }
   
-      // Handle the POST request for form submission
       const data = await request.formData();
       
       const prompt = data.get('prompt') ?? '';
       const categories = data.getAll('categories') ?? '';
       const promptId = String(data.get('pId')) || '';
-
-      console.log('promptId', promptId)
-      console.log('prompt', prompt)
-      console.log('categories', categories)
 
       const editPrompt = {
         prompt: prompt,
