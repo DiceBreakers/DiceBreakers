@@ -150,10 +150,6 @@ async function favToggle(event: Event) {
 
         if (response.ok) {
             console.log('Favorite Toggled Successfully');
-            showSuccessMessage = true;
-            setTimeout(() => {
-                showSuccessMessage = false;
-            }, 1500);
         } else {
             console.error('Something broke :-(');
             showFailureMessage = true;
