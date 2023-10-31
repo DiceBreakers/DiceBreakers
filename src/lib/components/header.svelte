@@ -8,7 +8,7 @@
 
 <style>
     .header {
-        height: 280px; 
-        margin-top: -10px;
+        height: 210px; 
+        margin-top: -90px;
     }
 </style>

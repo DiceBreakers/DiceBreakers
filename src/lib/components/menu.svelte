@@ -100,11 +100,11 @@
 .navToggle {
   position: relative;
   background-color: white;
-  height: 4.5rem;
-  width: 4.5rem;
+  height: 4rem;
+  width: 4rem;
   border-radius: 50%;
   position: fixed;
-  top: 5vh; 
+  top: 2vh; 
   right: 5vw; 
   z-index: 2000;
   box-shadow: 0 1rem 3rem #0b3861;
@@ -113,8 +113,8 @@
 
 img.icon {
     width:38px;
-    margin-top:11px;
-    margin-left:18px;
+    margin-top:8px;
+    margin-left:13px;
     filter: invert(18%) sepia(11%) saturate(7499%) hue-rotate(182deg) brightness(92%) contrast(95%);
 }
 
