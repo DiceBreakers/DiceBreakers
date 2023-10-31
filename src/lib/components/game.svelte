@@ -8,9 +8,11 @@
 	import { popup } from '@skeletonlabs/skeleton';
 	import type { PopupSettings } from '@skeletonlabs/skeleton';
 	import ServerMessage from '$lib/components/serverMessage.svelte';
+    import { currentUser } from '$lib/pocketbase'
 
 	let showSuccessMessage = false;
 	let showFailureMessage = false;
+	let showLoginMessage = false;
 
 	const Hover: PopupSettings = {
 	event: 'hover',
@@ -121,6 +123,14 @@ function displayNextPrompt() {
 }
 
 async function favToggle(event: Event) {
+	if (!$currentUser) {
+    showLoginMessage = true;
+    setTimeout(() => {
+      showLoginMessage = false;
+    }, 1500);
+    return;
+  }
+
 	currentFav = !currentFav;
     if (!currentId) return;
 
@@ -171,8 +181,19 @@ const nextBulb = () => {
 	dispatch('bulbChanged', bulbs[bulbIndex]);
 };
 
-
 </script>
+
+{#if showSuccessMessage}
+	<ServerMessage />
+{/if}
+
+{#if showFailureMessage}
+	<ServerMessage isError={true} messageText="Something is broken :-(" />
+{/if}
+
+{#if showLoginMessage}
+	<ServerMessage isError={true} messageText="You must be logged in" />
+{/if}
   
   <div class="card p-4">
 	<Accordion autocollapse>
