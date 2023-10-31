@@ -1,4 +1,5 @@
 <script>
+    import Attribution from "./attribution.svelte";
     import TOS from "./tos.svelte";
     import Privacy from "./privacy.svelte";
     import Cookies from "./cookies.svelte";
@@ -16,6 +17,12 @@
                 <div class="card p-4 variant-glass-secondary">
                     <h2>Docs:</h2>
                     <Accordion>
+                        <AccordionItem>
+                            <svelte:fragment slot="summary">Special Thanks/Attribution</svelte:fragment>
+                            <svelte:fragment slot="content">
+                                <Attribution />
+                            </svelte:fragment> 
+                        </AccordionItem>
                         <AccordionItem>
                             <svelte:fragment slot="summary">Terms of Service:</svelte:fragment>
                             <svelte:fragment slot="content">

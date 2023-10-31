@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
-	import { onMount } from 'svelte';
+	import { onMount, createEventDispatcher } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { quintOut } from 'svelte/easing';
 	import { slide, fade } from 'svelte/transition';
@@ -110,13 +110,26 @@ function displayNextPrompt() {
   if (promptIndex < generatedPrompts.length) {
 	const { prompt, author } = generatedPrompts[promptIndex];
 		currentPrompt = prompt;
-		currentAuthor = "Author: " + author; // Assuming you have a variable for displaying the author
+		currentAuthor = "Author: " + author;
     promptIndex++;
   } else {
     currentPrompt = '';
-	currentAuthor = ''; // Optional message when there are no more prompts
+	currentAuthor = '';
   }
 }
+
+const images = ['bulb0.png', 'bulb1.png', 'bulb2.png'];
+
+let currentImageIndex = 0;
+
+// Create an event dispatcher to emit events
+const dispatch = createEventDispatcher();
+
+// Function to cycle to the next image
+const nextImage = () => {
+  currentImageIndex = (currentImageIndex + 1) % images.length;
+  dispatch('imageChanged', images[currentImageIndex]);
+};
   </script>
   
   <div class="card p-4">
@@ -177,11 +190,14 @@ function displayNextPrompt() {
 				{#if isRolling}
 					<DicePortal />
 			  	{:else}
-					<div in:slide={{ duration: 1000 }} out:slide={{ duration: 250 }}>
-						<div class="prompts text-center">
-							<div id="prompt">{currentPrompt}</div>
-								<button class="btn variant-filled-primary margin" on:click={displayNextPrompt}>Roll the Dice</button>
-							<div class="right">{currentAuthor}</div>
+					<div in:slide={{ duration: 1000 }}>
+						<div class="prompts">
+							<div class="center">
+								<div class="bulb"><button on:click={nextImage}><img src={images[currentImageIndex]} alt="Bulb Rating"></button></div>
+								<div id="prompt">{currentPrompt}</div>
+									<button class="btn variant-filled-primary margin" on:click={displayNextPrompt}>Roll the Dice</button>
+							</div>
+							<div class="right"><span>{currentAuthor}</span></div>
 						</div>
 					</div>
 			  	{/if}
@@ -201,6 +217,14 @@ function displayNextPrompt() {
 
 	.right {
 		text-align: right;
+	}
+
+	.center {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		height: 100%;
 	}
 
 	.game {

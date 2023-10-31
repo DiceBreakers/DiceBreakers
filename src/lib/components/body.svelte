@@ -9,16 +9,6 @@
 		<div class="card p-4">
 			<div class="card p-4 variant-glass-secondary">
 					<header>
-						<h2><b>Reddit Community</b></h2>
-					</header>
-					Submit prompts for discussion or respond to other submissions!<br><br>
-					<a href="https://old.reddit.com/r/DiceBreakers/" class="badge variant-filled-primary"><b>/r/DiceBreakers</b></a>
-			</div>
-		</div>
-<!-- Custom Conversation Starter Google Sheet -->
-		<div class="card p-4 variant-glass-tertiary">
-				<div class="card p-4">
-					<header>
 						<h2><b>Physical Game:</b></h2>
 					</header>
 					Prefer physical dice? Play the original way with physical dice and a Google Sheet!
