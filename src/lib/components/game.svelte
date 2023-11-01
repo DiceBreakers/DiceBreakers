@@ -31,11 +31,14 @@
 	let primaryCategories = writable<CatItem[]>([]);
 	let additionalCategories = writable<CatItem[]>([]);
 	let currentPrompt = '';
+	let currentPromptId = '';
 	let currentAuthor = '';
-	let currentId = '';
+	let currentAuthId = '';
 	let currentFav = false;
+	let isSuper = false;
+	let isLiked = false;
 	let promptIndex = 0;
-	let generatedPrompts: { prompt: string; author: string; id: string; isFav: boolean; }[] = [];
+	let generatedPrompts: { prompt: string; promptId: string; author: string; authorId: string; isFav: boolean; isSuper: boolean; isLiked: boolean; }[] = [];
 	let isRolling = false;
 	
 	onMount(() => {
@@ -47,6 +50,18 @@
         });
     });
 
+	function getBulbImage(isLiked, isSuper) {
+  if (isSuper) {
+    return 'bulb2.png';
+  } else if (isLiked) {
+    return 'bulb1.png';
+  } else {
+    return 'bulb0.png';
+  }
+}
+
+
+
 	function toggleDice() {
     isRolling = true;
     setTimeout(() => {
@@ -57,18 +72,21 @@
   	function resetAnimation() {
 		currentPrompt = '';
 		currentAuthor = '';
-		currentId = '',
+		currentAuthId = '',
 		promptIndex = 0;
 		currentFav = false;
+		isSuper = false;
+		isLiked = false;
 	}
 
 	function displayFirstPrompt() {
   if (promptIndex < generatedPrompts.length) {
-	const { prompt, author, id } = generatedPrompts[promptIndex];
+	const { prompt, promptId, author, authorId } = generatedPrompts[promptIndex];
 		currentPrompt = prompt;
+		currentPromptId = promptId;
 		currentAuthor = author;
-		currentId = id;
-		const currentPromptIndex = generatedPrompts.findIndex(prompt => prompt.id === currentId);
+		currentAuthId = authorId;
+		const currentPromptIndex = generatedPrompts.findIndex(prompt => prompt.authorId === currentAuthId);
     	currentFav = currentPromptIndex >= 0 && generatedPrompts[currentPromptIndex].isFav;
     promptIndex++;
   } else {
@@ -97,15 +115,20 @@
     });
 
 	if (response.ok) {
-  const serverData = await response.json();
-  const rawData = JSON.parse(serverData.data);
-  const promptData = JSON.parse(rawData[1]);
+  let serverData = await response.json();
+  let rawData = JSON.parse(serverData.data);
+  let promptData = JSON.parse(rawData[1]);
+
+console.log('promptData:', promptData)
 
   generatedPrompts = promptData.map(obj => ({
     prompt: obj.prompt,
+	promptId: obj.promptId,
     author: obj.author,
-	id: obj.id,
+	authorId: obj.authorId,
 	isFav: obj.isFavAuthor,
+	isSuper: obj.isSuper,
+	isLiked: obj.isLiked,
   }));
   displayFirstPrompt();
 
@@ -120,6 +143,10 @@
 function displayNextPrompt() {
 	toggleDice();
 	displayFirstPrompt();
+	console.log('pIndex:', promptIndex)
+	if (promptIndex === 14) {
+    generate(new Event('click'));
+  }
 }
 
 async function favToggle(event: Event) {
@@ -132,15 +159,15 @@ async function favToggle(event: Event) {
   }
 
 	currentFav = !currentFav;
-    if (!currentId) return;
+    if (!currentAuthId) return;
 
-	const promptIndex = generatedPrompts.findIndex(prompt => prompt.id === currentId);
+	const promptIndex = generatedPrompts.findIndex(prompt => prompt.authorId === currentAuthId);
   		if (promptIndex >= 0) {
     		generatedPrompts[promptIndex].isFav = currentFav;
  		}
 
     const formData = new FormData();
-    formData.append('id', currentId);
+    formData.append('authorId', currentAuthId);
 
     try {
         const response = await fetch('?/favAuthor', {
@@ -166,15 +193,57 @@ async function favToggle(event: Event) {
     }
 }
 
-const bulbs = ['bulb0.png', 'bulb1.png', 'bulb2.png'];
+function incrementBulb() {
+  if (generatedPrompts[promptIndex].isSuper === true) {
+    generatedPrompts[promptIndex].isLiked = false;
+    generatedPrompts[promptIndex].isSuper = false;
+  } else if (generatedPrompts[promptIndex].isLiked === true) {
+    generatedPrompts[promptIndex].isSuper = true;
+  } else {
+    generatedPrompts[promptIndex].isLiked = true;
+  }
+}
 
-let bulbIndex = 0;
 
-const dispatch = createEventDispatcher();
+async function likePrompt(event: Event) {
+	if (!$currentUser) {
+    showLoginMessage = true;
+    setTimeout(() => {
+      showLoginMessage = false;
+    }, 1500);
+    return;
+  }
 
-const nextBulb = () => {
-	bulbIndex = (bulbIndex + 1) % bulbs.length;
-	dispatch('bulbChanged', bulbs[bulbIndex]);
+  	incrementBulb();
+
+    if (!currentAuthId) return;
+
+    const formData = new FormData();
+    formData.append('promptId', generatedPrompts[promptIndex].promptId);
+	console.log('pID:', generatedPrompts[promptIndex].promptId)
+
+    try {
+        const response = await fetch('?/likePrompt', {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (response.ok) {
+            console.log('Like Status Changed');
+        } else {
+            console.error('Something broke :-(');
+            showFailureMessage = true;
+            setTimeout(() => {
+                showFailureMessage = false;
+            }, 1500);
+        }
+    } catch (error) {
+        console.error('An error occurred:', error);
+        showFailureMessage = true;
+        setTimeout(() => {
+            showFailureMessage = false;
+        }, 1500);
+    }
 };
 
 </script>
@@ -252,7 +321,12 @@ const nextBulb = () => {
 					<div in:fade={{ duration: 1000 }}>
 						<div class="prompts">
 							<div class="center">
-								<div class="bulb"><button on:click={nextBulb}><img src={bulbs[bulbIndex]} alt="Bulb Rating"></button></div>
+								<div class="bulb">
+									<button on:click={likePrompt}>
+									  <img src={getBulbImage(generatedPrompts[promptIndex].isLiked, generatedPrompts[promptIndex].isSuper)} alt="Bulb Rating">
+									</button>
+								  </div>
+								  
 								<div id="prompt">{currentPrompt}</div>
 								<button class="btn variant-filled-primary margin" on:click={displayNextPrompt}>Roll the Dice</button>
 							</div>
