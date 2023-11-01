@@ -95,6 +95,7 @@
   }
 }
 	async function generate(event: Event) {
+		resetAnimation();
   		event.preventDefault();
 		toggleDice();
 
@@ -144,7 +145,8 @@ function displayNextPrompt() {
 	toggleDice();
 	displayFirstPrompt();
 	console.log('pIndex:', promptIndex)
-	if (promptIndex === 14) {
+	if (promptIndex === 15) {
+		resetAnimation();
     generate(new Event('click'));
   }
 }
@@ -262,12 +264,12 @@ async function likePrompt(event: Event) {
   
   <div class="card p-4">
 	<Accordion autocollapse>
-	  <AccordionItem open on:click={resetAnimation}> 
+	  <AccordionItem open> 
 		<svelte:fragment slot="lead"><i class="fa-solid fa-lg fa-gear" style="color: #1673c5;"></i></svelte:fragment>
 		<svelte:fragment slot="summary">Settings:</svelte:fragment>
 		<svelte:fragment slot="content">
 			<Accordion>
-				<AccordionItem open on:click={resetAnimation}>
+				<AccordionItem open>
 					<svelte:fragment slot="summary">Primary Categories:</svelte:fragment>
 					<svelte:fragment slot="content">
 			<label class="label">
@@ -287,7 +289,7 @@ async function likePrompt(event: Event) {
 			  </label>
 			</svelte:fragment>
 			</AccordionItem>
-			<AccordionItem on:click={resetAnimation}>
+			<AccordionItem>
 				<svelte:fragment slot="summary">Oddly Specific Categories:</svelte:fragment>
 				<svelte:fragment slot="content">
 				<label class="label">

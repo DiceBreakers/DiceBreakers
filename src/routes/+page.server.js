@@ -14,23 +14,22 @@ export const actions = {
         const categoriesString = selectedCategories.toString().replace(/,/g, '"||categories~"');
 		    let generatedPrompts = [];
         let records = await locals.pb.collection('prompts').getFullList({
-          filter: `(categories~"${categoriesString}") && postPublic = true`,
+          filter: `(categories~"${categoriesString}")`,
           expand: 'author,prompt',
           fields: 'expand.author.username,expand.author.id,id,prompt',
           sort: '@random',
         });
 
-        records = records.slice(0, 15);
-
-		generatedPrompts = records.map((record) => ({
-			prompt: record.prompt,
-      promptId: record.id,
-			author: record.expand?.author.username,
-      authorId: record.expand?.author.id,
-      isFavAuthor: locals.user?.favAuthors?.includes(record.expand?.author.id) || false,
-      isSuper: locals.user?.superLiked?.includes(record.id) || false,
-      isLiked: locals.user?.liked?.includes(record.id) || false,
-		  }));
+      records = records.slice(0, 15);
+      generatedPrompts = records.map((record) => ({
+        prompt: record.prompt,
+        promptId: record.id,
+        author: record.expand?.author.username,
+        authorId: record.expand?.author.id,
+        isFavAuthor: locals.user?.favAuthors?.includes(record.expand?.author.id) || false,
+        isSuper: locals.user?.superLiked?.includes(record.id) || false,
+        isLiked: locals.user?.liked?.includes(record.id) || false,
+        }));
 
       return {
         records: JSON.stringify(generatedPrompts),
@@ -60,7 +59,6 @@ export const actions = {
       
       try {
         const record = await locals.pb.collection('users').update(locals.user?.id, favUpdate);
-        console.log('favUpdate:', favUpdate)
       } catch (err) {
         console.log('Error: ', err);
         throw error(500, "Something went wrong while removing the favorite author.");
@@ -73,7 +71,6 @@ export const actions = {
       
       try {
         const record = await locals.pb.collection('users').update(locals.user?.id, favUpdate);
-        console.log('favUpdate:', favUpdate)
       } catch (err) {
         console.log('Error: ', err);
         throw error(500, "Something went wrong while adding the favorite author.");
@@ -91,7 +88,6 @@ export const actions = {
   
     const data = await request.formData();
     const currentPromptId = String(data.get('promptId')) || '';
-  
 
     pLiked = locals.user?.liked;
     pSuperLiked = locals.user?.superLiked;
@@ -103,6 +99,7 @@ export const actions = {
         liked: updatedLike,
         superLiked: updatedSuperLike,        
       }
+
       try {
         const record = await locals.pb.collection('users').update(locals.user?.id, updateLikes);
         return;
