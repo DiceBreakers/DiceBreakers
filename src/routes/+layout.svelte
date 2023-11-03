@@ -7,6 +7,16 @@
       storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
           
     let showMenu = false;
+
+    import { onMount } from 'svelte';
+    import { pb, updateCurrentUser } from '$lib/stores/pocketbase';
+
+    onMount(() => {
+// On the client-side, once the module is loaded, you can check and update the current user
+    if (pb.authStore.isValid) {
+      updateCurrentUser();
+      }
+    });
 </script>
 
 <Analytics />

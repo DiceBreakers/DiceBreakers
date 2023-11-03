@@ -1,31 +1,33 @@
-import { createInstance } from '$lib/pocketbase'
-import type { Handle } from '@sveltejs/kit'
+import { createInstance } from '$lib/stores/pocketbase';
+import type { Handle } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
-  const pb = createInstance()
+  // If locals.pb is already set, use that instance. Otherwise, create a new one.
+  const pb = event.locals.pb || createInstance();
 
-  // load the store data from the request cookie string
-  pb.authStore.loadFromCookie(event.request.headers.get('cookie') || '')
+  // Load the auth store data from the request cookie string
+  pb.authStore.loadFromCookie(event.request.headers.get('cookie') || '');
   try {
-    // get an up-to-date auth store state by verifying and refreshing the loaded auth model (if any)
+    // Refresh auth store state if valid
     if (pb.authStore.isValid) {
-      await pb.collection('users').authRefresh()
+      await pb.collection('users').authRefresh();
     }
   } catch (_) {
-    // clear the auth store on failed refresh
-    pb.authStore.clear()
+    pb.authStore.clear();
   }
 
-  event.locals.pb = pb
-  event.locals.user = pb.authStore.model
+  event.locals.pb = pb;
+  event.locals.user = pb.authStore.model;
 
-  const response = await resolve(event)
+  const response = await resolve(event);
 
-  // send back the default 'pb_auth' cookie to the client with the latest store state
-  response.headers.set(
-    'set-cookie',
-    pb.authStore.exportToCookie({ httpOnly: false })
-  )
+  // Only set the cookie if there's a change in authentication state
+  if (event.locals.user !== pb.authStore.model) {
+    response.headers.append(
+      'set-cookie',
+      pb.authStore.exportToCookie({ httpOnly: false })
+    );
+  }
 
-  return response
-}
+  return response;
+};

@@ -8,7 +8,7 @@
 	import { popup } from '@skeletonlabs/skeleton';
 	import type { PopupSettings } from '@skeletonlabs/skeleton';
 	import ServerMessage from '$lib/components/serverMessage.svelte';
-    import { currentUser } from '$lib/pocketbase'
+    import { currentUser } from '$lib/stores/user'
 
 	let showSuccessMessage = false;
 	let showFailureMessage = false;

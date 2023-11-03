@@ -14,7 +14,9 @@ const config = {
   ],
 
   kit: {
-    adapter: adapter(),
+    adapter: adapter({
+      cookies: true,
+    }),
   },
 }
 

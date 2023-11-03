@@ -1,7 +1,6 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
-  import { pb } from '$lib/pocketbase';
-  import { popup } from '@skeletonlabs/skeleton';
+  import { pb } from '$lib/stores/pocketbase';
   import ServerMessage from '$lib/components/serverMessage.svelte';
   import TOS from '../legal/tos.svelte';
   let tosChecked = false;
