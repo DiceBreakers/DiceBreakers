@@ -18,7 +18,7 @@ export const CustomDBClassic: CustomThemeConfig = {
 		"--on-tertiary": "0 0 0",
 		"--on-success": "var(--color-primary-900)",
 		"--on-warning": "var(--color-primary-900)",
-		"--on-error": "0 0 0",
+		"--on-error": "255 255 255",
 		"--on-surface": "var(--color-primary-900)",
 		// =~= Theme Colors  =~=
 		// primary | #1673c5 

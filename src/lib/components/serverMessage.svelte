@@ -26,11 +26,11 @@
   }
 
   .server-message.success {
-    background-color: green
+    background-color: #008000
   }
 
   .server-message.error {
-    background-color: red
+    background-color: #ff0000
   }
 
 </style>
