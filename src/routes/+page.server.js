@@ -9,8 +9,8 @@ export const actions = {
     const selectedCategories = data.getAll('categories') ?? [];
     pLiked = locals.user?.liked;
     pSuperLiked = locals.user?.superLiked;
-    let hiddenAuthors = locals.user.hiddenAuthors ?? [];
-    let hiddenPrompts = locals.user.hiddenPrompts ?? [];  
+    let hiddenAuthors = locals.user?.hiddenAuthors ?? [];
+    let hiddenPrompts = locals.user?.hiddenPrompts ?? [];  
     console.log('hiddenAuthors', hiddenAuthors)
     console.log('hiddenPrompts', hiddenPrompts)
 
@@ -29,8 +29,14 @@ export const actions = {
           !hiddenAuthors.includes(record.expand?.author.id) &&
           !hiddenPrompts.includes(record.id)
         );
-  
 
+        if (records.length === 0) {
+          console.log('noRecords')
+          console.error('Error: ', );
+          return error(404, "No Prompts Found");
+        }
+  
+        console.log('stillrunning')
       records = records.slice(0, 15);
       generatedPrompts = records.map((record) => ({
         prompt: record.prompt,

@@ -85,19 +85,24 @@
 	currentAuthor = 'Check the categories to roll new prompts!';
   }
 }
-	async function generate(event: Event) {
-		resetAnimation();
-  		event.preventDefault();
-		toggleDice();
 
-  	const formData = new FormData();
+async function generate(event?: Event) {
+  if (event) event.preventDefault();
+  resetAnimation();
+  toggleDice();
 
-  selectedCategories.subscribe((list: CatItem[]) => {
-    list.forEach(catItem => {
-      if (catItem.checked) {
-        formData.append('categories', catItem.value);
-      }
+  const formData = new FormData();
+
+  const selectedCats = await new Promise<CatItem[]>((resolve) => {
+    selectedCategories.subscribe((list) => {
+      resolve(list);
     });
+  });
+
+  selectedCats.forEach(catItem => {
+    if (catItem.checked) {
+      formData.append('categories', catItem.value);
+    }
   });
 
   try {
@@ -106,24 +111,24 @@
       body: formData,
     });
 
-	if (response.ok) {
-  let serverData = await response.json();
-  let rawData = JSON.parse(serverData.data);
-  let promptData = JSON.parse(rawData[1]);
+    if (response.ok) {
+		
+      let serverData = await response.json();
+      let rawData = JSON.parse(serverData.data);
+      let promptData = JSON.parse(rawData[1]);
 
-console.log('promptData:', promptData)
+      console.log('promptData:', promptData)
 
-  generatedPrompts = promptData.map(obj => ({
-    prompt: obj.prompt,
-	promptId: obj.promptId,
-    author: obj.author,
-	authorId: obj.authorId,
-	isFav: obj.isFavAuthor,
-	isSuper: obj.isSuper,
-	isLiked: obj.isLiked,
-  }));
-  displayFirstPrompt();
-
+      generatedPrompts = promptData.map(obj => ({
+        prompt: obj.prompt,
+        promptId: obj.promptId,
+        author: obj.author,
+        authorId: obj.authorId,
+        isFav: obj.isFavAuthor,
+        isSuper: obj.isSuper,
+        isLiked: obj.isLiked,
+      }));
+      displayFirstPrompt();
     } else {
       console.error('Failed to generate prompts.');
     }
@@ -133,14 +138,15 @@ console.log('promptData:', promptData)
 }
 
 function displayNextPrompt() {
-	toggleDice();
-	displayFirstPrompt();
-	console.log('pIndex:', promptIndex)
-	if (promptIndex === 15) {
-		resetAnimation();
-    generate(new Event('click'));
+  toggleDice();
+  displayFirstPrompt();
+  console.log('pIndex:', promptIndex)
+  if (promptIndex >= generatedPrompts.length) {
+    resetAnimation();
+    generate();
   }
 }
+
 
 async function favToggle() {
 	if (!$currentUser) {
@@ -264,7 +270,7 @@ async function hidePrompt() {
             setTimeout(() => {
                 promptHiddenMessage = false;
             }, 1500);
-			displayNextPrompt();
+			generate();
         } else {
             console.error('Something broke :-(');
             FailureMessage = true;
@@ -307,7 +313,7 @@ async function hideAuthor() {
             setTimeout(() => {
                 authorHiddenMessage = false;
             }, 1500);
-			displayNextPrompt();
+			generate();
         } else {
             console.error('Something broke :-(');
             FailureMessage = true;
