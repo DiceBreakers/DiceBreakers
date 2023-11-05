@@ -8,9 +8,14 @@ export const actions = {
     const data = await request.formData();
     const selectedCategories = data.getAll('categories') ?? [];
     pLiked = locals.user?.liked;
-    pSuperLiked = locals.user?.superLiked;  
+    pSuperLiked = locals.user?.superLiked;
+    let hiddenAuthors = locals.user.hiddenAuthors ?? [];
+    let hiddenPrompts = locals.user.hiddenPrompts ?? [];  
+    console.log('hiddenAuthors', hiddenAuthors)
+    console.log('hiddenPrompts', hiddenPrompts)
 
     try {
+          
         const categoriesString = selectedCategories.toString().replace(/,/g, '"||categories~"');
 		    let generatedPrompts = [];
         let records = await locals.pb.collection('prompts').getFullList({
@@ -19,6 +24,12 @@ export const actions = {
           fields: 'expand.author.username,expand.author.id,id,prompt',
           sort: '@random',
         });
+
+        records = records.filter(record => 
+          !hiddenAuthors.includes(record.expand?.author.id) &&
+          !hiddenPrompts.includes(record.id)
+        );
+  
 
       records = records.slice(0, 15);
       generatedPrompts = records.map((record) => ({

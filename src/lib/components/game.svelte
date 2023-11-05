@@ -142,7 +142,7 @@ function displayNextPrompt() {
   }
 }
 
-async function favToggle(event: Event) {
+async function favToggle() {
 	if (!$currentUser) {
     LoginMessage = true;
     setTimeout(() => {
@@ -198,7 +198,7 @@ function incrementBulb() {
 }
 
 
-async function likePrompt(event: Event) {
+async function likePrompt() {
 	if (!$currentUser) {
     LoginMessage = true;
     setTimeout(() => {
@@ -238,7 +238,7 @@ async function likePrompt(event: Event) {
     }
 };
 
-async function hidePrompt(event: Event) {
+async function hidePrompt() {
 	if (!$currentUser) {
     LoginMessage = true;
     setTimeout(() => {
@@ -281,7 +281,7 @@ async function hidePrompt(event: Event) {
     }
 }
 
-async function hideAuthor(event: Event) {
+async function hideAuthor() {
 	if (!$currentUser) {
     LoginMessage = true;
     setTimeout(() => {
@@ -324,7 +324,7 @@ async function hideAuthor(event: Event) {
     }
 }
 
-async function submitReport(event: Event) {
+async function submitReport() {
 	if (!$currentUser) {
     LoginMessage = true;
     setTimeout(() => {
