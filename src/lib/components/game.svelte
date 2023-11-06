@@ -343,9 +343,9 @@ async function submitReport() {
 
     const formData = new FormData();
     formData.append('authorId', currentAuthId);
-	formData.append('promptId', currentPromptId);
-	formData.append('promptText', currentPrompt);
-	formData.append('report', reportReason);
+	  formData.append('promptId', currentPromptId);
+	  formData.append('promptText', currentPrompt);
+	  formData.append('report', reportReason);
 
     try {
         const response = await fetch('?/report', {

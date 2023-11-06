@@ -9,7 +9,7 @@
     }
 	
 </script>
-<div class="center">
+<div class="loginMenu">
 <h2>Login:</h2>
 	<form
 	method="POST"
@@ -74,7 +74,7 @@
 		background-color: rgba(84, 81, 81, 0.0);
 	}
 
-	.center {
+	.loginMenu {
 		margin: auto;
 		display: block;
 		max-width: 700px;
