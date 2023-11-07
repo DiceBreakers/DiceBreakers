@@ -2,7 +2,7 @@
 	import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
-	import { fade } from 'svelte/transition';
+	import { fade, slide } from 'svelte/transition';
 	import DicePortal from '$lib/components/dicePortal.svelte';
 	import { catList } from '$lib/components/catList.svelte';
 	import { popup } from '@skeletonlabs/skeleton';
@@ -402,7 +402,7 @@ async function submitReport() {
 	<ServerMessage isError={true} messageText="You must be logged in" />
 {/if}
   
-  <div class="card p-4">
+  <div class="card p-4" transition:fade={{ delay: 250, duration: 300 }}>
 	<Accordion autocollapse>
 	  <AccordionItem> 
 		<svelte:fragment slot="lead"><i class="fa-solid fa-lg fa-gear" style="color: #1673c5;"></i></svelte:fragment>

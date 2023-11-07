@@ -12,3 +12,8 @@
 <div class="bg_gradient">
 <Footer />
 </div>
+<div class="bg_gradient"></div>
+
+<style>
+
+</style>
