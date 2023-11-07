@@ -1,5 +1,5 @@
 <script>
-	import Input from "../../lib/components/input.svelte";
+	import Input from "$lib/components/input.svelte";
     import { currentUser } from '$lib/stores/user'
 	import ServerMessage from "$lib/components/serverMessage.svelte";
 

@@ -21,12 +21,6 @@
 		id: string;
 	};
 
-	const hover: PopupSettings = {
-		event: 'hover',
-		target: 'popupHover',
-		placement: 'top'
-	};
-
 	const deletePopup: PopupSettings = {
 		event: 'click',
 		target: 'deletePopup',

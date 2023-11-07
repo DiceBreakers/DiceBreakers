@@ -102,7 +102,7 @@
 				<AccordionItem open>
 					<svelte:fragment slot="summary">Primary Categories:</svelte:fragment>
 					<svelte:fragment slot="content">
-						<label class="label"> <!-- Added "class" here -->
+						<label class="label">
 							<div class="categories-grid">
 								{#each $primaryCategories as catItem}
 								<label class="category-item">

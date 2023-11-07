@@ -1,6 +1,4 @@
 <script>
-  import { onMount, afterUpdate } from 'svelte';
-
   export let isError = false;
   export let isSuccess = true;
   export let messageText = 'Success!';

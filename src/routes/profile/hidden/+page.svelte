@@ -1,14 +1,20 @@
 <script>
   import Header from '$lib/components/header.svelte'
+  import Hidden from './hidden.svelte'
   import Footer from '$lib/components/footer.svelte'
-  import Game from './game.svelte'
+
 </script>
 
 
 <div class="bg_gradient">
+
 <Header />
 </div>
-<Game />
+<Hidden />
 <div class="bg_gradient">
 <Footer />
 </div>
+
+<style>
+
+</style>

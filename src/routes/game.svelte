@@ -3,11 +3,11 @@
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { fade } from 'svelte/transition';
-	import DicePortal from './dicePortal.svelte';
-	import { catList } from './catList.svelte';
+	import DicePortal from '$lib/components/dicePortal.svelte';
+	import { catList } from '$lib/components/catList.svelte';
 	import { popup } from '@skeletonlabs/skeleton';
 	import ServerMessage from '$lib/components/serverMessage.svelte';
-    import { currentUser } from '$lib/stores/user'
+  import { currentUser } from '$lib/stores/user'
 
 	let SuccessMessage = false;
 	let FailureMessage = false;
@@ -404,12 +404,12 @@ async function submitReport() {
   
   <div class="card p-4">
 	<Accordion autocollapse>
-	  <AccordionItem open> 
+	  <AccordionItem> 
 		<svelte:fragment slot="lead"><i class="fa-solid fa-lg fa-gear" style="color: #1673c5;"></i></svelte:fragment>
 		<svelte:fragment slot="summary">Settings:</svelte:fragment>
 		<svelte:fragment slot="content">
 			<Accordion>
-				<AccordionItem open>
+				<AccordionItem>
 					<svelte:fragment slot="summary">Primary Categories:</svelte:fragment>
 					<svelte:fragment slot="content">
 			<label class="label">
@@ -463,9 +463,9 @@ async function submitReport() {
 					<div in:fade={{ duration: 1000 }}>
 						<div class="promptBox">
 							<div class="gameTop">
-								<div class="bulb">
+								<div class="bulb" use:popup={{ event: 'hover', target: 'likeTT', placement: 'top'}}>
 									<button on:click={likePrompt}>
-									  <img src={getBulbImage(generatedPrompts[promptIndex].isLiked, generatedPrompts[promptIndex].isSuper)} alt="Bulb Rating">
+									  <img alt="Bulb Rating" src={getBulbImage(generatedPrompts[promptIndex].isLiked, generatedPrompts[promptIndex].isSuper)}>
 									</button>
 								</div>								  
 								<div class="prompt">{currentPrompt}</div>
@@ -474,10 +474,12 @@ async function submitReport() {
 							<div class="gameBottom">
 								<div class="hideMenuButton">
 									<div title="Hide/Report" class="fa-regular fa-xl fa-eye-slash" style="color: #1e3050;"
-									use:popup={{ event: 'click', target: 'hideMenu', placement: 'top' }}></div>
+									use:popup={{ event: 'click', target: 'hideMenu', placement: 'top' }}
+                  use:popup={{ event: 'hover', target: 'hideTT', placement: 'top'}}></div>
 								</div>
 								<div class="right"><b>{currentAuthor}</b> 
-									<button on:click={favToggle}>
+									<button on:click={favToggle}
+                  use:popup={{ event: 'hover', target: 'favTT', placement: 'top'}}>
 										{#if currentFav}
 											<i class="fa-solid fa-xl fa-star" style="color: #fecb0e;"></i>
 										{:else}
@@ -497,7 +499,23 @@ async function submitReport() {
 
   <!-- Popup Menus -->
 
-  	<div class="popup hideAdjust" data-popup="hideMenu">
+  <div class="popup likeTT" data-popup="likeTT">
+    Like
+  </div>
+
+  <div class="popup sLikeTT" data-popup="sLikeTT">
+    Super Like
+	</div>
+
+  <div class="popup favTT" data-popup="favTT">
+    Favorite Author
+  </div>
+
+  <div class="popup hideTT" data-popup="hideTT">
+    Hide/Report
+	</div>
+
+  <div class="popup hideMenu" data-popup="hideMenu">
 		<div class="popup-HM" in:fade={{ duration: 800 }}>
 			<span><button class="badge variant-filled-error report" 
 				use:popup={{ event: 'click', target: 'reportMenu', placement: 'top' }}>Report</button>									  
@@ -512,9 +530,9 @@ async function submitReport() {
   <div class="popup reportMenu" data-popup="reportMenu">
     <div class="popup-RM" in:fade={{ duration: 800 }}>
     	<textarea id="reportReason" bind:value={reportReason} class="textArea" rows="3" placeholder="Reason for report:"></textarea>
-		<div class="center">
-      		<button class="submit-report badge variant-filled-error" on:click={submitReport}>Report</button>
-		</div>
+		  <div class="center">
+        <button class="submit-report badge variant-filled-error" on:click={submitReport}>Report</button>
+		  </div>
     </div>
   </div>
 
@@ -536,17 +554,25 @@ async function submitReport() {
 		margin-right: 8px;
 	}
 
-	.hideAdjust {
+  .likeTT {
+    margin-top: 10px;
+  }
+
+  .hideTT {
+    margin-top: -15px;
+  }
+
+	.hideMenu {
 		align-self: flex-start;
-  		margin-top: 40px;
+    margin-top: 40px;
 		margin-left: 12px;
 		width: 175px;
 	}
 
 	.popup-HM {
-        display: flex;
-        justify-content: space-between; 
-        align-items: center; 
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; 
     }
 
 	.popup-RM {
@@ -562,23 +588,23 @@ async function submitReport() {
 		padding: 0.4em;
 }
 
-    .hide-options {
-        display: flex; 
-        flex-direction: column; 
-        align-items: flex-end;
-    }
+  .hide-options {
+    display: flex; 
+    flex-direction: column; 
+    align-items: flex-end;
+  }
 
-    .hideMenuButton .fa-eye-slash {
-        cursor: pointer; 
-    }
+  .hideMenuButton .fa-eye-slash {
+    cursor: pointer; 
+  }
 
 	.gameBottom {
     display: flex;
     align-items: center; 
     justify-content: space-between;
-	margin-left: auto;
-	margin-right: auto;
-	width: 250px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 250px;
 	}
 
 	.hideMenuButton {
