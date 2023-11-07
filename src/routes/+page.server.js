@@ -31,9 +31,8 @@ export const actions = {
         );
 
         if (records.length === 0) {
-          console.log('noRecords')
-          console.error('Error: ', );
-          return error(404, "No Prompts Found");
+          console.log('noRecords');
+          throw new Error("No Prompts Found");
         }
   
         console.log('stillrunning')

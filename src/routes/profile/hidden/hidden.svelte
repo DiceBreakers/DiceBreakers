@@ -231,16 +231,15 @@
 			<svelte:fragment slot="content">
 				{#if $currentPageAuthors}
 					<div class="hiddenAuthors">
-					<ul>
-						{#each $currentPageAuthors as author}
-						<li>
-							<a href="/profile/hidden" on:click={() => handleShowAuthor(author)}>
-							<i class="mr fa-solid fa-x" style="color: #1673c5;"></i>
-							{author.username}
-							</a>
-						</li>
-						{/each}
-					</ul>		
+						<ul>
+							{#each $currentPageAuthors as author}
+								<li>
+									<a href="/profile/hidden" on:click={() => handleShowAuthor(author)}>
+									<i class="mr fa-solid fa-x" style="color: #1673c5;"></i>
+										{author.username}</a>
+								</li>
+							{/each}
+						</ul>		
 					</div>
 					<div class="pages">
 					<ul class="pad">
@@ -261,7 +260,7 @@
 			<svelte:fragment slot="content">
 				{#if $currentPagePrompts}
 					<div class="hiddenPrompts">
-					<ul>
+						<ul>
 						{#each $currentPagePrompts as prompt}
 						<li>
 							<a href="/profile/hidden" on:click={() => handleShowPrompt(prompt)}>
@@ -270,7 +269,7 @@
 							</a>
 						</li>
 						{/each}
-					</ul>		
+						</ul>		
 					</div>
 					<div class="pages">
 					<ul class="pad">

@@ -1,8 +1,8 @@
 <script>
-    import { slide } from "svelte/transition";
+    import { fade } from "svelte/transition";
 </script>
 
-<div class="header" in:slide={{ duration: 1000 }}><span>
+<div class="header" in:fade={{ duration: 1000 }}><span>
     <a href="/"><img src="/LogoSlogan.png" width="400" height="auto"
         title="Return Home" alt="Dice Breakers Blue Icosahedron Logo"></a></span>
 </div>

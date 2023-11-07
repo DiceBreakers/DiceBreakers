@@ -35,8 +35,10 @@
 	let generatedPrompts: { prompt: string; promptId: string; author: string; authorId: string; isFav: boolean; isSuper: boolean; isLiked: boolean; }[] = [];
 	let isRolling = false;
 	let reportReason = '';
+
+
 	
-	onMount(() => {
+	onMount(async() => {
         catList.subscribe((list: CatItem[]) => {
             selectedCategories.set(list);
             const categories = list;
@@ -402,7 +404,7 @@ async function submitReport() {
 	<ServerMessage isError={true} messageText="You must be logged in" />
 {/if}
   
-  <div class="card p-4" transition:fade={{ delay: 250, duration: 300 }}>
+  <div class="card p-4" transition:fade={{ delay: 1000, duration: 500 }}>
 	<Accordion autocollapse>
 	  <AccordionItem> 
 		<svelte:fragment slot="lead"><i class="fa-solid fa-lg fa-gear" style="color: #1673c5;"></i></svelte:fragment>
@@ -459,21 +461,19 @@ async function submitReport() {
 			<div class="game">
 				{#if isRolling}
 					<DicePortal />
-			  	{:else}
-					<div in:fade={{ duration: 1000 }}>
-						<div class="promptBox">
-							<div class="gameTop">
-								<div class="bulb" use:popup={{ event: 'hover', target: 'likeTT', placement: 'top'}}>
-									<button on:click={likePrompt}>
-									  <img alt="Bulb Rating" src={getBulbImage(generatedPrompts[promptIndex].isLiked, generatedPrompts[promptIndex].isSuper)}>
-									</button>
-								</div>								  
-								<div class="prompt">{currentPrompt}</div>
-								<button class="btn variant-filled-primary margin" on:click={displayNextPrompt}>Roll the Dice</button>
-							</div>
-							<div class="gameBottom">
-								<div class="hideMenuButton">
-									<div title="Hide/Report" class="fa-regular fa-xl fa-eye-slash" style="color: #1e3050;"
+			  {:else}
+					<div class="promptBox">
+						<div class="gameTop">
+              <button on:click={likePrompt}>
+							  <img alt="Bulb Rating" src={getBulbImage(generatedPrompts[promptIndex].isLiked, generatedPrompts[promptIndex].isSuper)}>
+              </button>
+						  <div class="prompt" in:fade={{ delay: 100, duration: 800 }}>{currentPrompt}</div>
+							<button in:fade={{ delay: 2500, duration: 1500 }} class="btn variant-filled-primary margin"
+                on:click={displayNextPrompt}>Roll the Dice</button>
+						</div>
+						<div class="gameBottom" in:slide={{ delay: 1000, duration: 800 }}>
+							<div class="hideMenuButton">
+								<div title="Hide/Report" class="fa-regular fa-xl fa-eye-slash" style="color: #1e3050;"
 									use:popup={{ event: 'click', target: 'hideMenu', placement: 'top' }}
                   use:popup={{ event: 'hover', target: 'hideTT', placement: 'top'}}></div>
 								</div>
@@ -489,7 +489,6 @@ async function submitReport() {
 								</div>
 							</div>
 						</div>
-					</div>
 			  	{/if}
 			</div>			  
 		  </svelte:fragment>
@@ -515,7 +514,7 @@ async function submitReport() {
     Hide/Report
 	</div>
 
-  <div class="popup hideMenu" data-popup="hideMenu">
+  <div class="popup_hideMenu" data-popup="hideMenu">
 		<div class="popup-HM" in:fade={{ duration: 800 }}>
 			<span><button class="badge variant-filled-error report" 
 				use:popup={{ event: 'click', target: 'reportMenu', placement: 'top' }}>Report</button>									  
@@ -562,11 +561,16 @@ async function submitReport() {
     margin-top: -15px;
   }
 
-	.hideMenu {
+	.popup_hideMenu {
 		align-self: flex-start;
     margin-top: 40px;
 		margin-left: 12px;
 		width: 175px;
+    background-color: #0b3861;
+    color: #8FE0F7;
+		padding: 5px;
+		border-radius: 5px;
+		z-index: 2000;
 	}
 
 	.popup-HM {
