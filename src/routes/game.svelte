@@ -667,4 +667,28 @@ async function submitReport() {
 		min-width: 300px;
 	}
 
+
+/* Add a media query for narrow screens */
+@media (max-width: 600px) {
+  .category-item {
+    display: flex; /* Use flex layout */
+    align-items: center; /* Align items vertically */
+    gap: 10px; /* Add space between checkbox and label */
+  }
+
+  .checkboxSize {
+    flex-shrink: 0; /* Prevent the checkbox from shrinking */
+  }
+
+  .checkboxSM {
+    white-space: nowrap; /* Prevent the label from wrapping */
+    overflow: hidden; /* Hide overflow */
+    text-overflow: ellipsis; /* Add an ellipsis to text that's too long */
+    max-width: 70%; /* Set a max width for the label */
+  }
+
+  .fa-circle-info {
+    flex-shrink: 0; /* Prevent the icon from shrinking */
+  }
+}
 </style>
