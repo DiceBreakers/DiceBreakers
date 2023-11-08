@@ -9,9 +9,11 @@
 <div class="bg_gradient">
 	<Header />
 </div>
-<div class="body card p-4 variant-glass-secondary">
+
+<div class="bg_gradient">
   <Login />
 </div>
+
 <div class="bg_gradient">
 	<Footer />
 </div>

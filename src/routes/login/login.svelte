@@ -9,40 +9,39 @@
     }
 	
 </script>
-<div class="loginMenu">
-<h2>Login:</h2>
-	<form
-	method="POST"
-	action="/login?/login"
-	class="card item"
-	use:enhance={() => {
-	  return async ({ result }) => {
-		pb.authStore.loadFromCookie(document.cookie)
-		await applyAction(result)
-	  }
-	}}>
-		<input type="email" name="email" placeholder="Email" class="input" autocomplete="email" />
-		<input type="password" name="password" placeholder="Password" class="input" />
-		<button class="btn btn-sm variant-filled-primary" type="submit">Login</button>
-		<a on:click={closeMenu} href="/reset" class="button btn btn-sm">Forgot pw?</a>
-  </form>
-  <p class="indent">Or</p>
-  <form class="auth-form" method="post" action="/login?/OAuth2"
-  use:enhance={() => {
-	return async ({ result }) => {
-	  pb.authStore.loadFromCookie(document.cookie)
-	  await applyAction(result)
-	}
-  }}>
-	<div>
-		<button class="btn-auth" type="submit">
-		<img class="btn-auth-img" src='/googleSignIn.png' alt='google sign in'/>
-		</button>
-	</div>
 
-</form> 
- 	<div class="register btn btn-lg variant-filled-secondary">
-  		<a href="/register" title="Register Here"><strong>Click here to register!</strong></a>
+<div class="body card p-4">
+	<div class="loginMenu">
+		<h2>Login:</h2>
+			<form method="POST"
+				action="/login?/login"
+				class="card item"
+				use:enhance={() => {
+				return async ({ result }) => {
+					pb.authStore.loadFromCookie(document.cookie)
+					await applyAction(result)}}}>
+				<input type="email" name="email" placeholder="Email" class="input" autocomplete="email" />
+				<input type="password" name="password" placeholder="Password" class="input" />
+				<button class="btn btn-sm variant-filled-primary" type="submit">Login</button>
+				<a on:click={closeMenu} href="/reset" class="button btn btn-sm">Forgot pw?</a>
+			</form>
+		<p class="indent">Or</p>
+			<form class="auth-form" method="post" action="/login?/OAuth2"
+					use:enhance={() => {
+						return async ({ result }) => {
+						pb.authStore.loadFromCookie(document.cookie)
+						await applyAction(result)
+						}
+					}}>
+				<div>
+					<button class="btn-auth" type="submit">
+					<img class="btn-auth-img" src='/googleSignIn.png' alt='google sign in'/>
+					</button>
+				</div>
+			</form> 
+				<div class="register btn btn-lg variant-filled-secondary">
+					<a href="/register" title="Register Here"><strong>Click here to register!</strong></a>
+				</div>
 	</div>
 </div>
 

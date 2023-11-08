@@ -6,9 +6,13 @@
 
 
 <div class="bg_gradient">
-<Header />
+  <Header />
 </div>
-<Legal />
+
 <div class="bg_gradient">
-<Footer />
+  <Legal />
+</div>
+
+<div class="bg_gradient">
+  <Footer />
 </div>

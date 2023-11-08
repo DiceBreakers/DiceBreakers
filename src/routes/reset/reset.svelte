@@ -1,5 +1,5 @@
 <script>
-    import ServerMessage from "../../lib/components/serverMessage.svelte";
+    import ServerMessage from "$lib/components/serverMessage.svelte";
 	let form;
 
 </script>
@@ -8,7 +8,7 @@
 	<h2 class="mt-2 text-center text-3xl font-bold tracking-tight text-base-content">
 		Reset Your Password
 	</h2>
-	<p class="text-center mt-1">We'll send you an email with a link to reset your password.</p>
+	<p class="text-center mt-1">We'll send you an email with a link to finish reseting your password.</p>
 	<form
 		action="?/resetPasswordInit"
 		method="POST"

@@ -25,6 +25,8 @@
 	    background-position: center center;
 		background-repeat: no-repeat;
 		background-attachment: fixed;
+		z-index: -2000;
+		
 	}
 
 	.checkboxSize {
@@ -56,8 +58,7 @@
 
 	.categories-grid {
 	display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-	/* You can adjust the minmax value and gap as needed */
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
 	}
 
 	.category-item {
@@ -68,7 +69,7 @@
 	/* Media query for small screens */
 	@media (max-width: 768px) {
 	.categories-grid {
-		grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
 		/* Adjust values for smaller screens */
 	}
 	}

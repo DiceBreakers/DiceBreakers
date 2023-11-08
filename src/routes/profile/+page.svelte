@@ -6,12 +6,15 @@
 
 
 <div class="bg_gradient">
-
-<Header />
+  <Header />
 </div>
-<Profile />
+
 <div class="bg_gradient">
-<Footer />
+  <Profile />
+</div>
+
+<div class="bg_gradient">
+  <Footer />
 </div>
 
 <style>

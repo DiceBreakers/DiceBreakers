@@ -91,8 +91,7 @@
 {/if}
   
 
-<section id="addPrompt">
-	<div class="card p-4 variant-glass-secondary">
+	<div class="card p-4">
 		<form on:submit={handleSubmit}>
 			<label class="label">
 				<div class="body padding"><h1>Add a Prompt:</h1></div>
@@ -145,7 +144,6 @@
 			</div>
 		</form>
 	</div>
-</section>
 			
 <style>
 	.padding {

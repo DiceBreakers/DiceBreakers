@@ -20,8 +20,11 @@ export const actions = {
 
     try {          
 		    let generatedPrompts = [];
-        let records = await locals.pb.collection('prompts').getFullList({
-          filter: `(categories?~"${selectedCategories}")&&("${hiddenAuthors}"?!~author)&&("${hiddenPrompts}"?!~id)`,
+        const categoriesString = selectedCategories.toString().replace(/,/g, '"||categories~"');
+        let records = await locals.pb.collection('prompts').getList(1, 15, {
+          page: 1,
+          perPage: 15,
+          filter: `(categories~"${categoriesString}")&&("${hiddenAuthors}"?!~author)&&("${hiddenPrompts}"?!~id)`,
           expand: 'author',
           fields: 'expand.author.username,expand.author.id,id,prompt',
           sort: '@random',
@@ -29,27 +32,24 @@ export const actions = {
 
         console.log('records:', records)
 
-        if (records.length === 0) {
-          console.log('noRecords');
-          throw new Error("No Prompts Found");
+        if (!records) {
+          console.log('Nothing matched that search');
+          throw new Error("Nothing matched that search");
         }
-
-        console.log('record length', records.length)
-        console.log('still running')
   
-      records = records.slice(0, 15);
-      generatedPrompts = records.map((record) => ({
-        prompt: record.prompt,
-        promptId: record.id,
-        author: record.expand?.author.username,
-        authorId: record.expand?.author.id,
-        isFavAuthor: locals.user?.favAuthors?.includes(record.expand?.author.id) || false,
-        isSuper: locals.user?.superLiked?.includes(record.id) || false,
-        isLiked: locals.user?.liked?.includes(record.id) || false,
-        }));
+    //  records = records.slice(0, 15);
+    //  generatedPrompts = records.map((record) => ({
+    //    prompt: record.prompt,
+    //    promptId: record.id,
+    //    author: record.expand?.author.username,
+    //    authorId: record.expand?.author.id,
+    //    isFavAuthor: locals.user?.favAuthors?.includes(record.expand?.author.id) || false,
+    //    isSuper: locals.user?.superLiked?.includes(record.id) || false,
+    //    isLiked: locals.user?.liked?.includes(record.id) || false,
+    //    }));
 
       return {
-        records: JSON.stringify(generatedPrompts),
+        records: JSON.stringify(records),
       };
     } catch (err) {
       console.error('Error: ', err);

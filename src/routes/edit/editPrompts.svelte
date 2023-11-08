@@ -437,7 +437,7 @@ async function deletePrompt(event: Event) {
 		</svelte:fragment>
 	</AccordionItem>
 		{:else}
-			<div class="text-center margin">Select prompt to edit...</div>
+			<div class="text-center margin">Select which prompt you want to edit.</div>
 		{/if}
 	</section>
 	</Accordion>

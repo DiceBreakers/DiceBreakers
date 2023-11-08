@@ -6,16 +6,13 @@
 
 
 <div class="bg_gradient">
-
 	<Header />
-
 </div>
+
+<div class="bg_gradient">
 	<AddPrompt />
+</div>
 
 <div class="bg_gradient">
 	<Footer />
 </div>
-
-<style>
-
-</style>

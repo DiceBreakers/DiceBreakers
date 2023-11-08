@@ -8,7 +8,9 @@
 	<Header />
 </div>
 
-<About />
+<div class="bg_gradient">
+  <About />
+</div>
 
 <div class="bg_gradient">
   <Footer />

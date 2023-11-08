@@ -23,7 +23,7 @@
   <ServerMessage isError={true} messageText="Must agree to our TOS" />
 {/if}
 
-<div class="center">
+<div class="center body card p-4">
   <h2>Enter email and password to register:</h2>
   <form
     method="POST"

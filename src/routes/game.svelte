@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
-	import { writable } from 'svelte/store';
+	import { get, writable } from 'svelte/store';
 	import { fade, slide } from 'svelte/transition';
 	import DicePortal from '$lib/components/dicePortal.svelte';
 	import { catList } from '$lib/components/catList.svelte';
@@ -22,10 +22,21 @@
 	  checked: boolean;
 	  tooltip: string;
 	};
+
+  type Prompt = {
+    prompt: string;
+    promptId: string;
+    author: string;
+    authorId: string;
+    isFavAuthor: boolean;
+    isLiked: boolean;
+    isSuper: boolean;
+  }
 	
 	let selectedCategories = writable<CatItem[]>([]);
 	let primaryCategories = writable<CatItem[]>([]);
 	let additionalCategories = writable<CatItem[]>([]);
+  let promptArray = writable<Prompt[]>([]);
 	let currentPrompt = '';
 	let currentPromptId = '';
 	let currentAuthor = '';
@@ -34,7 +45,7 @@
   let isLiked = false;
   let isSuper = false;
 	let promptIndex = 0;
-	let generatedPrompts: { prompt: string; promptId: string; author: string; authorId: string; isFav: boolean; isSuper: boolean; isLiked: boolean; }[] = [];
+	let generatedPrompts: { prompt: string; promptId: string; author: string; authorId: string; isFavAuthor: boolean; isSuper: boolean; isLiked: boolean; }[] = [];
 	let isRolling = false;
 	let reportReason = '';
 	
@@ -46,56 +57,6 @@
             additionalCategories.set(categories.slice(6));
         });
     });
-
-	function getBulbImage(isLiked, isSuper) {
-  if (isSuper) {
-    return 'bulb2.png';
-  } else if (isLiked) {
-    return 'bulb1.png';
-  } else {
-    return 'bulb0.png';
-  }
-}
-
-	function toggleDice() {
-    isRolling = true;
-    setTimeout(() => {
-      isRolling = false;
-    }, 3300);
-  }
-
-  	function resetAnimation() {
-		currentPrompt = '';
-		currentAuthor = '';
-		currentAuthId = '';
-		promptIndex = 0;
-		currentFav = false;
-	}
-
-	function updatePrompt() {
-    console.log('initpromptIndex', promptIndex)
-    console.log('initgeneratedprompts.length', generatedPrompts.length)
-    console.log('initgPromts[pIndex]:', generatedPrompts[promptIndex]);
-  if (promptIndex < generatedPrompts.length) {
-	const { prompt, promptId, author, authorId, isFav } = generatedPrompts[promptIndex];
-		currentPrompt = prompt;
-		currentPromptId = promptId;
-		currentAuthor = author;
-		currentAuthId = authorId;
-    currentFav = isFav;
-
-    console.log('endpromptIndex', promptIndex)
-    console.log('endgeneratedprompts.length', generatedPrompts.length)
-    console.log('endgPromts[pIndex]:', generatedPrompts[promptIndex]);
-  } else {
-    currentPrompt = "Hmm. Something went wrong, you shouldn't be here..."
-	  currentAuthor = '';
-    isLiked = false;
-    isSuper = false;
-    currentFav = false;
-  console.log('Failed if check.')
-  }
-}
 
 async function generate(event?: Event) {
   if (event) event.preventDefault();
@@ -116,6 +77,8 @@ async function generate(event?: Event) {
     }
   });
 
+  const user = get(currentUser);
+
   try {
     const response = await fetch('?/generate', {
       method: 'POST',
@@ -125,20 +88,26 @@ async function generate(event?: Event) {
     if (response.ok) {
 		
       let serverData = await response.json();
+          console.log('serverData:', serverData)
       let rawData = JSON.parse(serverData.data);
+          console.log('rawData:', rawData)
       let promptData = JSON.parse(rawData[1]);
+          console.log('promptData:', promptData)
+      let generatedPrompts = promptData.items.map(obj => ({
+          prompt: obj.prompt,
+          promptId: obj.id,
+          author: obj.expand.author.username,
+          authorId: obj.expand.author.id,
+          isFavAuthor: user?.favAuthors.includes(obj.expand?.author.id) || false,
+          isSuper: user?.superLiked.includes(obj.id) || false,
+          isLiked: user?.liked.includes(obj.id) || false,
+        }));
+          console.log('generatedPrompts:', generatedPrompts);
 
-      console.log('promptData:', promptData)
+        promptArray.set(generatedPrompts);
 
-      generatedPrompts = promptData.map(obj => ({
-        prompt: obj.prompt,
-        promptId: obj.promptId,
-        author: obj.author,
-        authorId: obj.authorId,
-        isFav: obj.isFavAuthor,
-        isSuper: obj.isSuper,
-        isLiked: obj.isLiked,
-      }));
+        console.log('promptArray:', promptArray)
+
       updatePrompt();
     } else {
         console.error('Failed to generate prompts.');
@@ -149,10 +118,63 @@ async function generate(event?: Event) {
   }
 }
 
+function updatePrompt() {
+  const prompts = get(promptArray);
+  console.log('promptIndex', promptIndex);
+  
+  if (promptIndex < prompts.length) {
+    const promptData = prompts[promptIndex];
+    console.log('promptData:', promptData);
+
+    try {
+      if (promptData) {
+        let { prompt, promptId, author, authorId, isFavAuthor, isSuper, isLiked } = promptData;
+        currentPrompt = prompt;
+        currentPromptId = promptId;
+        currentAuthor = author;
+        currentAuthId = authorId;
+        currentFav = isFavAuthor;
+        isSuper = isSuper;
+        isLiked = isLiked;
+      } else {
+        throw new Error('Prompt data is undefined');
+      }
+    } catch (error) {
+      console.error('Failed to set prompt data:', error);
+      currentPrompt = "Hmm. Something went wrong, you shouldn't be here...";
+      currentAuthor = '';
+      currentPromptId = '';
+      currentAuthId = '';
+      currentFav = false;
+      isLiked = false;
+      isSuper = false;
+    }
+  } else {
+    console.error('No more prompts to display.');
+    currentPrompt = "Hmm. Either there was a server error, or the search was too narrow/you've managed to hide everyone. Change some settings and try again.";
+  }
+}
+
+function toggleDice() {
+    isRolling = true;
+    setTimeout(() => {
+      isRolling = false;
+    }, 3300);
+  }
+
+function resetAnimation() {
+		currentPrompt = '';
+		currentAuthor = '';
+		currentAuthId = '';
+		promptIndex = 0;
+		currentFav = false;
+	}
+
 function displayNextPrompt() {
   promptIndex++;
 
-  if (promptIndex >= generatedPrompts.length) {
+  const prompts = get(promptArray);
+  if (promptIndex >= prompts.length) {
     generate();
     return;
   }
@@ -162,17 +184,8 @@ function displayNextPrompt() {
   updatePrompt();
 }
 
-function updateFavoriteStatusForAuthor(authorId, isFav) {
-  generatedPrompts = generatedPrompts.map((prompt) => {
-    if (prompt.authorId === authorId) {
-      return { ...prompt, isFav: isFav };
-    }
-    return prompt;
-  });
-}
-
 async function favToggle() {
-	if (!$currentUser) {
+  if (!$currentUser) {
     LoginMessage = true;
     setTimeout(() => {
       LoginMessage = false;
@@ -180,92 +193,105 @@ async function favToggle() {
     return;
   }
 
-	currentFav = !currentFav;
-    if (!currentAuthId) return;
+  if (!currentAuthId) return;
 
-	const promptIndex = generatedPrompts.findIndex(prompt => prompt.authorId === currentAuthId);
-  		if (promptIndex >= 0) {
-    		generatedPrompts[promptIndex].isFav = currentFav;
- 		}
+  const newFavStatus = !currentFav;
 
-    const formData = new FormData();
-    formData.append('authorId', currentAuthId);
+  promptArray.update(prompts => {
+    return prompts.map(prompt => {
+      if (prompt.authorId === currentAuthId) {
+        return { ...prompt, isFavAuthor: newFavStatus };
+      }
+      return prompt;
+    });
+  });
 
-    try {
-        const response = await fetch('?/favAuthor', {
-            method: 'POST',
-            body: formData,
-        });
+  const formData = new FormData();
+  formData.append('authorId', currentAuthId);
 
-        if (response.ok) {
-            console.log('Favorite Toggled Successfully');
-            updateFavoriteStatusForAuthor(currentAuthId, currentFav);
-        } else {
-            console.error('Something broke :-(');
-            FailureMessage = true;
-            setTimeout(() => {
-                FailureMessage = false;
-            }, 1500);
-        }
-    } catch (error) {
-        console.error('An error occurred:', error);
-        FailureMessage = true;
-        setTimeout(() => {
-            FailureMessage = false;
-        }, 1500);
+  try {
+    const response = await fetch('?/favAuthor', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (response.ok) {
+      console.log('Favorite Toggled Successfully');
+    } else {
+      console.error('Something broke :-(');
+      FailureMessage = true;
+      setTimeout(() => {
+        FailureMessage = false;
+      }, 1500);
     }
-}
-
-function incrementBulb() {
-  if (generatedPrompts[promptIndex].isSuper === true) {
-    generatedPrompts[promptIndex].isLiked = false;
-    generatedPrompts[promptIndex].isSuper = false;
-  } else if (generatedPrompts[promptIndex].isLiked === true) {
-    generatedPrompts[promptIndex].isSuper = true;
-  } else {
-    generatedPrompts[promptIndex].isLiked = true;
+  } catch (error) {
+    console.error('An error occurred:', error);
+    FailureMessage = true;
+    setTimeout(() => {
+      FailureMessage = false;
+    }, 1500);
   }
 }
+
+$: bulbImage = $promptArray[promptIndex]?.isSuper ? 'bulb2.png' :
+                 $promptArray[promptIndex]?.isLiked ? 'bulb1.png' : 'bulb0.png';
 
 async function likePrompt() {
-	if (!$currentUser) {
-    LoginMessage = true;
-    setTimeout(() => {
-      LoginMessage = false;
-    }, 1500);
-    return;
-  }
+    if (!$currentUser) {
+      LoginMessage = true;
+      setTimeout(() => {
+        LoginMessage = false;
+      }, 1500);
+      return;
+    }
 
-  	incrementBulb();
+    const currentPrompts = get(promptArray);
+    const prompt = currentPrompts[promptIndex];
 
-    if (!currentAuthId) return;
+    if (prompt.isSuper) {
+      prompt.isLiked = false;
+      prompt.isSuper = false;
+    } else if (prompt.isLiked) {
+      prompt.isSuper = true;
+    } else {
+      prompt.isLiked = true;
+    }
+    
+    // Notify Svelte to update the UI accordingly
+    promptArray.update(n => {
+      n[promptIndex] = prompt;
+      return n;
+    });
+
+    if (!prompt.authorId) return;
 
     const formData = new FormData();
-    formData.append('promptId', currentPromptId);
+    formData.append('promptId', prompt.promptId);
+    console.log('promptId', prompt.promptId)
 
     try {
-        const response = await fetch('?/likePrompt', {
-            method: 'POST',
-            body: formData,
-        });
+      const response = await fetch('?/likePrompt', {
+        method: 'POST',
+        body: formData,
+      });
 
-        if (response.ok) {
-            console.log('Like Status Changed');
-        } else {
-            console.error('Something broke :-(');
-            FailureMessage = true;
-            setTimeout(() => {
-                FailureMessage = false;
-            }, 1500);
-        }
-    } catch (error) {
-        console.error('An error occurred:', error);
+      if (response.ok) {
+        console.log('Like Status Changed');
+      } else {
+        console.error('Something broke :-(');
         FailureMessage = true;
         setTimeout(() => {
-            FailureMessage = false;
+          FailureMessage = false;
         }, 1500);
+      }
+    } catch (error) {
+      console.error('An error occurred:', error);
+      FailureMessage = true;
+      setTimeout(() => {
+        FailureMessage = false;
+      }, 1500);
     }
-};
+  }
 
 async function hidePrompt() {
 	if (!$currentUser) {
@@ -424,9 +450,6 @@ async function submitReport() {
 {#if LoginMessage}
 	<ServerMessage isError={true} messageText="You must be logged in" />
 {/if}
-  
-
-
 
   <div class="card p-4" transition:fade={{ delay: 1000, duration: 500 }}>
 	<Accordion autocollapse>
@@ -488,16 +511,16 @@ async function submitReport() {
 			  {:else}
 					<div class="promptBox">
 						<div class="gameTop">
-              {#if generatedPrompts[promptIndex]}
+              {#if $promptArray.length > 0 && $promptArray[promptIndex]}
               <button on:click={likePrompt}>
-							  <img alt="Bulb Rating" src={getBulbImage(generatedPrompts[promptIndex].isLiked, generatedPrompts[promptIndex].isSuper)}>
+							  <img alt="Bulb Rating" src={bulbImage}>
               </button>
               {/if}
 						  <div class="prompt" in:fade={{ delay: 100, duration: 800 }}>{currentPrompt}</div>
-							<button in:fade={{ delay: 2500, duration: 1500 }} class="btn variant-filled-primary margin"
+							<button in:fade={{ delay: 2000, duration: 1500 }} class="btn variant-filled-primary margin"
                 on:click={displayNextPrompt}>Roll the Dice</button>
 						</div>
-            {#if generatedPrompts[promptIndex]}
+            {#if $promptArray.length > 0 && $promptArray[promptIndex]}
 						<div class="gameBottom" in:slide={{ delay: 1000, duration: 800 }}>
 							<div class="hideMenuButton">
 								<div title="Hide/Report" class="fa-regular fa-xl fa-eye-slash" style="color: #1e3050;"
@@ -505,13 +528,13 @@ async function submitReport() {
                   use:popup={{ event: 'hover', target: 'hideTT', placement: 'top'}}></div>
 								</div>
 								<div class="right"><b>{currentAuthor}</b> 
-									<button on:click={favToggle}>
-										{#if currentFav}
-											<i class="fa-solid fa-xl fa-star" style="color: #fecb0e;"></i>
-										{:else}
-											<i class="fa-regular fa-xl fa-star" style="color: #0d4576;"></i>
-										{/if}
-									</button>
+                  <button on:click={favToggle}>
+                    {#if $promptArray[promptIndex].isFavAuthor}
+                      <i class="fa-solid fa-xl fa-star" style="color: #fecb0e;"></i>
+                    {:else}
+                      <i class="fa-regular fa-xl fa-star" style="color: #0d4576;"></i>
+                    {/if}
+                  </button>
 								</div>
 							</div>
               {/if}
