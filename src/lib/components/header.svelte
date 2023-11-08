@@ -9,8 +9,8 @@
 
 <style>
     .header {
-        height: 210px; 
-        margin-top: -90px;
+        height: 110px; 
+        margin-top: -70px;
     }
 
 </style>

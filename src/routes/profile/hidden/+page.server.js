@@ -31,28 +31,31 @@ export const actions = {
       }
     },
 
-    pullHiddenAuthors: async ({ locals }) => {
-
-      let currentHiddenAuthors = locals?.user?.hiddenAuthors || [];
-
+    pullHiddenAuthors: async ({ locals }) => {    
       try {
-          const hiddenAuthorsString = currentHiddenAuthors.toString().replace(/,/g, '"||id="');
-  
-          let hiddenAuthors = [];
-          if (locals.user && locals.user.name !== null) {
-            let records = await locals.pb.collection('users').getFullList({
-              filter: `(id="${hiddenAuthorsString}")`,
-              fields: 'username,id',
-              sort: '-created',
+        let hiddenAuthors = [];
+        if (locals.user && locals.user.name !== null) {
+          let records = await locals.pb.collection('users').getFullList({
+            expand: 'hiddenAuthors',
+            fields: 'expand.hiddenAuthors.username,expand.hiddenAuthors.id',
+            sort: '-created',
           });
-        
-          hiddenAuthors = records.map((record) => ({
-              username: record.username,
-              id: record.id,
-            }));
-        };
-
-  
+    
+          console.log('records:', records);
+    
+          hiddenAuthors = records.flatMap((record) => {
+            if (Array.isArray(record.expand?.hiddenAuthors)) {
+              return record.expand?.hiddenAuthors.map((author) => ({
+                username: author.username,
+                id: author.id, 
+              }));
+            }
+            return []; 
+          });
+        }
+    
+        console.log('hiddenAuthors:', hiddenAuthors);
+    
         return {
           records: JSON.stringify(hiddenAuthors),
         };
@@ -61,6 +64,7 @@ export const actions = {
         throw error(400, "The robots didn't like something about that...");
       }
     },
+    
   
     showAuthor: async ({ request, locals }) => {
       if (request.method !== 'POST') {
@@ -118,4 +122,5 @@ export const actions = {
 
       throw redirect(303, '/profile/hidden');
     },
+
   };

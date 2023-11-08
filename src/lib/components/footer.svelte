@@ -27,6 +27,7 @@
         height: 0px;
         text-align: center;
         margin-top: -25px;
+        color: rgba(255, 255, 255, 0.75);
     }
     .footer ul {
         margin: auto;

@@ -6,14 +6,13 @@
 
 
 <div class="bg_gradient">
-<Header />
+  <Header />
 </div>
-<Game />
+
 <div class="bg_gradient">
-<Footer />
+  <Game />
 </div>
-<div class="bg_gradient"></div>
 
-<style>
-
-</style>
+<div class="bg_gradient">
+  <Footer />
+</div>

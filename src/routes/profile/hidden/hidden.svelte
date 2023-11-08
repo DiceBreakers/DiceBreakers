@@ -159,6 +159,7 @@
         });
 
         if (response.ok) {
+			pullHiddenPrompts();
             console.log('Prompt no longer hidden!');
             showSuccessMessage = true;
             setTimeout(() => {
@@ -190,8 +191,6 @@
 		const formData = new FormData();
 		formData.append('authorId', selectedAuthor.id);
 
-		console.log('HAID:', selectedAuthor.id)
-
     try {
         const response = await fetch('/profile/hidden?/showAuthor', {
             method: 'POST',
@@ -199,6 +198,7 @@
         });
 
         if (response.ok) {
+			pullHiddenAuthors();
             console.log('Author no longer hidden!');
             showSuccessMessage = true;
             setTimeout(() => {

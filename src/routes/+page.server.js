@@ -6,36 +6,37 @@ let pSuperLiked = [];
 export const actions = {
   generate: async ({ request, locals }) => {
     const data = await request.formData();
-    const selectedCategories = data.getAll('categories') ?? [];
+    let selectedCategories = data.getAll('categories') ?? [];
     pLiked = locals.user?.liked;
     pSuperLiked = locals.user?.superLiked;
     let hiddenAuthors = locals.user?.hiddenAuthors ?? [];
-    let hiddenPrompts = locals.user?.hiddenPrompts ?? [];  
-    console.log('hiddenAuthors', hiddenAuthors)
-    console.log('hiddenPrompts', hiddenPrompts)
+    let hiddenPrompts = locals.user?.hiddenPrompts ?? [];
+    if (hiddenAuthors.length === 0) {
+      hiddenAuthors = ['empty'];
+    }
+    if (hiddenPrompts.length === 0) {
+      hiddenPrompts = ['empty'];
+    }
 
-    try {
-          
-        const categoriesString = selectedCategories.toString().replace(/,/g, '"||categories~"');
+    try {          
 		    let generatedPrompts = [];
         let records = await locals.pb.collection('prompts').getFullList({
-          filter: `(categories~"${categoriesString}")`,
-          expand: 'author,prompt',
+          filter: `(categories?~"${selectedCategories}")&&("${hiddenAuthors}"?!~author)&&("${hiddenPrompts}"?!~id)`,
+          expand: 'author',
           fields: 'expand.author.username,expand.author.id,id,prompt',
           sort: '@random',
         });
 
-        records = records.filter(record => 
-          !hiddenAuthors.includes(record.expand?.author.id) &&
-          !hiddenPrompts.includes(record.id)
-        );
+        console.log('records:', records)
 
         if (records.length === 0) {
           console.log('noRecords');
           throw new Error("No Prompts Found");
         }
+
+        console.log('record length', records.length)
+        console.log('still running')
   
-        console.log('stillrunning')
       records = records.slice(0, 15);
       generatedPrompts = records.map((record) => ({
         prompt: record.prompt,

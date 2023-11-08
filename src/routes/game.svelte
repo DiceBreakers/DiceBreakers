@@ -31,12 +31,12 @@
 	let currentAuthor = '';
 	let currentAuthId = '';
 	let currentFav = false;
+  let isLiked = false;
+  let isSuper = false;
 	let promptIndex = 0;
 	let generatedPrompts: { prompt: string; promptId: string; author: string; authorId: string; isFav: boolean; isSuper: boolean; isLiked: boolean; }[] = [];
 	let isRolling = false;
 	let reportReason = '';
-
-
 	
 	onMount(async() => {
         catList.subscribe((list: CatItem[]) => {
@@ -67,31 +67,40 @@
   	function resetAnimation() {
 		currentPrompt = '';
 		currentAuthor = '';
-		currentAuthId = '',
+		currentAuthId = '';
 		promptIndex = 0;
 		currentFav = false;
 	}
 
-	function displayFirstPrompt() {
+	function updatePrompt() {
+    console.log('initpromptIndex', promptIndex)
+    console.log('initgeneratedprompts.length', generatedPrompts.length)
+    console.log('initgPromts[pIndex]:', generatedPrompts[promptIndex]);
   if (promptIndex < generatedPrompts.length) {
-	const { prompt, promptId, author, authorId } = generatedPrompts[promptIndex];
+	const { prompt, promptId, author, authorId, isFav } = generatedPrompts[promptIndex];
 		currentPrompt = prompt;
 		currentPromptId = promptId;
 		currentAuthor = author;
 		currentAuthId = authorId;
-		const currentPromptIndex = generatedPrompts.findIndex(prompt => prompt.authorId === currentAuthId);
-    	currentFav = currentPromptIndex >= 0 && generatedPrompts[currentPromptIndex].isFav;
-    promptIndex++;
+    currentFav = isFav;
+
+    console.log('endpromptIndex', promptIndex)
+    console.log('endgeneratedprompts.length', generatedPrompts.length)
+    console.log('endgPromts[pIndex]:', generatedPrompts[promptIndex]);
   } else {
-    currentPrompt = '';
-	currentAuthor = 'Check the categories to roll new prompts!';
+    currentPrompt = "Hmm. Something went wrong, you shouldn't be here..."
+	  currentAuthor = '';
+    isLiked = false;
+    isSuper = false;
+    currentFav = false;
+  console.log('Failed if check.')
   }
 }
 
 async function generate(event?: Event) {
   if (event) event.preventDefault();
-  resetAnimation();
   toggleDice();
+  resetAnimation();
 
   const formData = new FormData();
 
@@ -130,25 +139,37 @@ async function generate(event?: Event) {
         isSuper: obj.isSuper,
         isLiked: obj.isLiked,
       }));
-      displayFirstPrompt();
+      updatePrompt();
     } else {
-      console.error('Failed to generate prompts.');
-    }
+        console.error('Failed to generate prompts.');
+        currentPrompt = "Hmm. Either there was a server error, or the search was too narrow/you've managed to hide everyone. Change some settings and try again."
+      }
   } catch (error) {
     console.error('An error occurred:', error);
   }
 }
 
 function displayNextPrompt() {
-  toggleDice();
-  displayFirstPrompt();
-  console.log('pIndex:', promptIndex)
+  promptIndex++;
+
   if (promptIndex >= generatedPrompts.length) {
-    resetAnimation();
     generate();
+    return;
   }
+
+  toggleDice();
+  console.log('pIndex:', promptIndex);
+  updatePrompt();
 }
 
+function updateFavoriteStatusForAuthor(authorId, isFav) {
+  generatedPrompts = generatedPrompts.map((prompt) => {
+    if (prompt.authorId === authorId) {
+      return { ...prompt, isFav: isFav };
+    }
+    return prompt;
+  });
+}
 
 async function favToggle() {
 	if (!$currentUser) {
@@ -178,6 +199,7 @@ async function favToggle() {
 
         if (response.ok) {
             console.log('Favorite Toggled Successfully');
+            updateFavoriteStatusForAuthor(currentAuthId, currentFav);
         } else {
             console.error('Something broke :-(');
             FailureMessage = true;
@@ -204,7 +226,6 @@ function incrementBulb() {
     generatedPrompts[promptIndex].isLiked = true;
   }
 }
-
 
 async function likePrompt() {
 	if (!$currentUser) {
@@ -376,7 +397,7 @@ async function submitReport() {
             FailureMessage = false;
         }, 1500);
     }
-}
+  }
 
 </script>
 
@@ -404,6 +425,9 @@ async function submitReport() {
 	<ServerMessage isError={true} messageText="You must be logged in" />
 {/if}
   
+
+
+
   <div class="card p-4" transition:fade={{ delay: 1000, duration: 500 }}>
 	<Accordion autocollapse>
 	  <AccordionItem> 
@@ -464,13 +488,16 @@ async function submitReport() {
 			  {:else}
 					<div class="promptBox">
 						<div class="gameTop">
+              {#if generatedPrompts[promptIndex]}
               <button on:click={likePrompt}>
 							  <img alt="Bulb Rating" src={getBulbImage(generatedPrompts[promptIndex].isLiked, generatedPrompts[promptIndex].isSuper)}>
               </button>
+              {/if}
 						  <div class="prompt" in:fade={{ delay: 100, duration: 800 }}>{currentPrompt}</div>
 							<button in:fade={{ delay: 2500, duration: 1500 }} class="btn variant-filled-primary margin"
                 on:click={displayNextPrompt}>Roll the Dice</button>
 						</div>
+            {#if generatedPrompts[promptIndex]}
 						<div class="gameBottom" in:slide={{ delay: 1000, duration: 800 }}>
 							<div class="hideMenuButton">
 								<div title="Hide/Report" class="fa-regular fa-xl fa-eye-slash" style="color: #1e3050;"
@@ -478,8 +505,7 @@ async function submitReport() {
                   use:popup={{ event: 'hover', target: 'hideTT', placement: 'top'}}></div>
 								</div>
 								<div class="right"><b>{currentAuthor}</b> 
-									<button on:click={favToggle}
-                  use:popup={{ event: 'hover', target: 'favTT', placement: 'top'}}>
+									<button on:click={favToggle}>
 										{#if currentFav}
 											<i class="fa-solid fa-xl fa-star" style="color: #fecb0e;"></i>
 										{:else}
@@ -488,6 +514,7 @@ async function submitReport() {
 									</button>
 								</div>
 							</div>
+              {/if}
 						</div>
 			  	{/if}
 			</div>			  
