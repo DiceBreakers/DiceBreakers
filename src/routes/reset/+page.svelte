@@ -11,9 +11,7 @@
   </div>
 
   <div class="bg_gradient">
-    <div class="body card p-4 variant-glass-secondary">
       <Reset />
-    </div>
   </div>
 
   <div class="bg_gradient">

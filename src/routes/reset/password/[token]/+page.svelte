@@ -21,25 +21,24 @@
 </div>
 
 <div class="bg_gradient">
-  <div class="body card p-4 variant-glass-secondary">
+  <div class="body card p-4">
     <div class="flex flex-col items-center h-full w-full">
-      <h2 class="mt-2 text-center text-3xl font-bold tracking-tight text-base-content">
+      <h2>
         Reset Your Password
       </h2>
-      <p class="text-center mt-1">Set and confirm new password:</p>
+      <p>Set and confirm new password:</p>
       <form
         action="?/resetPassword"
         method="POST"
-        class="flex flex-col items-center space-y-2 w-full pt-4"
-      >
-        <div class="form-control w-full max-w-md">
-            <input type="password" name="password" placeholder="Password" class="input" />
-            <input type="password" name="passwordConfirm" placeholder="Confirm Password" class="input" />
-            <hidden name="token" value={token} class="input" />
-        </div>
-        <div class="center-text">
-          <button type="submit" class="btn btn-sm variant-filled-primary">Complete Password Reset</button>
-        </div>
+        class="flex flex-col items-center w-full m2">
+          <div class="form-control w-full max-w-md">
+              <input type="password" name="password" placeholder="Password" class="input m2" />
+              <input type="password" name="passwordConfirm" placeholder="Confirm Password" class="input m2" />
+              <hidden name="token" value={token} class="input" />
+          </div>
+          <div>
+            <button type="submit" class="btn btn-sm variant-filled-primary m2">Complete Password Reset</button>
+          </div>
         {#if form?.success}
                 <ServerMessage />
         {/if}
@@ -51,3 +50,9 @@
 <div class="bg_gradient">
   <Footer />
 </div>
+
+<style>
+  .m2 {
+    margin: 2px;
+  }
+</style>
