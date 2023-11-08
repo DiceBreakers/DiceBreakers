@@ -667,28 +667,4 @@ async function submitReport() {
 		min-width: 300px;
 	}
 
-
-/* media query for narrow screens */
-@media (max-width: 600px) {
-  .category-item {
-    display: flex;
-    align-items: center; 
-  }
-
-  .checkboxSize {
-    flex-shrink: 0;
-  }
-
-  .checkboxSM {
-    white-space: nowrap; 
-    overflow: hidden; 
-    text-overflow: ellipsis; 
-    max-width: 70%; 
-    font-size: .8em;
-  }
-
-  .fa-circle-info {
-    flex-shrink: 0;
-  }
-}
 </style>
