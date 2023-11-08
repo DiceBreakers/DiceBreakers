@@ -47,12 +47,12 @@
   </div>
 </div>
   
-<div class="bg_gradient">
+<div class="bg_gradient_footer">
   <Footer />
 </div>
 
 <style>
-  .m2 {
-    margin: 2px;
-  }
+  .body {
+		padding: 2em;
+	}
 </style>

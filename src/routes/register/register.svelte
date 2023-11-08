@@ -36,13 +36,13 @@
       }
     }}
     on:submit={handleSubmit}>
-    <input type="email" name="email" placeholder="Email" class="input" />
-    <input type="password" name="password" placeholder="Password" class="input" />
-    <input type="password" name="passwordConfirm" placeholder="Confirm Password" class="input" />
+    <input type="email" name="email" placeholder="Email" class="input m2" />
+    <input type="password" name="password" placeholder="Password" class="input m2" />
+    <input type="password" name="passwordConfirm" placeholder="Confirm Password" class="input m2" />
     <label>
       <input
         name="TOS"
-        class="checkbox checkboxSize"
+        class="checkbox checkboxSize m2"
         type="checkbox"
         bind:checked={tosChecked}
         title="Terms of Service" />
@@ -62,5 +62,9 @@
       margin: auto;
       display: block;
       max-width: 700px;
+  }
+
+  .m2 {
+    margin: 2px;
   }
 </style>

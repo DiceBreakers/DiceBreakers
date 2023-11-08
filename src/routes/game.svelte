@@ -451,14 +451,14 @@ async function submitReport() {
 	<ServerMessage isError={true} messageText="You must be logged in" />
 {/if}
 
-  <div class="card p-4" transition:fade={{ delay: 1000, duration: 500 }}>
+  <div class="container card p-4" transition:fade={{ delay: 1000, duration: 500 }}>
 	<Accordion autocollapse>
-	  <AccordionItem> 
+	  <AccordionItem open> 
 		<svelte:fragment slot="lead"><i class="fa-solid fa-lg fa-gear" style="color: #1673c5;"></i></svelte:fragment>
 		<svelte:fragment slot="summary">Settings:</svelte:fragment>
 		<svelte:fragment slot="content">
 			<Accordion>
-				<AccordionItem>
+				<AccordionItem open>
 					<svelte:fragment slot="summary">Primary Categories:</svelte:fragment>
 					<svelte:fragment slot="content">
 			<label class="label">

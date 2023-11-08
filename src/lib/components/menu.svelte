@@ -3,7 +3,7 @@
     import { applyAction, enhance } from '$app/forms'
     import { pb } from '$lib/stores/pocketbase'
     import { currentUser } from '$lib/stores/user'
-    import Login from '../../routes/login/login.svelte';
+    import LoginMenu from './loginMenu.svelte';
 
     export let showMenu = false;
 
@@ -18,25 +18,21 @@
   in:slide={{ duration:800, axis:'x'}}
   out:slide={{ delay:800, duration:800, axis:'x'}}>
     <ul class="item">
-<!-- user logged in -->
         {#if $currentUser}
-        <li><a href="/add" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Add Prompts</a></li>
-        <li><a href="/edit" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Edit Prompts</a></li>
-        <li><a href="/" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Play</a></li>
-        <li class="topMarginL"><a href="/profile/hidden" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Hidden Authors/Prompts</a></li>
-        <li><a href="/profile" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Account Settings</a></li>
-            <form method="POST" action="/logout" use:enhance={() => {
-                return async ({ result }) => {
-                  pb.authStore.clear()
-                  await applyAction(result)
-                }
-              }}
-            >
-              <button class="topMarginS btn btn-sm variant-filled-primary">Log out</button>
-            </form>
-    <!-- user logged out -->
+          <li><a href="/add" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Add Prompts</a></li>
+          <li><a href="/edit" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Edit Prompts</a></li>
+          <li><a href="/" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Play</a></li>
+          <li class="topMarginL"><a href="/profile/hidden" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Hidden Authors/Prompts</a></li>
+          <li><a href="/profile" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Account Settings</a></li>
+              <form method="POST" action="/logout" use:enhance={() => {
+                  return async ({ result }) => {
+                    pb.authStore.clear()
+                    await applyAction(result)}
+                  }}>
+                <button class="topMarginS btn btn-sm variant-filled-primary">Log out</button>
+              </form>
         {:else}
-          <Login />
+          <LoginMenu />
         {/if}
     </ul>
 </nav>

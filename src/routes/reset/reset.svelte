@@ -34,4 +34,8 @@
 	h1 {
 		margin-bottom: 20px;
 	}
+
+	.body {
+		padding: 2em;
+	}
 </style>

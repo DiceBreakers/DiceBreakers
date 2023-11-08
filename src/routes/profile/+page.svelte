@@ -13,7 +13,7 @@
   <Profile />
 </div>
 
-<div class="bg_gradient">
+<div class="bg_gradient_footer">
   <Footer />
 </div>
 

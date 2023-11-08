@@ -223,13 +223,17 @@
 
 </script>
 
-<div class="card p-4">
+<div class="card p-4 container">
 	<Accordion autocollapse>
 		<AccordionItem open on:toggle={pullHiddenAuthors}>
 			<svelte:fragment slot="lead"><i class="fa-solid fa-lg fa-users" style="color: #1673c5;"></i></svelte:fragment>
 			<svelte:fragment slot="summary">Hidden Authors:</svelte:fragment>
 			<svelte:fragment slot="content">
-				{#if $currentPageAuthors}
+				{#if $currentPageAuthors.length == 0}
+				<div class="text-center">
+					I didn't find any hidden authors.
+				</div>
+				{:else}
 					<div class="hiddenAuthors">
 						<ul>
 							{#each $currentPageAuthors as author}
@@ -258,7 +262,11 @@
 			<svelte:fragment slot="lead"><i class="fa-solid fa-lg fa-pencil" style="color: #1673c5;"></i></svelte:fragment>
 			<svelte:fragment slot="summary">Hidden Prompts:</svelte:fragment>
 			<svelte:fragment slot="content">
-				{#if $currentPagePrompts}
+				{#if $currentPagePrompts.length == 0}
+				<div class="text-center">
+					I didn't find any hidden prompts.
+				</div>
+				{:else}
 					<div class="hiddenPrompts">
 						<ul>
 						{#each $currentPagePrompts as prompt}
