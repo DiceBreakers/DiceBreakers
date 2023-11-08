@@ -657,9 +657,9 @@ async function submitReport() {
 	.game {
 		position: relative;
 		display: flex;
-    	justify-content: center;
-		align-items: center;
-  		height: 40vh;
+    justify-content: center;
+    align-items: center;
+    height: 40vh;
 	}
 
 	.prompt {
@@ -668,27 +668,27 @@ async function submitReport() {
 	}
 
 
-/* Add a media query for narrow screens */
+/* media query for narrow screens */
 @media (max-width: 600px) {
   .category-item {
-    display: flex; /* Use flex layout */
-    align-items: center; /* Align items vertically */
-    gap: 10px; /* Add space between checkbox and label */
+    display: flex;
+    align-items: center; 
   }
 
   .checkboxSize {
-    flex-shrink: 0; /* Prevent the checkbox from shrinking */
+    flex-shrink: 0;
   }
 
   .checkboxSM {
-    white-space: nowrap; /* Prevent the label from wrapping */
-    overflow: hidden; /* Hide overflow */
-    text-overflow: ellipsis; /* Add an ellipsis to text that's too long */
-    max-width: 70%; /* Set a max width for the label */
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    max-width: 70%; 
+    font-size: .8em;
   }
 
   .fa-circle-info {
-    flex-shrink: 0; /* Prevent the icon from shrinking */
+    flex-shrink: 0;
   }
 }
 </style>
