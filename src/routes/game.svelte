@@ -7,14 +7,7 @@
 	import { catList } from '$lib/components/catList.svelte';
 	import { popup } from '@skeletonlabs/skeleton';
 	import ServerMessage from '$lib/components/serverMessage.svelte';
-  import { currentUser } from '$lib/stores/user'
-
-	let SuccessMessage = false;
-	let FailureMessage = false;
-	let ReportMessage = false;
-	let LoginMessage = false;
-	let promptHiddenMessage = false;
-	let authorHiddenMessage = false;
+  import { currentUser } from '$lib/stores/user';
 
 	type CatItem = {
 	  value: string;
@@ -31,6 +24,7 @@
     isFavAuthor: boolean;
     isLiked: boolean;
     isSuper: boolean;
+    score: number;
   }
 	
 	let selectedCategories = writable<CatItem[]>([]);
@@ -44,10 +38,20 @@
 	let currentFav = false;
   let isLiked = false;
   let isSuper = false;
+  let score = 0;
 	let promptIndex = 0;
-	let generatedPrompts: { prompt: string; promptId: string; author: string; authorId: string; isFavAuthor: boolean; isSuper: boolean; isLiked: boolean; }[] = [];
 	let isRolling = false;
-	let reportReason = '';
+  let SuccessMessage = false;
+	let FailureMessage = false;
+	let ReportMessage = false;
+	let LoginMessage = false;
+	let promptHiddenMessage = false;
+	let authorHiddenMessage = false;
+  let reportReason = '';
+
+  $: score = $promptArray[promptIndex]?.score ?? 0;
+  $: bulbImage = $promptArray[promptIndex]?.isSuper ? 'bulb2.png' :
+                 $promptArray[promptIndex]?.isLiked ? 'bulb1.png' : 'bulb0.png';
 	
 	onMount(async() => {
         catList.subscribe((list: CatItem[]) => {
@@ -77,8 +81,6 @@ async function generate(event?: Event) {
     }
   });
 
-  const user = get(currentUser);
-
   try {
     const response = await fetch('?/generate', {
       method: 'POST',
@@ -88,25 +90,24 @@ async function generate(event?: Event) {
     if (response.ok) {
 		
       let serverData = await response.json();
-          console.log('serverData:', serverData)
       let rawData = JSON.parse(serverData.data);
-          console.log('rawData:', rawData)
       let promptData = JSON.parse(rawData[1]);
-          console.log('promptData:', promptData)
-      let generatedPrompts = promptData.items.map(obj => ({
-          prompt: obj.prompt,
-          promptId: obj.id,
-          author: obj.expand.author.username,
-          authorId: obj.expand.author.id,
-          isFavAuthor: user?.favAuthors.includes(obj.expand?.author.id) || false,
-          isSuper: user?.superLiked.includes(obj.id) || false,
-          isLiked: user?.liked.includes(obj.id) || false,
-        }));
-          console.log('generatedPrompts:', generatedPrompts);
+      let generatedPrompts = promptData.map(obj => {
 
-        promptArray.set(generatedPrompts);
+      return {
+        prompt: obj.prompt,
+        promptId: obj.id,
+        author: obj.expand.author.username,
+        authorId: obj.expand.author.id,
+        isSuper: obj.superLiked,
+        isLiked: obj.liked,
+        isFavAuthor: obj.isFavAuthor,
+        score: obj.score,
+      };
+    });
 
-        console.log('promptArray:', promptArray)
+      promptArray.set(generatedPrompts);
+      console.log('generatedPrompts', generatedPrompts)
 
       updatePrompt();
     } else {
@@ -120,22 +121,18 @@ async function generate(event?: Event) {
 
 function updatePrompt() {
   const prompts = get(promptArray);
-  console.log('promptIndex', promptIndex);
   
   if (promptIndex < prompts.length) {
     const promptData = prompts[promptIndex];
-    console.log('promptData:', promptData);
 
     try {
       if (promptData) {
-        let { prompt, promptId, author, authorId, isFavAuthor, isSuper, isLiked } = promptData;
+        let { prompt, promptId, author, authorId, isFavAuthor } = promptData;
         currentPrompt = prompt;
         currentPromptId = promptId;
         currentAuthor = author;
         currentAuthId = authorId;
         currentFav = isFavAuthor;
-        isSuper = isSuper;
-        isLiked = isLiked;
       } else {
         throw new Error('Prompt data is undefined');
       }
@@ -148,6 +145,7 @@ function updatePrompt() {
       currentFav = false;
       isLiked = false;
       isSuper = false;
+      score = 0;
     }
   } else {
     console.error('No more prompts to display.');
@@ -180,7 +178,6 @@ function displayNextPrompt() {
   }
 
   toggleDice();
-  console.log('pIndex:', promptIndex);
   updatePrompt();
 }
 
@@ -196,15 +193,16 @@ async function favToggle() {
   if (!currentAuthId) return;
 
   const newFavStatus = !currentFav;
+  currentFav = newFavStatus;
 
   promptArray.update(prompts => {
-    return prompts.map(prompt => {
-      if (prompt.authorId === currentAuthId) {
-        return { ...prompt, isFavAuthor: newFavStatus };
-      }
-      return prompt;
+      return prompts.map(prompt => {
+        if (prompt.authorId === currentAuthId) {
+          return { ...prompt, isFavAuthor: newFavStatus };
+        }
+        return prompt;
+      });
     });
-  });
 
   const formData = new FormData();
   formData.append('authorId', currentAuthId);
@@ -233,10 +231,7 @@ async function favToggle() {
   }
 }
 
-$: bulbImage = $promptArray[promptIndex]?.isSuper ? 'bulb2.png' :
-                 $promptArray[promptIndex]?.isLiked ? 'bulb1.png' : 'bulb0.png';
-
-async function likePrompt() {
+async function pVote() {
     if (!$currentUser) {
       LoginMessage = true;
       setTimeout(() => {
@@ -247,30 +242,41 @@ async function likePrompt() {
 
     const currentPrompts = get(promptArray);
     const prompt = currentPrompts[promptIndex];
+    const originalScore = prompt.score;
 
     if (prompt.isSuper) {
       prompt.isLiked = false;
       prompt.isSuper = false;
+      prompt.score -= 5;
     } else if (prompt.isLiked) {
       prompt.isSuper = true;
+      prompt.isLiked = false;
+      prompt.score += 4;
     } else {
       prompt.isLiked = true;
+      prompt.score += 1;
     }
-    
+
     // Notify Svelte to update the UI accordingly
     promptArray.update(n => {
-      n[promptIndex] = prompt;
-      return n;
+      n[promptIndex] = {
+        ...prompt,
+        score: prompt.score,
+        isLiked: prompt.isLiked,
+        isSuper: prompt.isSuper
+      };
+      return [...n];
     });
+
+    console.log('score', prompt.score)
 
     if (!prompt.authorId) return;
 
     const formData = new FormData();
     formData.append('promptId', prompt.promptId);
-    console.log('promptId', prompt.promptId)
 
     try {
-      const response = await fetch('?/likePrompt', {
+      const response = await fetch('?/pVote', {
         method: 'POST',
         body: formData,
       });
@@ -432,7 +438,7 @@ async function submitReport() {
 {/if}
 
 {#if ReportMessage}
-	<ServerMessage messageText="We will look into your report."/>
+	<ServerMessage messageText="Thanks, we will review your report."/>
 {/if}
 
 {#if promptHiddenMessage}
@@ -510,18 +516,22 @@ async function submitReport() {
 					<DicePortal />
 			  {:else}
 					<div class="promptBox">
-						<div class="gameTop">
-              {#if $promptArray.length > 0 && $promptArray[promptIndex]}
-              <button on:click={likePrompt}>
-							  <img alt="Bulb Rating" src={bulbImage}>
-              </button>
-              {/if}
-						  <div class="prompt" in:fade={{ delay: 100, duration: 800 }}>{currentPrompt}</div>
+						<div class="gameTop" in:fade={{ delay: 100, duration: 800 }}>
+                {#if $promptArray.length > 0 && $promptArray[promptIndex]}
+                <div class="scoreContainer">
+                  <button on:click={pVote}>
+                    <img alt="Bulb Rating" src={bulbImage} class="bulbImage">
+                  </button>
+                  <span class="score" use:popup={{ event: 'hover', target: 'scoreTT', placement: 'right'}}>
+                    ({score})</span>
+                </div>
+                {/if}
+						  <div class="prompt">{currentPrompt}</div>
 							<button in:fade={{ delay: 2000, duration: 1500 }} class="btn variant-filled-primary margin"
                 on:click={displayNextPrompt}>Roll the Dice</button>
 						</div>
-            {#if $promptArray.length > 0 && $promptArray[promptIndex]}
-						<div class="gameBottom" in:slide={{ delay: 1000, duration: 800 }}>
+						<div class="gameBottom" in:fade={{ delay: 100, duration: 800 }}>
+              {#if $promptArray.length > 0 && $promptArray[promptIndex]}
 							<div class="hideMenuButton">
 								<div title="Hide/Report" class="fa-regular fa-xl fa-eye-slash" style="color: #1e3050;"
 									use:popup={{ event: 'click', target: 'hideMenu', placement: 'top' }}
@@ -536,10 +546,10 @@ async function submitReport() {
                     {/if}
                   </button>
 								</div>
-							</div>
               {/if}
 						</div>
-			  	{/if}
+					</div>
+			  {/if}
 			</div>			  
 		  </svelte:fragment>
 	  </AccordionItem>
@@ -548,20 +558,16 @@ async function submitReport() {
 
   <!-- Popup Menus -->
 
-  <div class="popup likeTT" data-popup="likeTT">
+  <div class="popup scoreTT" data-popup="scoreTT">
+    {#if score==1}
     Like
-  </div>
-
-  <div class="popup sLikeTT" data-popup="sLikeTT">
-    Super Like
+    {:else}
+    Likes
+    {/if}
 	</div>
 
-  <div class="popup favTT" data-popup="favTT">
-    Favorite Author
-  </div>
-
   <div class="popup hideTT" data-popup="hideTT">
-    Hide/Report
+    Report/Hide
 	</div>
 
   <div class="popup_hideMenu" data-popup="hideMenu">
@@ -586,6 +592,11 @@ async function submitReport() {
   </div>
 
 <style>
+
+  .scoreContainer {
+    display: flex;
+    align-items: center;
+  }
 		
 	.margin {
 		margin:2em;
@@ -602,10 +613,6 @@ async function submitReport() {
 	.report {
 		margin-right: 8px;
 	}
-
-  .likeTT {
-    margin-top: 10px;
-  }
 
   .hideTT {
     margin-top: -15px;

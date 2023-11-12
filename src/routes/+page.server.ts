@@ -1,61 +1,78 @@
 import { error, redirect } from '@sveltejs/kit';
 
-let pLiked = [];
-let pSuperLiked = [];
+interface PocketBaseError {
+  originalError?: {
+    status: number;
+  };
+}
 
 export const actions = {
   generate: async ({ request, locals }) => {
     const data = await request.formData();
     let selectedCategories = data.getAll('categories') ?? [];
-    pLiked = locals.user?.liked;
-    pSuperLiked = locals.user?.superLiked;
+
     let hiddenAuthors = locals.user?.hiddenAuthors ?? [];
     let hiddenPrompts = locals.user?.hiddenPrompts ?? [];
+
     if (hiddenAuthors.length === 0) {
-      hiddenAuthors = ['empty'];
-    }
+      hiddenAuthors = ['empty'];    }
     if (hiddenPrompts.length === 0) {
-      hiddenPrompts = ['empty'];
-    }
-
-    try {          
-		    let generatedPrompts = [];
-        const categoriesString = selectedCategories.toString().replace(/,/g, '"||categories~"');
-        let records = await locals.pb.collection('prompts').getList(1, 15, {
-          page: 1,
-          perPage: 15,
-          filter: `(categories~"${categoriesString}")&&("${hiddenAuthors}"?!~author)&&("${hiddenPrompts}"?!~id)`,
-          expand: 'author',
-          fields: 'expand.author.username,expand.author.id,id,prompt',
-          sort: '@random',
-        });
-
-        console.log('records:', records)
-
-        if (!records) {
-          console.log('Nothing matched that search');
-          throw new Error("Nothing matched that search");
-        }
+      hiddenPrompts = ['empty'];    }
   
-    //  records = records.slice(0, 15);
-    //  generatedPrompts = records.map((record) => ({
-    //    prompt: record.prompt,
-    //    promptId: record.id,
-    //    author: record.expand?.author.username,
-    //    authorId: record.expand?.author.id,
-    //    isFavAuthor: locals.user?.favAuthors?.includes(record.expand?.author.id) || false,
-    //    isSuper: locals.user?.superLiked?.includes(record.id) || false,
-    //    isLiked: locals.user?.liked?.includes(record.id) || false,
-    //    }));
+    try {
+      const categoriesString = selectedCategories.toString().replace(/,/g, '"||categories~"');
+      let prompts = await locals.pb.collection('prompts').getList(1, 5, {
+        page: 1,
+        perPage: 5,
+        filter: `(categories~"${categoriesString}")&&("${hiddenAuthors}"?!~author)&&("${hiddenPrompts}"?!~id)`,
+        expand: 'author',
+        fields: 'expand.author.username,expand.author.id,id,prompt',
+        sort: '@random',
+      });
+  
+      const promptsData = await Promise.all(prompts.items.map(async (prompt) => {
+      const isFavAuthor = locals.user?.favAuthors?.includes(prompt.expand?.author.id) || false;
+      
+        try {
+          const voteStatus = await locals.pb.collection('pVotes')
+            .getFirstListItem(`prompt="${prompt.id}"&&by="${locals.user?.id}"`);
 
+          const pScore = await locals.pb.collection('pScores')
+            .getFirstListItem(`promptId="${prompt.id}"`);
+          const score = pScore ? pScore.score : 0;
+      
+          return {
+            ...prompt,
+            liked: !!voteStatus,
+            superLiked: !!voteStatus && voteStatus.super,
+            isFavAuthor,
+            score,
+          };
+        } catch (err: unknown) {
+          const pbError = err as PocketBaseError;
+          if (pbError.originalError && pbError.originalError.status === 404) {
+            return {
+              ...prompt,
+              liked: false,
+              superLiked: false,
+              isFavAuthor,
+              score: 0,
+            };
+          } else {
+            throw err;
+          }
+        }
+      }));
+  
       return {
-        records: JSON.stringify(records),
+        records: JSON.stringify(promptsData),
       };
     } catch (err) {
       console.error('Error: ', err);
-      throw error(400, "The robots didn't like something about that...");
+      throw error(500, "The robots didn't like something about that...");
     }
   },
+  
 
   favAuthor: async ({ request, locals }) => {
     if (request.method !== 'POST') {
@@ -97,58 +114,56 @@ export const actions = {
     throw redirect(303, '/');
   },
 
-  likePrompt: async ({ request, locals }) => {
+  pVote: async ({ request, locals }) => {
     if (request.method !== 'POST') {
       console.log('Error: Non-POST');
       throw error(400, "The robots didn't like something about that...");
     }
   
     const data = await request.formData();
-    const currentPromptId = String(data.get('promptId')) || '';
-
-    pLiked = locals.user?.liked;
-    pSuperLiked = locals.user?.superLiked;
+    const currentPromptId = data.get('promptId') ? String(data.get('promptId')) : '';
+    const userId = locals.user?.id;
   
-    if (pSuperLiked.includes(currentPromptId)) {
-      const updatedLike = pLiked.filter((promptId) => promptId !== currentPromptId);
-      const updatedSuperLike = pSuperLiked.filter((promptId) => promptId !== currentPromptId);
-      const updateLikes = {
-        liked: updatedLike,
-        superLiked: updatedSuperLike,        
-      }
-
-      try {
-        const record = await locals.pb.collection('users').update(locals.user?.id, updateLikes);
-        return;
-      } catch (err) {
-        console.log('Error: ', err);
-        throw error(501, "Didn't remove likes");
-      }
-    } else if (pLiked.includes(currentPromptId)) {
-      const updatedSuperLike = [...pSuperLiked, currentPromptId];
-      const updateLikes = {
-        superLiked: updatedSuperLike,        
-      }
-      try {
-        const record = await locals.pb.collection('users').update(locals.user?.id, updateLikes);
-        return;
-      } catch (err) {
-        console.log('Error: ', err);
-        throw error(502, "Didn't add SuperLike");
-      }
-    } else {
-      const updatedLike = [...pLiked, currentPromptId];
-      const updateLikes = {
-        liked: updatedLike,        
-      }
-      try {
-        const record = await locals.pb.collection('users').update(locals.user?.id, updateLikes);
-      } catch (err) {
-        console.log('Error: ', err);
-        throw error(503, "Didn't add Like");
-      }
+    if (!userId) {
+      throw error(401, "You must be logged in to vote");
     }
-    throw redirect(303, '/');
+  
+    try {
+      let existingVote;
+  
+      try {
+        existingVote = await locals.pb.collection('pVotes')
+          .getFirstListItem(`prompt="${currentPromptId}"&&by="${userId}"`);
+      } catch (err: unknown) { 
+        const pbError = err as PocketBaseError; 
+        if (pbError.originalError && pbError.originalError.status === 404) {
+          existingVote = null;
+        } else {
+          throw err;
+        }
+      }
+  
+      if (existingVote) {
+        if (existingVote.super) {
+          await locals.pb.collection('pVotes').delete(existingVote.id);
+        } else {
+          const updateVote = { super: true };
+          await locals.pb.collection('pVotes').update(existingVote.id, updateVote);
+        }
+      } else {
+        const newVote = {
+          "prompt": currentPromptId,
+          "by": userId,
+          "super": false
+        };
+        await locals.pb.collection('pVotes').create(newVote);
+      }
+  
+      return; // Indicate success
+    } catch (err: unknown) { // Second catch with type assertion
+      console.log('Error: ', err);
+      throw error(500, "There was a problem processing your vote");
+    }
   },
 
   hidePrompt: async ({ request, locals }) => {

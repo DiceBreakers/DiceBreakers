@@ -44,7 +44,7 @@ export const actions: Actions = {
   OAuth2: async({cookies,url,locals})=>{
 
     const authMethods = await locals.pb?.collection('users').listAuthMethods();
-    //console.log("authmethods", authMethods);
+    console.log("authmethods", authMethods);
     if (!authMethods) {
         return {
             authProviderRedirect: '',
