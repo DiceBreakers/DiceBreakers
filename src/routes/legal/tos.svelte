@@ -21,7 +21,7 @@
     <p>5.2. You agree not to:</p>
     <ul>
         <li>a. Post, transmit, or share any content that is unlawful, harmful, threatening, abusive, defamatory, or invasive of another's privacy.</li>
-        <li>b. Post or comment any racist or discriminatory language. No warnings will be given to violators.</li>
+        <li>b. Post or comment any racist or discriminatory language. Harassing or hateful language will not be tolerated and posting or commenting can be revoked at any time.</li>
         <li>c. Engage in any activity that could harm, disable, overburden, or impair our Website.</li>
         <li>d. Attempt to gain unauthorized access to any account, computer system, or network.</li>
         <li>e. Introduce any viruses, trojans, or other malicious code.</li>

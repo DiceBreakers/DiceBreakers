@@ -23,15 +23,22 @@ export const actions = {
 
       const record = await locals.pb.collection('prompts').create(addPrompt);
 
-      // Handle success
+      if (record && author) {
+        const newVote = {
+          "prompt": record.id,
+          "by": author,
+          "super": false,
+        };
+        await locals.pb.collection('pVotes').create(newVote);
+      }
+
       return {
-        status: 201, // Created status code
-        body: { record }, // Return the newly created record
+        status: 201,
+        body: { record },
       };
     } catch (err) {
       console.error('Error:', err);
-
-      // Handle errors and return an appropriate error response
+      
       throw error(500, "Internal Server Error");
     }
   },
