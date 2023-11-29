@@ -10,14 +10,16 @@ export const actions = {
   generate: async ({ request, locals }) => {
     const data = await request.formData();
     let selectedCategories = data.getAll('categories') ?? [];
-
+  
     let hiddenAuthors = locals.user?.hiddenAuthors ?? [];
     let hiddenPrompts = locals.user?.hiddenPrompts ?? [];
-
+  
     if (hiddenAuthors.length === 0) {
-      hiddenAuthors = ['empty'];    }
+      hiddenAuthors = ['empty'];
+    }
     if (hiddenPrompts.length === 0) {
-      hiddenPrompts = ['empty'];    }
+      hiddenPrompts = ['empty'];
+    }
   
     try {
       const categoriesString = selectedCategories.toString().replace(/,/g, '"||categories~"');
@@ -30,45 +32,48 @@ export const actions = {
         sort: '@random',
       });
   
+      console.log('Raw prompts:', prompts.items);
+  
       const promptsData = await Promise.all(prompts.items.map(async (prompt) => {
-      const isFavAuthor = locals.user?.favAuthors?.includes(prompt.expand?.author.id) || false;
-      
+        const isFavAuthor = locals.user?.favAuthors?.includes(prompt.expand?.author.id) || false;
+  
+        // Separate try-catch for fetching score
+        let scoreData;
         try {
-          const voteStatus = await locals.pb.collection('pVotes')
-            .getFirstListItem(`prompt="${prompt.id}"&&by="${locals.user?.id}"`);
-
-          const pScore = await locals.pb.collection('pScores')
-            .getFirstListItem(`promptId="${prompt.id}"`);
-          const score = pScore ? pScore.score : 0;
-      
-          return {
-            ...prompt,
-            liked: !!voteStatus,
-            superLiked: !!voteStatus && voteStatus.super,
-            isFavAuthor,
-            score,
-          };
-        } catch (err: unknown) {
-          const pbError = err as PocketBaseError;
-          if (pbError.originalError && pbError.originalError.status === 404) {
-            return {
-              ...prompt,
-              liked: false,
-              superLiked: false,
-              isFavAuthor,
-              score: 0,
-            };
-          } else {
-            throw err;
-          }
+          scoreData = await locals.pb.collection('pScore')
+            .getFirstListItem(`id="${prompt.id}"`);
+          console.log(`Score data for prompt id ${prompt.id}:`, scoreData);
+        } catch (err) {
+          console.error(`Error fetching score for prompt id ${prompt.id}:`, err);
+          scoreData = { score: 0 }; // Default score in case of an error
         }
+  
+        // Separate try-catch for fetching vote status
+        let voteStatus;
+        try {
+          voteStatus = await locals.pb.collection('pVotes')
+            .getFirstListItem(`prompt="${prompt.id}"&&by="${locals.user?.id}"`);
+        } catch (err) {
+          console.error(`Error fetching vote status for prompt id ${prompt.id}:`, err);
+          voteStatus = null; // Default to null in case of an error
+        }
+  
+        return {
+          ...prompt,
+          liked: !!voteStatus,
+          superLiked: !!voteStatus && voteStatus.super,
+          isFavAuthor,
+          score: scoreData.score,
+        };
       }));
+  
+      console.log('promptsData:', promptsData);
   
       return {
         records: JSON.stringify(promptsData),
       };
     } catch (err) {
-      console.error('Error: ', err);
+      console.error('Error in generate function:', err);
       throw error(500, "The robots didn't like something about that...");
     }
   },
