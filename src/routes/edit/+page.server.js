@@ -10,7 +10,7 @@ export const actions = {
           const categoriesString = selectedCategories.toString().replace(/,/g, '"||categories~"');
   
           let userPrompts = [];
-          if (locals.user && locals.user.name !== null) {
+          if (locals.user && locals.user.username !== null) {
           let records = await locals.pb.collection('prompts').getFullList({
         filter: `(categories~"${categoriesString}") && author.username = "${locals.user.username}"`,
         fields: 'categories,prompt,id',
@@ -25,7 +25,7 @@ export const actions = {
         };
   
         return {
-          records: JSON.stringify(userPrompts), // Convert to JSON string
+          records: JSON.stringify(userPrompts),
         };
       } catch (err) {
         console.error('Error: ', err);

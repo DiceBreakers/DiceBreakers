@@ -2,7 +2,7 @@
 	import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	import { get, writable } from 'svelte/store';
-	import { fade, slide } from 'svelte/transition';
+	import { fade } from 'svelte/transition';
 	import DicePortal from '$lib/components/dicePortal.svelte';
 	import { catList } from '$lib/components/catList.svelte';
 	import { popup } from '@skeletonlabs/skeleton';
@@ -38,7 +38,7 @@
 	let currentFav = false;
   let isLiked = false;
   let isSuper = false;
-  let score = 0;
+  let comments = 0;
 	let promptIndex = 0;
 	let isRolling = false;
   let SuccessMessage = false;
@@ -242,7 +242,6 @@ async function pVote() {
 
     const currentPrompts = get(promptArray);
     const prompt = currentPrompts[promptIndex];
-    const originalScore = prompt.score;
 
     if (prompt.isSuper) {
       prompt.isLiked = false;
@@ -537,7 +536,8 @@ async function submitReport() {
 									use:popup={{ event: 'click', target: 'hideMenu', placement: 'top' }}
                   use:popup={{ event: 'hover', target: 'hideTT', placement: 'top'}}></div>
 								</div>
-								<div class="right"><b>{currentAuthor}</b> 
+                <div class="comments"><a href="/comments/{currentPromptId}">comments </a>({comments})</div>
+								<div class="author"><b>{currentAuthor}</b> 
                   <button on:click={favToggle}>
                     {#if $promptArray[promptIndex].isFavAuthor}
                       <i class="fa-solid fa-xl fa-star" style="color: #fecb0e;"></i>
@@ -560,9 +560,9 @@ async function submitReport() {
 
   <div class="popup scoreTT" data-popup="scoreTT">
     {#if score==1}
-    Like
+      Like
     {:else}
-    Likes
+      Likes
     {/if}
 	</div>
 
@@ -581,7 +581,7 @@ async function submitReport() {
 			</div>
 		</div>
 	</div>
-
+  
   <div class="popup reportMenu" data-popup="reportMenu">
     <div class="popup-RM" in:fade={{ duration: 800 }}>
     	<textarea id="reportReason" bind:value={reportReason} class="textArea" rows="3" placeholder="Reason for report:"></textarea>
@@ -596,6 +596,11 @@ async function submitReport() {
   .scoreContainer {
     display: flex;
     align-items: center;
+  }
+
+  .author {
+    width: 100px;
+    text-align: left;
   }
 		
 	.margin {
@@ -655,6 +660,15 @@ async function submitReport() {
     align-items: flex-end;
   }
 
+  .hideMenuButton {
+		list-style: none; 
+		padding: 0; 
+		margin: 0; 
+		display: flex;
+		gap: 1rem; 
+    width: 100px;
+	}
+
   .hideMenuButton .fa-eye-slash {
     cursor: pointer; 
   }
@@ -665,15 +679,8 @@ async function submitReport() {
     justify-content: space-between;
     margin-left: auto;
     margin-right: auto;
-    width: 250px;
-	}
-
-	.hideMenuButton {
-		list-style: none; 
-		padding: 0; 
-		margin: 0; 
-		display: flex;
-		gap: 1rem; 
+    max-width: 500px;
+    margin-top: 50px;
 	}
 
 	.gameTop {
