@@ -1,13 +1,5 @@
 
 <div class="footer">
-    <div class="icons">
-        <ul class="fa-brands fa-xl">
-            <a href="https://old.reddit.com/r/DiceBreakers" class="fa-reddit-alien" title="reddit"> </a>
-            <a href="https://www.instagram.com" class="fa-instagram" title="instagram"> </a>
-            <a href="https://www.twitter.com" class="fa-twitter" title="twitter"> </a>
-            <a href="https://www.facebook.com" class="fa-facebook-f" title="facebook"> </a>
-        </ul>
-    </div>
     <div class="legal">
     <ul>
         <a href="/about" title="About"><i class="fa-regular fa-copyright" title="Copyright Dice Breakers"/> DiceBreakers</a>
@@ -24,7 +16,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100px;
+    height: 1px;
     text-align: center;
     margin-top: -50px;
     color: rgba(255, 255, 255, 0.75);

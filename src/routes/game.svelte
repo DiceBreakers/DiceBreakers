@@ -3,7 +3,7 @@
 	import { onMount } from 'svelte';
 	import { get, writable } from 'svelte/store';
 	import { fade } from 'svelte/transition';
-	import DicePortal from '$lib/components/dicePortal.svelte';
+	import DicePortal from '$lib/components/diceRoll.svelte';
 	import { catList } from '$lib/components/catList.svelte';
 	import { popup } from '@skeletonlabs/skeleton';
 	import ServerMessage from '$lib/components/serverMessage.svelte';
@@ -508,7 +508,7 @@ async function submitReport() {
 	  </AccordionItem>
 	  <AccordionItem on:toggle={generate}>
 		<svelte:fragment slot="lead"><img src="favicon.png" alt="Dice Icon" width="21px" /></svelte:fragment>
-		<svelte:fragment slot="summary">Play</svelte:fragment>
+		<svelte:fragment slot="summary"><div class="rTD">Roll the Dice!</div></svelte:fragment>
 		<svelte:fragment slot="content">
 			<div class="game">
 				{#if isRolling}
@@ -600,11 +600,12 @@ async function submitReport() {
   }
 
   .author {
-    align-self: flex-end; /* Aligns the author to the right */
+    align-self: flex-end;
     display: flex;
     justify-content: flex-end;
-    width: 100%; /* Ensures the author spans the full width */
-    margin-top: 10px; /* Adjust as needed */
+    width: 100%;
+    margin-right: 20px;
+    margin-top: 10px;
   }
       
 	.margin {
@@ -615,9 +616,10 @@ async function submitReport() {
 		width: 70px;
 	}
 
-	.bottom {
-		margin-top: 6px;
-	}
+  .rTD {
+    text-align: center;
+    font-weight: bold;
+  }
 
 	.report {
 		margin-right: 8px;
@@ -706,6 +708,10 @@ async function submitReport() {
 	.prompt {
 		text-align: center;
 		min-width: 300px;
+	}
+
+  .bottom {
+		margin-top: 6px;
 	}
 
 </style>
