@@ -526,6 +526,15 @@ async function submitReport() {
                 </div>
                 {/if}
 						  <div class="prompt">{currentPrompt}</div>
+              <div class="author"><b>-{currentAuthor}</b> 
+                <button on:click={favToggle}>
+                  {#if $promptArray[promptIndex].isFavAuthor}
+                    <i class="fa-solid fa-xl fa-star" style="color: #fecb0e;"></i>
+                  {:else}
+                    <i class="fa-regular fa-xl fa-star" style="color: #0d4576;"></i>
+                  {/if}
+                </button>
+              </div>
 							<button in:fade={{ delay: 2000, duration: 1500 }} class="btn variant-filled-primary margin"
                 on:click={displayNextPrompt}>Roll the Dice</button>
 						</div>
@@ -537,15 +546,7 @@ async function submitReport() {
                   use:popup={{ event: 'hover', target: 'hideTT', placement: 'top'}}></div>
 								</div>
                 <div class="comments"><a href="/comments/{currentPromptId}">comments </a>({comments})</div>
-								<div class="author"><b>{currentAuthor}</b> 
-                  <button on:click={favToggle}>
-                    {#if $promptArray[promptIndex].isFavAuthor}
-                      <i class="fa-solid fa-xl fa-star" style="color: #fecb0e;"></i>
-                    {:else}
-                      <i class="fa-regular fa-xl fa-star" style="color: #0d4576;"></i>
-                    {/if}
-                  </button>
-								</div>
+							
               {/if}
 						</div>
 					</div>
@@ -599,10 +600,13 @@ async function submitReport() {
   }
 
   .author {
-    width: 100px;
-    text-align: left;
+    align-self: flex-end; /* Aligns the author to the right */
+    display: flex;
+    justify-content: flex-end;
+    width: 100%; /* Ensures the author spans the full width */
+    margin-top: 10px; /* Adjust as needed */
   }
-		
+      
 	.margin {
 		margin:2em;
 	}

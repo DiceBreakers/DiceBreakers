@@ -49,12 +49,22 @@ export const load: PageServerLoad = async ({ params, locals }) => {
         throw err;
       }
     }
-    
-    // Log statement before fetching prompt score
-    console.log(`Fetching prompt score for prompt ${promptId}`);
-    const pScore = await locals.pb.collection('pScore')
-      .getFirstListItem(`id="${promptId}"`);
-    const score = pScore ? pScore.score : 0;
+
+    let score = 0;
+    try {
+      // Fetching prompt score
+      // console.log(`Fetching prompt score for prompt ${promptId}`);
+      const pScore = await locals.pb.collection('pScore')
+        .getFirstListItem(`id="${promptId}"`);
+      score = pScore ? pScore.score : 0;
+    } catch (err: unknown) {
+      const pbError = err as PocketBaseError;
+      if (pbError.originalError && pbError.originalError.status === 404) {
+        console.log(`No score record found for prompt ${promptId}`);
+      } else {
+        throw err;
+      }
+    }
 
     prompt = {
       ...prompt,
@@ -63,6 +73,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
       isFavAuthor,
       score,
     };
+
 
     const commentsData = await Promise.all(comments.map(async (comment) => {
       const isFavAuthor = locals.user?.favAuthors?.includes(comment.expand?.author.id) || false;
@@ -102,7 +113,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
       }
     }));
 
-    console.log('commentsData', commentsData);
+    // console.log('commentsData', commentsData);
 
     return {
       records: JSON.stringify(commentsData),
