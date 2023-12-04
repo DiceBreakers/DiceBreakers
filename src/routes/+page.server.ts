@@ -10,6 +10,8 @@ export const actions = {
   generate: async ({ request, locals }) => {
     const data = await request.formData();
     let selectedCategories = data.getAll('categories') ?? [];
+
+    console.log('selectedCategories:', selectedCategories)
   
     let hiddenAuthors = locals.user?.hiddenAuthors ?? [];
     let hiddenPrompts = locals.user?.hiddenPrompts ?? [];
@@ -32,7 +34,7 @@ export const actions = {
         sort: '@random',
       });
   
-      console.log('Raw prompts:', prompts.items);
+      // console.log('Raw prompts:', prompts.items);
   
       const promptsData = await Promise.all(prompts.items.map(async (prompt) => {
       const isFavAuthor = locals.user?.favAuthors?.includes(prompt.expand?.author.id) || false;
@@ -76,7 +78,7 @@ export const actions = {
         };
       }));
   
-      console.log('promptsData:', promptsData);
+      // console.log('promptsData:', promptsData);
   
       return {
         records: JSON.stringify(promptsData),

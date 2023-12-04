@@ -49,13 +49,24 @@
 	let promptHiddenMessage = false;
 	let authorHiddenMessage = false;
   let reportReason = '';
-  let allPrimaryChecked = false;
+  let allPrimaryChecked = true;
   let allAdditionalChecked = false;
 
+
+  $: allPrimaryChecked = $primaryCategories.every(cat => cat.checked);
+  $: allAdditionalChecked = $additionalCategories.every(cat => cat.checked);
   $: score = $promptArray[promptIndex]?.score ?? 0;
   $: cCount = $promptArray[promptIndex]?.cCount ?? 0;
   $: bulbImage = $promptArray[promptIndex]?.isSuper ? 'bulb2.png' :
                  $promptArray[promptIndex]?.isLiked ? 'bulb1.png' : 'bulb0.png';
+
+  $: if ($primaryCategories) {
+        updateSelectedCategories();
+    }
+
+  $: if ($additionalCategories) {
+        updateSelectedCategories();
+    }
 	
 	onMount(async() => {
         catList.subscribe((list: CatItem[]) => {
@@ -435,17 +446,16 @@ async function submitReport() {
     }
   }
 
-  function handleAllClick(categoryGroup) {
+  function handleSelectAll(categoryGroup) {
         if (categoryGroup === 'primary') {
             allPrimaryChecked = !allPrimaryChecked;
-            $primaryCategories = $primaryCategories.map(cat => ({ ...cat, checked: allPrimaryChecked }));
+            primaryCategories.update(cats => cats.map(cat => ({ ...cat, checked: allPrimaryChecked })));
         } else if (categoryGroup === 'additional') {
             allAdditionalChecked = !allAdditionalChecked;
-            $additionalCategories = $additionalCategories.map(cat => ({ ...cat, checked: allAdditionalChecked }));
+            additionalCategories.update(cats => cats.map(cat => ({ ...cat, checked: allAdditionalChecked })));
         }
     }
 
-    // Update allChecked when any individual checkbox changes
     function updateAllChecked(categoryGroup) {
         if (categoryGroup === 'primary') {
             allPrimaryChecked = $primaryCategories.every(cat => cat.checked);
@@ -454,8 +464,9 @@ async function submitReport() {
         }
     }
 
-//    $: allPrimaryChecked = $primaryCategories.every(cat => cat.checked);
-//    $: allAdditionalChecked = $additionalCategories.every(cat => cat.checked);
+    function updateSelectedCategories() {
+        selectedCategories.set([...$primaryCategories, ...$additionalCategories]);
+    }
 
 </script>
 
@@ -496,13 +507,17 @@ async function submitReport() {
 			<label class="label">
 				<div class="categories-grid">
           <label class="category-item">
-            <input type="checkbox" class="checkbox checkboxSize" checked={allPrimaryChecked} on:click={() => handleAllClick('primary')}>
+            <input type="checkbox" class="checkbox checkboxSize" 
+                   bind:checked={allPrimaryChecked} 
+                   on:click={() => handleSelectAll('primary')}>
             <span class="checkboxSM">Select All</span>
-          </label>
+        </label>
 					{#each $primaryCategories as catItem}
 					<label class="category-item">
 					  <input name='categories' bind:checked={catItem.checked}
-					   class="checkbox checkboxSize" type="checkbox" value={catItem.value} title={catItem.tooltip}>
+              class="checkbox checkboxSize" type="checkbox" 
+              value={catItem.value} title={catItem.tooltip}
+              on:change={() => updateAllChecked('primary')}>
 					  <span class="checkboxSM">{catItem.label}
 						<div class="fa-solid fa-circle-info"
 						use:popup={{ event: 'hover', target: 'loopExample-' + catItem.value,
@@ -520,13 +535,17 @@ async function submitReport() {
 				<label class="label">
 					<div class="categories-grid">
             <label class="category-item">
-              <input type="checkbox" class="checkbox checkboxSize" checked={allAdditionalChecked} on:click={() => handleAllClick('additional')}>
+              <input type="checkbox" class="checkbox checkboxSize" 
+                     bind:checked={allAdditionalChecked} 
+                     on:click={() => handleSelectAll('additional')}>
               <span class="checkboxSM">Select All</span>
           </label>
 						{#each $additionalCategories as catItem}
 						<label class="category-item">
-						  <input name='categories' bind:checked={catItem.checked}
-						   class="checkbox checkboxSize" type="checkbox" value={catItem.value} title={catItem.tooltip}>
+              <input name='categories' bind:checked={catItem.checked}
+                class="checkbox checkboxSize" type="checkbox" 
+                value={catItem.value} title={catItem.tooltip}
+                on:change={() => updateAllChecked('additional')}>
 						  <span class="checkboxSM">{catItem.label}
 							<div class="fa-solid fa-circle-info"
 							use:popup={{ event: 'hover', target: 'loopExample-' + catItem.value,
