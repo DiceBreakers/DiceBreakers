@@ -48,6 +48,8 @@
 	let promptHiddenMessage = false;
 	let authorHiddenMessage = false;
   let reportReason = '';
+  let allPrimaryChecked = false;
+  let allAdditionalChecked = false;
 
   $: score = $promptArray[promptIndex]?.score ?? 0;
   $: bulbImage = $promptArray[promptIndex]?.isSuper ? 'bulb2.png' :
@@ -57,8 +59,8 @@
         catList.subscribe((list: CatItem[]) => {
             selectedCategories.set(list);
             const categories = list;
-            primaryCategories.set(categories.slice(0, 6));
-            additionalCategories.set(categories.slice(6));
+            primaryCategories.set(categories.slice(0, 5));
+            additionalCategories.set(categories.slice(5));
         });
     });
 
@@ -430,6 +432,27 @@ async function submitReport() {
     }
   }
 
+  function handleAllClick(categoryGroup) {
+        if (categoryGroup === 'primary') {
+            allPrimaryChecked = !allPrimaryChecked;
+            $primaryCategories = $primaryCategories.map(cat => ({ ...cat, checked: allPrimaryChecked }));
+        } else if (categoryGroup === 'additional') {
+            allAdditionalChecked = !allAdditionalChecked;
+            $additionalCategories = $additionalCategories.map(cat => ({ ...cat, checked: allAdditionalChecked }));
+        }
+    }
+
+    // Update allChecked when any individual checkbox changes
+    function updateAllChecked(categoryGroup) {
+        if (categoryGroup === 'primary') {
+            allPrimaryChecked = $primaryCategories.every(cat => cat.checked);
+        } else if (categoryGroup === 'additional') {
+            allAdditionalChecked = $additionalCategories.every(cat => cat.checked);
+        }
+    }
+
+    $: allChecked = $primaryCategories.every(cat => cat.checked);
+
 </script>
 
 {#if SuccessMessage}
@@ -468,6 +491,10 @@ async function submitReport() {
 					<svelte:fragment slot="content">
 			<label class="label">
 				<div class="categories-grid">
+          <label class="category-item">
+            <input type="checkbox" class="checkbox checkboxSize" checked={allChecked} on:click={handleAllClick}>
+            <span class="checkboxSM">Select All</span>
+          </label>
 					{#each $primaryCategories as catItem}
 					<label class="category-item">
 					  <input name='categories' bind:checked={catItem.checked}
@@ -488,6 +515,10 @@ async function submitReport() {
 				<svelte:fragment slot="content">
 				<label class="label">
 					<div class="categories-grid">
+            <label class="category-item">
+              <input type="checkbox" class="checkbox checkboxSize" checked={allAdditionalChecked} on:click={() => handleAllClick('additional')}>
+              <span class="checkboxSM">Select All</span>
+          </label>
 						{#each $additionalCategories as catItem}
 						<label class="category-item">
 						  <input name='categories' bind:checked={catItem.checked}

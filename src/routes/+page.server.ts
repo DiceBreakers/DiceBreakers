@@ -37,7 +37,6 @@ export const actions = {
       const promptsData = await Promise.all(prompts.items.map(async (prompt) => {
         const isFavAuthor = locals.user?.favAuthors?.includes(prompt.expand?.author.id) || false;
   
-        // Separate try-catch for fetching score
         let scoreData;
         try {
           scoreData = await locals.pb.collection('pScore')
@@ -45,17 +44,16 @@ export const actions = {
           console.log(`Score data for prompt id ${prompt.id}:`, scoreData);
         } catch (err) {
           console.error(`Error fetching score for prompt id ${prompt.id}:`, err);
-          scoreData = { score: 0 }; // Default score in case of an error
+          scoreData = { score: 0 }; 
         }
-  
-        // Separate try-catch for fetching vote status
+
         let voteStatus;
         try {
           voteStatus = await locals.pb.collection('pVotes')
             .getFirstListItem(`prompt="${prompt.id}"&&by="${locals.user?.id}"`);
         } catch (err) {
           console.error(`Error fetching vote status for prompt id ${prompt.id}:`, err);
-          voteStatus = null; // Default to null in case of an error
+          voteStatus = null;
         }
   
         return {
