@@ -23,9 +23,9 @@ export const actions = {
   
     try {
       const categoriesString = selectedCategories.toString().replace(/,/g, '"||categories~"');
-      let prompts = await locals.pb.collection('prompts').getList(1, 5, {
+      let prompts = await locals.pb.collection('prompts').getList(1, 2, {
         page: 1,
-        perPage: 5,
+        perPage: 2,
         filter: `(categories~"${categoriesString}")&&("${hiddenAuthors}"?!~author)&&("${hiddenPrompts}"?!~id)`,
         expand: 'author',
         fields: 'expand.author.username,expand.author.id,id,prompt',
@@ -35,16 +35,26 @@ export const actions = {
       console.log('Raw prompts:', prompts.items);
   
       const promptsData = await Promise.all(prompts.items.map(async (prompt) => {
-        const isFavAuthor = locals.user?.favAuthors?.includes(prompt.expand?.author.id) || false;
+      const isFavAuthor = locals.user?.favAuthors?.includes(prompt.expand?.author.id) || false;
   
         let scoreData;
         try {
           scoreData = await locals.pb.collection('pScore')
             .getFirstListItem(`id="${prompt.id}"`);
-          console.log(`Score data for prompt id ${prompt.id}:`, scoreData);
+          // console.log(`Score data for prompt id ${prompt.id}:`, scoreData);
         } catch (err) {
           console.error(`Error fetching score for prompt id ${prompt.id}:`, err);
           scoreData = { score: 0 }; 
+        }
+
+        let commentCount;
+        try {
+          commentCount = await locals.pb.collection('cCount')
+            .getFirstListItem(`id="${prompt.id}"`);
+        //   console.log(`Comment count for prompt id ${prompt.id}:`, cCount);
+        } catch (err) {
+          console.error(`Error fetching comment count for prompt id ${prompt.id}:`, err);
+          commentCount = { cCount: 0}; 
         }
 
         let voteStatus;
@@ -62,6 +72,7 @@ export const actions = {
           superLiked: !!voteStatus && voteStatus.super,
           isFavAuthor,
           score: scoreData.score,
+          cCount: commentCount.cCount,
         };
       }));
   

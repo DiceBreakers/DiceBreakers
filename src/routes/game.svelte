@@ -3,7 +3,7 @@
 	import { onMount } from 'svelte';
 	import { get, writable } from 'svelte/store';
 	import { fade } from 'svelte/transition';
-	import DicePortal from '$lib/components/diceRoll.svelte';
+	import DiceRoll from '$lib/components/diceRoll.svelte';
 	import { catList } from '$lib/components/catList.svelte';
 	import { popup } from '@skeletonlabs/skeleton';
 	import ServerMessage from '$lib/components/serverMessage.svelte';
@@ -25,6 +25,7 @@
     isLiked: boolean;
     isSuper: boolean;
     score: number;
+    cCount: number;
   }
 	
 	let selectedCategories = writable<CatItem[]>([]);
@@ -38,7 +39,7 @@
 	let currentFav = false;
   let isLiked = false;
   let isSuper = false;
-  let comments = 0;
+  let cCount = 0;
 	let promptIndex = 0;
 	let isRolling = false;
   let SuccessMessage = false;
@@ -52,6 +53,7 @@
   let allAdditionalChecked = false;
 
   $: score = $promptArray[promptIndex]?.score ?? 0;
+  $: cCount = $promptArray[promptIndex]?.cCount ?? 0;
   $: bulbImage = $promptArray[promptIndex]?.isSuper ? 'bulb2.png' :
                  $promptArray[promptIndex]?.isLiked ? 'bulb1.png' : 'bulb0.png';
 	
@@ -105,6 +107,7 @@ async function generate(event?: Event) {
         isLiked: obj.liked,
         isFavAuthor: obj.isFavAuthor,
         score: obj.score,
+        cCount: obj.cCount,
       };
     });
 
@@ -451,7 +454,8 @@ async function submitReport() {
         }
     }
 
-    $: allChecked = $primaryCategories.every(cat => cat.checked);
+//    $: allPrimaryChecked = $primaryCategories.every(cat => cat.checked);
+//    $: allAdditionalChecked = $additionalCategories.every(cat => cat.checked);
 
 </script>
 
@@ -492,7 +496,7 @@ async function submitReport() {
 			<label class="label">
 				<div class="categories-grid">
           <label class="category-item">
-            <input type="checkbox" class="checkbox checkboxSize" checked={allChecked} on:click={handleAllClick}>
+            <input type="checkbox" class="checkbox checkboxSize" checked={allPrimaryChecked} on:click={() => handleAllClick('primary')}>
             <span class="checkboxSM">Select All</span>
           </label>
 					{#each $primaryCategories as catItem}
@@ -543,7 +547,7 @@ async function submitReport() {
 		<svelte:fragment slot="content">
 			<div class="game">
 				{#if isRolling}
-					<DicePortal />
+					<DiceRoll />
 			  {:else}
 					<div class="promptBox">
 						<div class="gameTop" in:fade={{ delay: 100, duration: 800 }}>
@@ -576,8 +580,7 @@ async function submitReport() {
 									use:popup={{ event: 'click', target: 'hideMenu', placement: 'top' }}
                   use:popup={{ event: 'hover', target: 'hideTT', placement: 'top'}}></div>
 								</div>
-                <div class="comments"><a href="/comments/{currentPromptId}">comments </a>({comments})</div>
-							
+                <div class="comments"><a href="/comments/{currentPromptId}">comments </a>({cCount})</div>							
               {/if}
 						</div>
 					</div>
