@@ -1,11 +1,14 @@
 <script>
+	import { fly, slide } from 'svelte/transition';
+  import { cubicInOut } from 'svelte/easing';
+
   export let isError = false;
   export let isSuccess = true;
   export let messageText = 'Success!';
 
 </script>
 
-<div class="server-message" class:success={isSuccess} class:error={isError}>
+<div class="server-message" class:success={isSuccess} class:error={isError} transition:fly="{{ x: 200, y: -200, duration: 600, easing: cubicInOut }}">
   {messageText}
 </div>
 

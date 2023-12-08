@@ -3,11 +3,11 @@
 	import { onMount } from 'svelte';
 	import { get, writable } from 'svelte/store';
 	import { fade } from 'svelte/transition';
-	import DiceRoll from '$lib/components/diceRoll.svelte';
-	import { catList } from '$lib/components/catList.svelte';
 	import { popup } from '@skeletonlabs/skeleton';
-	import ServerMessage from '$lib/components/serverMessage.svelte';
   import { currentUser } from '$lib/stores/user';
+  import { catList } from '$lib/components/catList.svelte';
+  import DiceRoll from '$lib/components/diceRoll.svelte';
+  import ServerMessage from '$lib/components/serverMessage.svelte';
 
 	type CatItem = {
 	  value: string;
@@ -22,12 +22,13 @@
     author: string;
     authorId: string;
     isFavAuthor: boolean;
-    isLiked: boolean;
-    isSuper: boolean;
+    liked: boolean;
+    superLiked: boolean;
     score: number;
     cCount: number;
   }
 	
+  let selectedFilter = writable('all');
 	let selectedCategories = writable<CatItem[]>([]);
 	let primaryCategories = writable<CatItem[]>([]);
 	let additionalCategories = writable<CatItem[]>([]);
@@ -37,8 +38,8 @@
 	let currentAuthor = '';
 	let currentAuthId = '';
 	let currentFav = false;
-  let isLiked = false;
-  let isSuper = false;
+  let liked = false;
+  let superLiked = false;
   let cCount = 0;
 	let promptIndex = 0;
 	let isRolling = false;
@@ -57,8 +58,8 @@
   $: allAdditionalChecked = $additionalCategories.every(cat => cat.checked);
   $: score = $promptArray[promptIndex]?.score ?? 0;
   $: cCount = $promptArray[promptIndex]?.cCount ?? 0;
-  $: bulbImage = $promptArray[promptIndex]?.isSuper ? 'bulb2.png' :
-                 $promptArray[promptIndex]?.isLiked ? 'bulb1.png' : 'bulb0.png';
+  $: bulbImage = $promptArray[promptIndex]?.superLiked ? 'bulb2.png' :
+                 $promptArray[promptIndex]?.liked ? 'bulb1.png' : 'bulb0.png';
 
   $: if ($primaryCategories) {
         updateSelectedCategories();
@@ -67,6 +68,16 @@
   $: if ($additionalCategories) {
         updateSelectedCategories();
     }
+
+  $: if ($selectedFilter !== 'all') {
+    if (!$currentUser) {
+      $selectedFilter = 'all';
+      LoginMessage = true;
+      setTimeout(() => {
+        LoginMessage = false;
+      }, 2000);
+    }
+  }
 	
 	onMount(async() => {
         catList.subscribe((list: CatItem[]) => {
@@ -96,6 +107,10 @@ async function generate(event?: Event) {
     }
   });
 
+  formData.append('selectedFilter', $selectedFilter.toString());
+
+  console.log('SelectedFilter:', $selectedFilter.toString());
+
   try {
     const response = await fetch('?/generate', {
       method: 'POST',
@@ -112,8 +127,8 @@ async function generate(event?: Event) {
       return {
         prompt: obj.prompt,
         promptId: obj.id,
-        author: obj.expand.author.username,
-        authorId: obj.expand.author.id,
+        author: obj.author,
+        authorId: obj.authorId,
         isSuper: obj.superLiked,
         isLiked: obj.liked,
         isFavAuthor: obj.isFavAuthor,
@@ -128,14 +143,15 @@ async function generate(event?: Event) {
       updatePrompt();
     } else {
         console.error('Failed to generate prompts.');
-        currentPrompt = "Hmm. Either there was a server error, or the search was too narrow/you've managed to hide everyone. Change some settings and try again."
+        currentPrompt = "Hmm. I didn't find any prompts for some reason."
+        currentAuthor = "Womp Womp"
       }
   } catch (error) {
     console.error('An error occurred:', error);
   }
 }
 
-function updatePrompt() {
+async function updatePrompt() {
   const prompts = get(promptArray);
   
   if (promptIndex < prompts.length) {
@@ -149,6 +165,19 @@ function updatePrompt() {
         currentAuthor = author;
         currentAuthId = authorId;
         currentFav = isFavAuthor;
+
+        // Fetch additional details for the prompt
+        const additionalDetails = await fetchPromptDetails(promptId);
+          if (additionalDetails) {
+            // Merge the additional details with the current prompt data
+            const updatedPrompt = {
+              ...promptData,
+              ...additionalDetails // Ensure this structure matches the expected prompt data structure
+            };
+
+            prompts[promptIndex] = updatedPrompt;
+            promptArray.set(prompts); // Update the promptArray with the new data
+          }
       } else {
         throw new Error('Prompt data is undefined');
       }
@@ -159,13 +188,49 @@ function updatePrompt() {
       currentPromptId = '';
       currentAuthId = '';
       currentFav = false;
-      isLiked = false;
-      isSuper = false;
+      liked = false;
+      superLiked = false;
       score = 0;
     }
   } else {
     console.error('No more prompts to display.');
     currentPrompt = "Hmm. Either there was a server error, or the search was too narrow/you've managed to hide everyone. Change some settings and try again.";
+    currentAuthor = "Womp Womp";
+    currentFav = false;
+    liked = false;
+    superLiked = false;
+    score = 0;
+  }
+}
+
+async function fetchPromptDetails(promptId) {
+  try {
+    const formData = new FormData();
+    formData.append('promptId', promptId);
+
+    const response = await fetch('?/promptStatus', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const jsonResponse = await response.json();
+    if (jsonResponse && jsonResponse.data) {
+      const dataArr = JSON.parse(jsonResponse.data);
+      const additionalDetails = dataArr.length > 1 ? JSON.parse(dataArr[1]) : {};
+
+      console.log('additionalDetails:', additionalDetails);
+
+      return additionalDetails;
+    }
+
+    return {};
+  } catch (error) {
+    console.error('An error occurred while fetching prompt details:', error);
+    return {};
   }
 }
 
@@ -202,7 +267,7 @@ async function favToggle() {
     LoginMessage = true;
     setTimeout(() => {
       LoginMessage = false;
-    }, 1500);
+    }, 2000);
     return;
   }
 
@@ -236,14 +301,14 @@ async function favToggle() {
       FailureMessage = true;
       setTimeout(() => {
         FailureMessage = false;
-      }, 1500);
+      }, 2000);
     }
   } catch (error) {
     console.error('An error occurred:', error);
     FailureMessage = true;
     setTimeout(() => {
       FailureMessage = false;
-    }, 1500);
+    }, 2000);
   }
 }
 
@@ -252,23 +317,23 @@ async function pVote() {
       LoginMessage = true;
       setTimeout(() => {
         LoginMessage = false;
-      }, 1500);
+      }, 2000);
       return;
     }
 
     const currentPrompts = get(promptArray);
     const prompt = currentPrompts[promptIndex];
 
-    if (prompt.isSuper) {
-      prompt.isLiked = false;
-      prompt.isSuper = false;
+    if (prompt.superLiked) {
+      prompt.liked = false;
+      prompt.superLiked = false;
       prompt.score -= 5;
-    } else if (prompt.isLiked) {
-      prompt.isSuper = true;
-      prompt.isLiked = false;
+    } else if (prompt.liked) {
+      prompt.superLiked = true;
+      prompt.liked = false;
       prompt.score += 4;
     } else {
-      prompt.isLiked = true;
+      prompt.liked = true;
       prompt.score += 1;
     }
 
@@ -277,8 +342,8 @@ async function pVote() {
       n[promptIndex] = {
         ...prompt,
         score: prompt.score,
-        isLiked: prompt.isLiked,
-        isSuper: prompt.isSuper
+        liked: prompt.liked,
+        superLiked: prompt.superLiked
       };
       return [...n];
     });
@@ -303,14 +368,14 @@ async function pVote() {
         FailureMessage = true;
         setTimeout(() => {
           FailureMessage = false;
-        }, 1500);
+        }, 2000);
       }
     } catch (error) {
       console.error('An error occurred:', error);
       FailureMessage = true;
       setTimeout(() => {
         FailureMessage = false;
-      }, 1500);
+      }, 2000);
     }
   }
 
@@ -319,7 +384,7 @@ async function hidePrompt() {
     LoginMessage = true;
     setTimeout(() => {
       LoginMessage = false;
-    }, 1500);
+    }, 2000);
     return;
   }
 
@@ -339,21 +404,21 @@ async function hidePrompt() {
 			promptHiddenMessage = true;
             setTimeout(() => {
                 promptHiddenMessage = false;
-            }, 1500);
+            }, 2000);
 			generate();
         } else {
             console.error('Something broke :-(');
             FailureMessage = true;
             setTimeout(() => {
                 FailureMessage = false;
-            }, 1500);
+            }, 2000);
         }
     } catch (error) {
         console.error('An error occurred:', error);
         FailureMessage = true;
         setTimeout(() => {
             FailureMessage = false;
-        }, 1500);
+        }, 2000);
     }
 }
 
@@ -362,7 +427,7 @@ async function hideAuthor() {
     LoginMessage = true;
     setTimeout(() => {
       LoginMessage = false;
-    }, 1500);
+    }, 2000);
     return;
   }
 
@@ -382,21 +447,21 @@ async function hideAuthor() {
 			authorHiddenMessage = true;
             setTimeout(() => {
                 authorHiddenMessage = false;
-            }, 1500);
+            }, 2000);
 			generate();
         } else {
             console.error('Something broke :-(');
             FailureMessage = true;
             setTimeout(() => {
                 FailureMessage = false;
-            }, 1500);
+            }, 2000);
         }
     } catch (error) {
         console.error('An error occurred:', error);
         FailureMessage = true;
         setTimeout(() => {
             FailureMessage = false;
-        }, 1500);
+        }, 2000);
     }
 }
 
@@ -405,7 +470,7 @@ async function submitReport() {
     LoginMessage = true;
     setTimeout(() => {
       LoginMessage = false;
-    }, 1500);
+    }, 2000);
     return;
   }
 
@@ -435,14 +500,14 @@ async function submitReport() {
             FailureMessage = true;
             setTimeout(() => {
                 FailureMessage = false;
-            }, 1500);
+            }, 2000);
         }
     } catch (error) {
         console.error('An error occurred:', error);
         FailureMessage = true;
         setTimeout(() => {
             FailureMessage = false;
-        }, 1500);
+        }, 2000);
     }
   }
 
@@ -490,47 +555,62 @@ async function submitReport() {
 	<ServerMessage isError={true} messageText="Something is broken :-(" />
 {/if}
 
-{#if LoginMessage}
-	<ServerMessage isError={true} messageText="You must be logged in" />
-{/if}
+<div class="message-container">
+  {#if LoginMessage}
+    <ServerMessage isError={true} messageText="You'll need to log in for that." />
+  {/if}
+</div>
 
   <div class="container card p-4" transition:fade={{ delay: 1000, duration: 500 }}>
 	<Accordion autocollapse>
-	  <AccordionItem open> 
+	  <AccordionItem> 
 		<svelte:fragment slot="lead"><i class="fa-solid fa-lg fa-gear" style="color: #1673c5;"></i></svelte:fragment>
-		<svelte:fragment slot="summary">Settings:</svelte:fragment>
+		<svelte:fragment slot="summary">Settings and Categories</svelte:fragment>
 		<svelte:fragment slot="content">
 			<Accordion>
-				<AccordionItem open>
-					<svelte:fragment slot="summary">Primary Categories:</svelte:fragment>
+        <AccordionItem>
+          <svelte:fragment slot="summary">Filter</svelte:fragment>
 					<svelte:fragment slot="content">
-			<label class="label">
-				<div class="categories-grid">
-          <label class="category-item">
-            <input type="checkbox" class="checkbox checkboxSize" 
-                   bind:checked={allPrimaryChecked} 
-                   on:click={() => handleSelectAll('primary')}>
-            <span class="checkboxSM">Select All</span>
-        </label>
-					{#each $primaryCategories as catItem}
-					<label class="category-item">
-					  <input name='categories' bind:checked={catItem.checked}
-              class="checkbox checkboxSize" type="checkbox" 
-              value={catItem.value} title={catItem.tooltip}
-              on:change={() => updateAllChecked('primary')}>
-					  <span class="checkboxSM">{catItem.label}
-						<div class="fa-solid fa-circle-info"
-						use:popup={{ event: 'hover', target: 'loopExample-' + catItem.value,
-						placement: 'top' }}></div></span>
-						<div class="popup" data-popup="loopExample-{catItem.value}">{catItem.tooltip}</div>
-					</label>
-					{/each}
-				</div>
-			  </label>
+            <label class="label">
+              <select bind:value={$selectedFilter} class="selectFilter" name="selectedFilter">
+                <option value="all">No Filter</option>
+                <option value="liked">All Liked</option>
+                <option value="superLiked">Super Liked</option>
+                <option value="favAuthors">Favorite Authors</option>
+              </select>
+            </label>
+          </svelte:fragment>
+        </AccordionItem>
+				<AccordionItem>
+					<svelte:fragment slot="summary">Primary Categories</svelte:fragment>
+					<svelte:fragment slot="content">
+            <label class="label">
+              <div class="categories-grid">
+                <label class="category-item">
+                  <input type="checkbox" class="checkbox checkboxSize" 
+                        bind:checked={allPrimaryChecked} 
+                        on:click={() => handleSelectAll('primary')}>
+                  <span class="checkboxSM">Select All</span>
+              </label>
+            {#each $primaryCategories as catItem}
+            <label class="category-item">
+              <input name='categories' bind:checked={catItem.checked}
+                class="checkbox checkboxSize" type="checkbox" 
+                value={catItem.value} title={catItem.tooltip}
+                on:change={() => updateAllChecked('primary')}>
+              <span class="checkboxSM">{catItem.label}
+              <div class="fa-solid fa-circle-info"
+              use:popup={{ event: 'hover', target: 'loopExample-' + catItem.value,
+              placement: 'top' }}></div></span>
+              <div class="popup" data-popup="loopExample-{catItem.value}">{catItem.tooltip}</div>
+            </label>
+            {/each}
+          </div>
+          </label>
 			</svelte:fragment>
 			</AccordionItem>
 			<AccordionItem>
-				<svelte:fragment slot="summary">Oddly Specific Categories:</svelte:fragment>
+				<svelte:fragment slot="summary">Oddly Specific Categories</svelte:fragment>
 				<svelte:fragment slot="content">
 				<label class="label">
 					<div class="categories-grid">
@@ -582,7 +662,7 @@ async function submitReport() {
 						  <div class="prompt">{currentPrompt}</div>
               <div class="author"><b>-{currentAuthor}</b> 
                 <button on:click={favToggle}>
-                  {#if $promptArray[promptIndex].isFavAuthor}
+                  {#if $promptArray[promptIndex]?.isFavAuthor}
                     <i class="fa-solid fa-xl fa-star" style="color: #fecb0e;"></i>
                   {:else}
                     <i class="fa-regular fa-xl fa-star" style="color: #0d4576;"></i>
@@ -646,6 +726,10 @@ async function submitReport() {
   </div>
 
 <style>
+
+.selectFilter {
+    border-radius: 5px;
+  }
 
   .scoreContainer {
     display: flex;

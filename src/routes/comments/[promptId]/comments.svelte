@@ -1,6 +1,9 @@
 <script lang="ts">
     import { writable } from 'svelte/store';
+    import { onMount } from 'svelte';
+    import { goto } from '$app/navigation';
     import { popup } from '@skeletonlabs/skeleton';
+    import { fade } from 'svelte/transition';
     import type { PopupSettings } from '@skeletonlabs/skeleton';
 	import ServerMessage from '$lib/components/serverMessage.svelte';
     import { currentUser } from '$lib/stores/user';
@@ -11,12 +14,18 @@
 
    // console.log(data)
 
+   
+
     const showReplyForm = writable(false);
+
+    
+    let commentArray = writable<Comment[]>([]);
+    let loading = true;
 
     let comment;
     let promptId;
 
-
+    let showRollButton = false;
     let SuccessMessage = false;
 	let FailureMessage = false;
 	let ReportMessage = false;
@@ -60,8 +69,9 @@
         score: 0
     });
 
-    let commentArray = writable<Comment[]>([]);
-    let loading = true;
+    $: bulbImage = $prompt?.isSuper ? '/bulb2.png' :
+                   $prompt?.isLiked ? '/bulb1.png' : '/bulb0.png';
+
 
     if (data && data.prompt) {
         try {
@@ -250,8 +260,15 @@ function toggleReplyForm() {
         showReplyForm.update(current => !current);
     }
 
- $: bulbImage = $prompt?.isSuper ? '/bulb2.png' :
-                   $prompt?.isLiked ? '/bulb1.png' : '/bulb0.png';
+function navigateHome() {
+    goto('/');
+  }
+
+onMount(() => {
+    setTimeout(() => {
+      showRollButton = true;
+    }, 1000);
+  });
 
 </script>
 
@@ -280,6 +297,15 @@ function toggleReplyForm() {
                     {/if}
                 </button>
             </div>
+            {#if showRollButton}
+                <button in:fade={{ duration: 800 }} class="btn variant-filled-primary margin" on:click={navigateHome}>
+                Roll Again
+                </button>
+            {:else}
+                <div class="btn variant-filled-primary margin" style="visibility: hidden;">
+                  Uh. This is supposed to be hidden?
+                </div>              
+            {/if}
         </div>
         {#each organizedComments as comment}
             <CommentItem comment={comment} promptId={$prompt.id} />

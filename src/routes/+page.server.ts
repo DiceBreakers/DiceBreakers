@@ -6,86 +6,188 @@ interface PocketBaseError {
   };
 }
 
+let queryFilter;
+let likeQueryFilter;
+
+async function queryPromptsWithFilter(locals, queryFilter) {
+  console.log('queryFilter:', queryFilter);
+  return await locals.pb.collection('prompts').getList(1, 10, {
+    page: 1,
+    perPage: 10,
+    filter: queryFilter,
+    expand: 'author',
+    fields: 'expand.author.username, expand.author.id, id, prompt',
+    sort: '@random',
+    skipTotal: true,
+  });
+}
+
+async function queryLikedPrompts(locals, likeQueryFilter) {
+  return await locals.pb.collection('pVotes').getList(1, 10, {
+    page: 1,
+    perPage: 10,
+    filter: likeQueryFilter,
+    expand: 'prompt.author', // Expanding prompt and its nested author relation
+    fields: 'expand.prompt,expand.prompt.author.id,expand.prompt.author.username', // Requesting all fields at each level
+    sort: '@random',
+    skipTotal: true,
+  });
+}
+
 export const actions = {
   generate: async ({ request, locals }) => {
-    const data = await request.formData();
-    let selectedCategories = data.getAll('categories') ?? [];
+    if (request.method !== 'POST') {
+      console.log('Error: Non-POST');
+      throw error(400, "The robots didn't like something about that...");
+    }
 
-    console.log('selectedCategories:', selectedCategories)
+    const data = await request.formData();
+
+    // console.log('formData:', data)
+
+    const selectedCategories = data.getAll('categories') ?? [];
+    const selectedFilter = data.get('selectedFilter');
+
+    // console.log('selectedCategories:', selectedCategories)
+  //  console.log('selectedFilter:', selectedFilter)
   
+    let favAuthors = locals.user?.favAuthors ?? [];
     let hiddenAuthors = locals.user?.hiddenAuthors ?? [];
+    let authorFilter = '';
+    let categoriesFilter = '';
+    let categoriesString = '';
+
     let hiddenPrompts = locals.user?.hiddenPrompts ?? [];
   
     if (hiddenAuthors.length === 0) {
-      hiddenAuthors = ['empty'];
+      hiddenAuthors = ['FakePlaceholderUsername'];
     }
     if (hiddenPrompts.length === 0) {
-      hiddenPrompts = ['empty'];
+      hiddenPrompts = ['FakePlaceholderPromptID'];
     }
+
+  let prompts;
   
+  try {
+    switch (selectedFilter) {
+      case 'favAuthors':
+        categoriesString = selectedCategories.toString().replace(/,/g, '"||categories~"');
+        categoriesFilter = `categories~"${categoriesString}"`;
+
+        if (favAuthors.length > 0) {
+          authorFilter = `"${favAuthors.join(',')}"?~author`;
+        } else {
+          authorFilter = `"${hiddenAuthors.join(',')}"?!~author`;
+        }
+        break;
+      case 'liked':
+            categoriesString = selectedCategories.toString().replace(/,/g, '"||prompt.categories~"');
+            categoriesFilter = `prompt.categories~"${categoriesString}"`;
+        break;
+      case 'superLiked':
+            categoriesString = selectedCategories.toString().replace(/,/g, '"||prompt.categories~"');
+            categoriesFilter = `prompt.categories~"${categoriesString}")&&(super=true`;
+        break;
+      default:
+        categoriesString = selectedCategories.toString().replace(/,/g, '"||categories~"');
+        categoriesFilter = `categories~"${categoriesString}"`;
+        authorFilter = `"${hiddenAuthors}"?!~author`;
+        break;
+    }
+
+    queryFilter = `(${categoriesFilter})&&(${authorFilter})&&("${hiddenPrompts.join(',')}"?!~id)`;
+    likeQueryFilter = `(${categoriesFilter})`
+
+    if (selectedFilter === 'favAuthors' || selectedFilter === 'all') {
+      prompts = await queryPromptsWithFilter(locals, queryFilter);
+    } else {
+      prompts = await queryLikedPrompts(locals, likeQueryFilter);
+    } 
+
+//    console.log('RawPrompts:', prompts);
+
+    const promptsData = await Promise.all(prompts.items.map(async (promptItem) => {
+  //    console.log('Current Prompt:', promptItem);
+
+
+      const promptDetails = promptItem.expand.prompt;
+      const pAuthor = promptItem.expand?.author || promptDetails.expand?.author || null;
+      const isFavAuthor = locals.user?.favAuthors?.includes(pAuthor?.id) || false;
+
+  //    console.log('promptDetails:', promptDetails)
+ //     console.log('pAuthor:', pAuthor)
+ //     console.log('isFavAuthor:', isFavAuthor)
+
+      return {
+      //  ...prompt,
+        liked: promptItem.hasOwnProperty('super') ? true : false, // Assuming default liked status
+        superLiked: promptItem.hasOwnProperty('super') ? promptItem.super : false, // Assuming default superLiked status
+        id: promptItem.id || promptItem.expand.prompt.id,
+        prompt: promptDetails?.prompt || promptItem.prompt || null, 
+        author: pAuthor?.username || 'Unknown', // Safe access with default value
+        authorId: pAuthor?.id || 'Unknown', // Safe access with default value
+        isFavAuthor,
+        score: 1, // Assuming default score
+        cCount: 0, // Assuming default comment count
+      };
+    }));
+
+ //   console.log('Processed Prompts Data:', promptsData);
+
+    return {
+      records: JSON.stringify(promptsData),
+    };
+  } catch (err) {
+    console.error('Error in generate function:', err);
+    throw error(500, "The robots didn't like something about that...");
+  }
+},
+
+  promptStatus: async ({ request, locals }) => {
     try {
-      const categoriesString = selectedCategories.toString().replace(/,/g, '"||categories~"');
-      let prompts = await locals.pb.collection('prompts').getList(1, 2, {
-        page: 1,
-        perPage: 2,
-        filter: `(categories~"${categoriesString}")&&("${hiddenAuthors}"?!~author)&&("${hiddenPrompts}"?!~id)`,
-        expand: 'author',
-        fields: 'expand.author.username,expand.author.id,id,prompt',
-        sort: '@random',
-      });
+      // Extract the promptId from the request
+      const data = await request.formData();
+      const promptId = data.get('promptId');
   
-      // console.log('Raw prompts:', prompts.items);
+      let scoreData, commentCount, likeStatus;
   
-      const promptsData = await Promise.all(prompts.items.map(async (prompt) => {
-      const isFavAuthor = locals.user?.favAuthors?.includes(prompt.expand?.author.id) || false;
+      try {
+        scoreData = await locals.pb.collection('pScore')
+          .getFirstListItem(`id="${promptId}"`);
+      } catch (err) {
+        scoreData = { score: 1 };
+      }
   
-        let scoreData;
-        try {
-          scoreData = await locals.pb.collection('pScore')
-            .getFirstListItem(`id="${prompt.id}"`);
-          // console.log(`Score data for prompt id ${prompt.id}:`, scoreData);
-        } catch (err) {
-          console.error(`Error fetching score for prompt id ${prompt.id}:`, err);
-          scoreData = { score: 0 }; 
-        }
+      try {
+        commentCount = await locals.pb.collection('cCount')
+          .getFirstListItem(`id="${promptId}"`);
+      } catch (err) {
+        commentCount = { cCount: 0 };
+      }
+  
+      try {
+        likeStatus = await locals.pb.collection('pVotes')
+          .getFirstListItem(`prompt="${promptId}"&&by="${locals.user?.id}"`);
+      } catch (err) {
+        likeStatus = null;
+      }
 
-        let commentCount;
-        try {
-          commentCount = await locals.pb.collection('cCount')
-            .getFirstListItem(`id="${prompt.id}"`);
-        //   console.log(`Comment count for prompt id ${prompt.id}:`, cCount);
-        } catch (err) {
-          console.error(`Error fetching comment count for prompt id ${prompt.id}:`, err);
-          commentCount = { cCount: 0}; 
-        }
-
-        let voteStatus;
-        try {
-          voteStatus = await locals.pb.collection('pVotes')
-            .getFirstListItem(`prompt="${prompt.id}"&&by="${locals.user?.id}"`);
-        } catch (err) {
-          console.error(`Error fetching vote status for prompt id ${prompt.id}:`, err);
-          voteStatus = null;
-        }
+      // console.log('likes:', likeStatus, 'comments:', commentCount, 'score:', scoreData)
   
-        return {
-          ...prompt,
-          liked: !!voteStatus,
-          superLiked: !!voteStatus && voteStatus.super,
-          isFavAuthor,
-          score: scoreData.score,
-          cCount: commentCount.cCount,
-        };
-      }));
-  
-      // console.log('promptsData:', promptsData);
+      const promptAdditionalDetails = {
+        liked: !!likeStatus,
+        superLiked: !!likeStatus && likeStatus.super,
+        score: scoreData.score,
+        cCount: commentCount.cCount,
+      };
   
       return {
-        records: JSON.stringify(promptsData),
+        details: JSON.stringify(promptAdditionalDetails),
       };
+  
     } catch (err) {
-      console.error('Error in generate function:', err);
-      throw error(500, "The robots didn't like something about that...");
+      console.error('Error in promptStatus function:', err);
+      throw error(500, "There was an error processing the prompt details.");
     }
   },
   
