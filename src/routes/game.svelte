@@ -9,6 +9,8 @@
   import DiceRoll from '$lib/components/diceRoll.svelte';
   import ServerMessage from '$lib/components/serverMessage.svelte';
 
+  export let data;
+
 	type CatItem = {
 	  value: string;
 	  label: string;
@@ -47,12 +49,13 @@
 	let FailureMessage = false;
 	let ReportMessage = false;
 	let LoginMessage = false;
+  let SettingsSaved = false;
 	let promptHiddenMessage = false;
 	let authorHiddenMessage = false;
   let reportReason = '';
   let allPrimaryChecked = true;
   let allAdditionalChecked = false;
-
+  let preferences;
 
   $: allPrimaryChecked = $primaryCategories.every(cat => cat.checked);
   $: allAdditionalChecked = $additionalCategories.every(cat => cat.checked);
@@ -78,15 +81,38 @@
       }, 2000);
     }
   }
+
+  if (data && data.preferences) {
+  try {
+    preferences = JSON.parse(data.preferences);
+    console.log('preferences:', preferences);
+
+    selectedFilter.set(preferences.selectedFilter);
+    selectedCategories.set(preferences.selectedCategories);
+    primaryCategories.set(preferences.primaryCategories);
+    additionalCategories.set(preferences.additionalCategories);
+    
+  } catch (e) {
+    console.error("Error parsing preferences data:", e);
+  }
+} else {
+  console.log('noPreferences');
+}
 	
-	onMount(async() => {
-        catList.subscribe((list: CatItem[]) => {
-            selectedCategories.set(list);
-            const categories = list;
-            primaryCategories.set(categories.slice(0, 5));
-            additionalCategories.set(categories.slice(5));
-        });
+onMount(() => {
+  // Check if preferences are already set
+  if (!preferences) {
+    console.log('No preferences set, using default categories');
+    catList.subscribe((list: CatItem[]) => {
+      selectedCategories.set(list);
+      const categories = list;
+      primaryCategories.set(categories.slice(0, 5));
+      additionalCategories.set(categories.slice(5));
     });
+  } else {
+    console.log('Preferences already set');
+  }
+});
 
 async function generate(event?: Event) {
   if (event) event.preventDefault();
@@ -234,6 +260,57 @@ async function fetchPromptDetails(promptId) {
   }
 }
 
+async function saveSettings() {
+  console.log('running Save Settings')
+  
+	if (!$currentUser) {
+    LoginMessage = true;
+    setTimeout(() => {
+      LoginMessage = false;
+    }, 2000);
+    return;
+  }
+
+    const formData = new FormData();
+
+    const preferences = {
+      selectedFilter: $selectedFilter,
+      primaryCategories: $primaryCategories,
+      additionalCategories: $additionalCategories
+    };
+
+    console.log('SavingSettings:', preferences)
+
+    formData.append('preferences', JSON.stringify(preferences));
+
+    console.log('SavingSettings:', preferences)
+
+    try {
+        const response = await fetch('?/saveSettings', {
+            method: 'POST',
+            body: formData,
+        });
+        if (response.ok) {
+			    SettingsSaved = true;
+            setTimeout(() => {
+                SettingsSaved = false;
+            }, 2000);
+        } else {
+            console.error('Something broke :-(');
+            FailureMessage = true;
+            setTimeout(() => {
+                FailureMessage = false;
+            }, 2000);
+        }
+    } catch (error) {
+        console.error('An error occurred:', error);
+        FailureMessage = true;
+        setTimeout(() => {
+            FailureMessage = false;
+        }, 2000);
+    }
+  }
+
 function toggleDice() {
     isRolling = true;
     setTimeout(() => {
@@ -337,7 +414,6 @@ async function pVote() {
       prompt.score += 1;
     }
 
-    // Notify Svelte to update the UI accordingly
     promptArray.update(n => {
       n[promptIndex] = {
         ...prompt,
@@ -543,6 +619,10 @@ async function submitReport() {
 	<ServerMessage messageText="Thanks, we will review your report."/>
 {/if}
 
+{#if SettingsSaved}
+	<ServerMessage messageText="Settings Successfully Saved!"/>
+{/if}
+
 {#if promptHiddenMessage}
 	<ServerMessage messageText="Prompt Hidden!" />
 {/if}
@@ -569,16 +649,20 @@ async function submitReport() {
 		<svelte:fragment slot="content">
 			<Accordion>
         <AccordionItem>
-          <svelte:fragment slot="summary">Filter</svelte:fragment>
+          <svelte:fragment slot="summary">Settings</svelte:fragment>
 					<svelte:fragment slot="content">
             <label class="label">
+              <span>Show</span>
               <select bind:value={$selectedFilter} class="selectFilter" name="selectedFilter">
-                <option value="all">No Filter</option>
+                <option value="all">All Prompts</option>
                 <option value="liked">All Liked</option>
                 <option value="superLiked">Super Liked</option>
                 <option value="favAuthors">Favorite Authors</option>
               </select>
             </label>
+              <button on:click={saveSettings} class="btn variant-filled-primary margin">
+                Save Settings/Categories as Default
+              </button>
           </svelte:fragment>
         </AccordionItem>
 				<AccordionItem>
@@ -727,9 +811,10 @@ async function submitReport() {
 
 <style>
 
-.selectFilter {
-    border-radius: 5px;
-  }
+  .selectFilter {
+      border-radius: 5px;
+      margin-left: 5px;
+    }
 
   .scoreContainer {
     display: flex;

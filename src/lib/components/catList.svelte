@@ -84,14 +84,14 @@
 			label: 'Philosophy',
 			checked: false,
 			filter: true,
-			tooltip: 'For spiritual or philisophical considerations.',
+			tooltip: 'For philisophical or spiritual considerations.',
 		},
 		{
 			value: 'mature',
 			label: 'Mature',
 			checked: false,
 			filter: true,
-			tooltip: "Prompts that might deserve an age restriction.",
+			tooltip: "Prompts for an older crowd.",
 		},
 		{
 			value: 'fortune',
@@ -99,13 +99,6 @@
 			checked: false,
 			filter: true,
 			tooltip: 'Try to guess which friend a fortune is talking about!',
-		},
-		{
-			value: 'activities',
-			label: 'Activities',
-			checked: false,
-			filter: true,
-			tooltip: "For anything other than conversation prompts.",
 		},
 		{
 			value: 'wyr',

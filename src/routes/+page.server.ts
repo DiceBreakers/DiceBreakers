@@ -1,10 +1,22 @@
 import { error, redirect } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
 
 interface PocketBaseError {
   originalError?: {
     status: number;
   };
 }
+
+export const load: PageServerLoad = async ({ locals }) => {
+  // Check if the user is logged in and has preferences
+  if (!locals.user || typeof locals.user.preferences === 'undefined') {
+    console.log('User not logged in or no preferences found');
+    return { props: { preferences: null } };
+  } else {
+    console.log('User preferences:', locals.user.preferences);
+    return { preferences: JSON.stringify(locals.user.preferences), }
+  }
+};
 
 let queryFilter;
 let likeQueryFilter;
@@ -27,8 +39,8 @@ async function queryLikedPrompts(locals, likeQueryFilter) {
     page: 1,
     perPage: 10,
     filter: likeQueryFilter,
-    expand: 'prompt.author', // Expanding prompt and its nested author relation
-    fields: 'expand.prompt,expand.prompt.author.id,expand.prompt.author.username', // Requesting all fields at each level
+    expand: 'prompt.author', 
+    fields: 'expand.prompt,expand.prompt.author.id,expand.prompt.author.username',
     sort: '@random',
     skipTotal: true,
   });
@@ -191,6 +203,60 @@ export const actions = {
     }
   },
   
+  saveSettings: async ({ request, locals }) => {
+    if (request.method !== 'POST') {
+      console.log('Error: Non-POST');
+      throw error(400, "The robots didn't like something about that...");
+    }
+  
+    const data = await request.formData();       
+    console.log('data:', data)
+
+   // Retrieve 'preferences' from FormData and ensure it's a string before parsing
+   const preferencesString = data.get('preferences');
+   let preferences;
+   if (typeof preferencesString === 'string') {
+       preferences = JSON.parse(preferencesString);
+   } else {
+       // Handle the case where preferencesString is not a string
+       console.error("Preferences data is not a string");
+       throw error(400, "Invalid preferences data");
+   }
+   console.log('preferences:', preferences);
+
+    const user = locals.user?.id || '';
+  
+    const settings = { 
+      preferences: preferences,    
+    };
+
+    console.log('settings:', settings)
+  
+    try {
+      const record = await locals.pb.collection('users').update(user, settings);
+    } catch (err) {
+      console.log('Error: ', err);
+      throw error(500, "Failed to save settings. Try again?");
+    }
+  },
+
+  loadSettings: async ({ locals }) => {
+    if (!locals.user) {
+      console.log('Error: User not logged in');
+      throw error(401, "User not logged in");
+    }
+
+    try {
+      const { preferences } = locals.user.preferences;
+      console.log('preferences:', preferences)
+      return {
+        body: JSON.stringify({ preferences })
+      };
+    } catch (err) {
+      console.log('Error loading settings:', err);
+      throw error(500, "Failed to load settings");
+    }
+  },
 
   favAuthor: async ({ request, locals }) => {
     if (request.method !== 'POST') {
