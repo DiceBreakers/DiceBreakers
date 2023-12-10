@@ -5,9 +5,6 @@
   import Game from './game.svelte'
 
   export let data: PageData;
-
-  console.log('Preferences in +page.svelte:', data);
-
 </script>
 
 

@@ -85,7 +85,7 @@
   if (data && data.preferences) {
   try {
     preferences = JSON.parse(data.preferences);
-    console.log('preferences:', preferences);
+  //  console.log('preferences:', preferences);
 
     selectedFilter.set(preferences.selectedFilter);
     selectedCategories.set(preferences.selectedCategories);
@@ -110,7 +110,7 @@ onMount(() => {
       additionalCategories.set(categories.slice(5));
     });
   } else {
-    console.log('Preferences already set');
+    console.log('Preferences Set On Load');
   }
 });
 
@@ -135,7 +135,7 @@ async function generate(event?: Event) {
 
   formData.append('selectedFilter', $selectedFilter.toString());
 
-  console.log('SelectedFilter:', $selectedFilter.toString());
+  // console.log('SelectedFilter:', $selectedFilter.toString());
 
   try {
     const response = await fetch('?/generate', {
@@ -724,7 +724,7 @@ async function submitReport() {
 		</Accordion>
 	</svelte:fragment>
 	  </AccordionItem>
-	  <AccordionItem on:toggle={generate}>
+	  <AccordionItem on:toggle={displayNextPrompt}>
 		<svelte:fragment slot="lead"><img src="favicon.png" alt="Dice Icon" width="21px" /></svelte:fragment>
 		<svelte:fragment slot="summary"><div class="rTD">Roll the Dice!</div></svelte:fragment>
 		<svelte:fragment slot="content">
@@ -760,9 +760,10 @@ async function submitReport() {
               {#if $promptArray.length > 0 && $promptArray[promptIndex]}
 							<div class="hideMenuButton">
 								<div title="Hide/Report" class="fa-regular fa-xl fa-eye-slash" style="color: #1e3050;"
-									use:popup={{ event: 'click', target: 'hideMenu', placement: 'top' }}
-                  use:popup={{ event: 'hover', target: 'hideTT', placement: 'top'}}></div>
-								</div>
+									use:popup={{ event: 'click', target: 'hideMenu', placement: 'top' }}>
+                </div>
+                <div class="hideText">(hide)</div>
+							</div>
                 <div class="comments"><a href="/comments/{currentPromptId}">comments </a>({cCount})</div>							
               {/if}
 						</div>
@@ -782,10 +783,6 @@ async function submitReport() {
     {:else}
       Likes
     {/if}
-	</div>
-
-  <div class="popup hideTT" data-popup="hideTT">
-    Report/Hide
 	</div>
 
   <div class="popup_hideMenu" data-popup="hideMenu">
@@ -847,10 +844,6 @@ async function submitReport() {
 		margin-right: 8px;
 	}
 
-  .hideTT {
-    margin-top: -15px;
-  }
-
 	.popup_hideMenu {
 		align-self: flex-start;
     margin-top: 40px;
@@ -895,10 +888,17 @@ async function submitReport() {
 		display: flex;
 		gap: 1rem; 
     width: 100px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 	}
 
   .hideMenuButton .fa-eye-slash {
     cursor: pointer; 
+  }
+
+  .hideText {
+    font-size: small;
   }
 
 	.gameBottom {

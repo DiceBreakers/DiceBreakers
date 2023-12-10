@@ -10,10 +10,10 @@ interface PocketBaseError {
 export const load: PageServerLoad = async ({ locals }) => {
   // Check if the user is logged in and has preferences
   if (!locals.user || typeof locals.user.preferences === 'undefined') {
-    console.log('User not logged in or no preferences found');
+  //  console.log('User not logged in or no preferences found');
     return { props: { preferences: null } };
   } else {
-    console.log('User preferences:', locals.user.preferences);
+  //  console.log('User preferences:', locals.user.preferences);
     return { preferences: JSON.stringify(locals.user.preferences), }
   }
 };
@@ -22,7 +22,6 @@ let queryFilter;
 let likeQueryFilter;
 
 async function queryPromptsWithFilter(locals, queryFilter) {
-  console.log('queryFilter:', queryFilter);
   return await locals.pb.collection('prompts').getList(1, 10, {
     page: 1,
     perPage: 10,
@@ -210,7 +209,7 @@ export const actions = {
     }
   
     const data = await request.formData();       
-    console.log('data:', data)
+  //  console.log('data:', data)
 
    // Retrieve 'preferences' from FormData and ensure it's a string before parsing
    const preferencesString = data.get('preferences');
@@ -222,7 +221,7 @@ export const actions = {
        console.error("Preferences data is not a string");
        throw error(400, "Invalid preferences data");
    }
-   console.log('preferences:', preferences);
+ //  console.log('preferences:', preferences);
 
     const user = locals.user?.id || '';
   
@@ -230,7 +229,7 @@ export const actions = {
       preferences: preferences,    
     };
 
-    console.log('settings:', settings)
+  //  console.log('settings:', settings)
   
     try {
       const record = await locals.pb.collection('users').update(user, settings);
@@ -248,7 +247,6 @@ export const actions = {
 
     try {
       const { preferences } = locals.user.preferences;
-      console.log('preferences:', preferences)
       return {
         body: JSON.stringify({ preferences })
       };
