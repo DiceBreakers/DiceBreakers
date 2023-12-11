@@ -34,8 +34,8 @@
 		<img class="btn-auth-img" src='/googleSignIn.png' alt='google sign in'/>
 		</button>
 	</div>
-
-</form> 
+	</form> 
+	
  	<div class="register btn btn-lg variant-filled-secondary">
   		<a href="/register" title="Register Here"><strong>Click here to register!</strong></a>
 	</div>
