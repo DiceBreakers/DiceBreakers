@@ -31,18 +31,18 @@
 			tooltip: 'Think happy thoughts!',
 		},
 		{
-			value: 'heavy',
-			label: 'Heavy',
-			checked: true,
-			filter: true,
-			tooltip: 'These prompts could touch on heavy or sensitive topics.',
-		},
-		{
 			value: 'kids',
 			label: 'Kids',
-			checked: false,
+			checked: true,
 			filter: true,
 			tooltip: 'Prompts appropriate for all ages!',
+		},
+		{
+			value: 'heavy',
+			label: 'Heavy',
+			checked: false,
+			filter: true,
+			tooltip: 'These prompts could touch on heavy or sensitive topics.',
 		},
 		{
 			value: 'music',
