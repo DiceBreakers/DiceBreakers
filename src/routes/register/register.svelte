@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { applyAction, enhance } from '$app/forms';
+  import { applyAction } from '$app/forms';
   import { pb } from '$lib/stores/pocketbase';
   import { TabGroup, Tab, TabAnchor } from '@skeletonlabs/skeleton';
   import ServerMessage from '$lib/components/serverMessage.svelte';
@@ -19,7 +19,7 @@
 
 
   const handleSubmit = async (event) => {
-    event.preventDefault(); // Prevent the form from submitting normally
+    console.log('submit')
     let isValid = true;
 
     // Check if TOS is checked
@@ -48,7 +48,7 @@
     // Submit form if all validations pass
     if (isValid) {
       pb.authStore.loadFromCookie(document.cookie);
-      await applyAction(event.detail.result);
+      await applyAction(event.result);
     }
   };
 
