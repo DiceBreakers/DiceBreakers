@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { catList } from '../../lib/components/catList.svelte';
+	import { catList } from '$lib/components/catList.svelte';
 	import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
-	import ServerMessage from '../../lib/components/serverMessage.svelte';
+	import ServerMessage from '$lib/components/serverMessage.svelte';
 	import { popup } from '@skeletonlabs/skeleton';
 	import type { PopupSettings } from '@skeletonlabs/skeleton';
 
@@ -75,8 +75,8 @@
 		catList.subscribe((list: CatItem[]) => {
 			selectedCategories.set(list);
 			const categories = list;
-			primaryCategories.set(categories.slice(0, 6)); // Adjust the number as needed
-			additionalCategories.set(categories.slice(6));
+			primaryCategories.set(categories.slice(0, 5)); // Adjust the number as needed
+			additionalCategories.set(categories.slice(5));
 		});
 	}
 	)

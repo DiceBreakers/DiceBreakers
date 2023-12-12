@@ -95,10 +95,10 @@
 			const categories = list;
 			filterCategories.set(list);
 			const fCategories = list;
-			primaryCategories.set(categories.slice(0, 6));
-			additionalCategories.set(categories.slice(6));
-			filterPrimaryCats.set(fCategories.slice(0, 6));
-			filterAdditionalCats.set(fCategories.slice(6));
+			primaryCategories.set(categories.slice(0, 5));
+			additionalCategories.set(categories.slice(5));
+			filterPrimaryCats.set(fCategories.slice(0, 5));
+			filterAdditionalCats.set(fCategories.slice(5));
 			pullPrompts();
 		});
 	}
