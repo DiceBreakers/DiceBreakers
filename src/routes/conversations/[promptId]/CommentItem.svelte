@@ -16,6 +16,14 @@
         showReplyForm.update(current => !current);
     }
 
+    function handleNewComment(event) {
+    const newComment = event.detail.newComment;
+    if (comment.id === newComment.parent) {
+        // Use the spread operator to trigger reactivity
+        comment.children = [...(comment.children || []), newComment];
+    }
+}
+
 </script>
 
 <div class="comment">
@@ -26,7 +34,7 @@
     {/if}
 
     {#if $showReplyForm}
-        <Reply promptId={promptId} parentId={comment.id} on:cancelReply={toggleReplyForm} />
+        <Reply promptId={promptId} parentId={comment.id} on:cancelReply={toggleReplyForm} on:commentAdded={handleNewComment} />
     {/if}
 
     {#if hasChildren(comment)}

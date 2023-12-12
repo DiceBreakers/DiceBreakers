@@ -124,6 +124,7 @@
     }
 
     console.log($commentArray);
+    
 
 function organizeComments(commentsArray: Comment[]): Comment[] {
     let organizedComments: Comment[] = [];
@@ -151,6 +152,31 @@ function organizeComments(commentsArray: Comment[]): Comment[] {
 }
 
     let organizedComments = organizeComments($commentArray);
+
+
+    $: organizedComments = organizeComments($commentArray);
+
+
+    function addNewComment(newComment: Comment) {
+    commentArray.update(currentComments => {
+        if (newComment.parent) {
+            const parentIndex = currentComments.findIndex(c => c.id === newComment.parent);
+            const parentComment = currentComments[parentIndex];
+
+            // Check if parentComment is defined
+            if (parentComment) {
+                // Ensure that children array is initialized
+                parentComment.children = parentComment.children || [];
+                parentComment.children.push(newComment);
+            }
+        } else {
+            currentComments.push(newComment);
+        }
+        return currentComments;
+    });
+}
+
+
 
 async function pVote() {
     if (!$currentUser) {
@@ -257,6 +283,14 @@ async function pVote() {
 }
 
 function toggleReplyForm() {
+    if (!$currentUser) {
+      LoginMessage = true;
+      setTimeout(() => {
+        LoginMessage = false;
+      }, 1500);
+      return;
+    }
+
         showReplyForm.update(current => !current);
     }
 
@@ -307,14 +341,14 @@ onMount(() => {
                 </div>              
             {/if}
         </div>
+        <div class="button alignRight"><button on:click={toggleReplyForm} class="badge variant-filled-primary">Reply</button></div>
         {#each organizedComments as comment}
             <CommentItem comment={comment} promptId={$prompt.id} />
         {/each}
         {#if $commentArray.length === 0}
-            <div>No comments yet... Be the first?</div>
-            <div class="button"><button on:click={toggleReplyForm} class="badge variant-filled-primary">Reply</button></div>
+            <div>No comments yet... Be the first?</div>            
             {#if $showReplyForm}
-                <Reply promptId={$prompt.id} on:cancelReply={toggleReplyForm} />
+                <Reply promptId={$prompt.id} on:cancelReply={toggleReplyForm} on:commentAdded={e => addNewComment(e.detail.newComment)}/>
             {/if}
         {/if}
     </div>
@@ -328,6 +362,31 @@ onMount(() => {
         Likes
     {/if}
 </div>
+
+
+{#if SuccessMessage}
+	<ServerMessage />
+{/if}
+
+{#if ReportMessage}
+	<ServerMessage messageText="Thanks, we will review your report."/>
+{/if}
+
+{#if promptHiddenMessage}
+	<ServerMessage messageText="Prompt Hidden!" />
+{/if}
+
+{#if authorHiddenMessage}
+	<ServerMessage messageText="Author Hidden!" />
+{/if}
+
+{#if FailureMessage}
+	<ServerMessage isError={true} messageText="Something is broken :-(" />
+{/if}
+
+{#if LoginMessage}
+  <ServerMessage isError={true} messageText="You'll need to log in first!" />
+{/if}
 
 
 <style>
@@ -359,5 +418,13 @@ onMount(() => {
 .button {
     margin-top: 10px;
     margin-bottom: 10px;
+}
+
+.alignRight {
+    text-align: right;
+}
+
+.alignRight button {
+    margin-left: auto;
 }
 </style>

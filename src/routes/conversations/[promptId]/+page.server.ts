@@ -16,7 +16,6 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   }
   
   try {
-    // Log statement before fetching comments
     // console.log(`Fetching comments for prompt ${promptId}`);
     let comments = await locals.pb.collection('comments').getFullList({
       filter: `(prompt="${promptId}")&&("${hiddenAuthors}"?!~author)`,
@@ -25,7 +24,6 @@ export const load: PageServerLoad = async ({ params, locals }) => {
       sort: '-created',
     });
 
-    // Log statement before fetching prompt details
     // console.log(`Fetching prompt details for prompt ${promptId}`);
     let prompt = await locals.pb.collection('prompts').getFirstListItem(`id="${promptId}"`, {
       expand: 'author',
@@ -34,7 +32,6 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
     const isFavAuthor = locals.user?.favAuthors?.includes(prompt.expand?.author.id) || false;
 
-    // Log statement before fetching vote status
     // console.log(`Fetching vote status for prompt ${promptId}`);
     let voteStatus;
     try {
@@ -52,7 +49,6 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
     let score = 0;
     try {
-      // Fetching prompt score
       // console.log(`Fetching prompt score for prompt ${promptId}`);
       const pScore = await locals.pb.collection('pScore')
         .getFirstListItem(`id="${promptId}"`);
@@ -79,12 +75,10 @@ export const load: PageServerLoad = async ({ params, locals }) => {
       const isFavAuthor = locals.user?.favAuthors?.includes(comment.expand?.author.id) || false;
       
       try {
-        // Log statement before fetching each comment vote status
         console.log(`Fetching vote status for comment ${comment.id}`);
         const voteStatus = await locals.pb.collection('cVotes')
           .getFirstListItem(`comment="${comment.id}"&&by="${locals.user?.id}"`);
 
-        // Log statement before fetching each comment score
         console.log(`Fetching comment score for comment ${comment.id}`);
         const cScore = await locals.pb.collection('cScore')
           .getFirstListItem(`id="${comment.id}"`);

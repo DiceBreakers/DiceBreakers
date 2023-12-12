@@ -635,11 +635,11 @@ async function submitReport() {
 	<ServerMessage isError={true} messageText="Something is broken :-(" />
 {/if}
 
-<div class="message-container">
-  {#if LoginMessage}
-    <ServerMessage isError={true} messageText="You'll need to log in for that." />
-  {/if}
-</div>
+
+{#if LoginMessage}
+  <ServerMessage isError={true} messageText="You'll need to log in first!" />
+{/if}
+
 
   <div class="container card p-4" transition:fade={{ delay: 1000, duration: 500 }}>
 	<Accordion autocollapse>
@@ -764,7 +764,7 @@ async function submitReport() {
                 </div>
                 <div class="hideText">(hide)</div>
 							</div>
-                <div class="comments"><a href="/comments/{currentPromptId}">comments </a>({cCount})</div>							
+                <div class="comments"><a href="/conversations/{currentPromptId}">comments </a>({cCount})</div>
               {/if}
 						</div>
 					</div>
