@@ -82,7 +82,7 @@
     }
   }
 
-  if (data && data.preferences) {
+  if (data.preferences) {
   try {
     preferences = JSON.parse(data.preferences);
   //  console.log('preferences:', preferences);
@@ -96,13 +96,12 @@
     console.error("Error parsing preferences data:", e);
   }
 } else {
-  console.log('noPreferences');
+  console.log('No preferences found, using default categories');
 }
 	
 onMount(() => {
-  // Check if preferences are already set
   if (!preferences) {
-    console.log('No preferences set, using default categories');
+    //console.log('No preferences set, using default categories');
     catList.subscribe((list: CatItem[]) => {
       selectedCategories.set(list);
       const categories = list;
