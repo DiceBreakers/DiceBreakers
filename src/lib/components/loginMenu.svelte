@@ -2,15 +2,25 @@
 	import { createEventDispatcher } from 'svelte';
 	import { applyAction, enhance } from '$app/forms'
     import { pb } from '$lib/stores/pocketbase'
+	import { currentUser } from '$lib/stores/user';
+	import ServerMessage from '$lib/components/serverMessage.svelte';
 
+	let loginSuccessMessage = false;
 
-
+	const handleLoginClick = (event) => {
+		closeMenu();
+	};
 
     const dispatch = createEventDispatcher();
 
     const closeMenu = () => {
         dispatch('closeMenu');
     };
+
+	$: if ($currentUser) {
+    loginSuccessMessage = true;
+    setTimeout(() => loginSuccessMessage = false, 2000); // Message display duration
+  }
 
 </script>
 
@@ -28,7 +38,7 @@
 	}}>
 		<input type="email" name="email" placeholder="Email" class="input" autocomplete="email" />
 		<input type="password" name="password" placeholder="Password" class="input" />
-		<button class="btn btn-sm variant-filled-primary">Login</button>
+		<button on:click={handleLoginClick} class="btn btn-sm variant-filled-primary">Login</button>
 		<a on:click={closeMenu} href="/reset" class="button btn btn-sm">Forgot pw?</a>
   </form>
   <form class="auth-form" method="post" action="/login?/OAuth2">
@@ -44,6 +54,10 @@
   		<a on:click={closeMenu} href="/register" title="Register Here"><strong>Click here to register!</strong></a>
 	</div>
 </div>
+
+{#if loginSuccessMessage}
+  <ServerMessage isError={false} messageText='Thanks for logging back in, ${currentUser}!' />
+{/if}
 
 <style>
 	button:hover{
