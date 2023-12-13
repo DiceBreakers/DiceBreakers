@@ -20,19 +20,16 @@ export const actions: Actions = {
     }
 
     try {
-      // Get the password from the form data
       const password = data.password || '';
 
-      // Hash the password using SHA-256 and the environment secret
       const hash = crypto.createHash('sha256');
       hash.update(password);
       hash.update(SECRET_SIGNATURE);
       const hashedPassword = hash.digest('hex');
       
-      // Set the hashed password for data
       data.password = hashedPassword;
 
-      const result= await locals.pb.collection('users').authWithPassword(data.email, data.password)
+      const result = await locals.pb.collection('users').authWithPassword(data.email, data.password)
       console.log('Login result', result);
     } catch (e) {
       console.error(e)

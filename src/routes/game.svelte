@@ -191,17 +191,15 @@ async function updatePrompt() {
         currentAuthId = authorId;
         currentFav = isFavAuthor;
 
-        // Fetch additional details for the prompt
         const additionalDetails = await fetchPromptDetails(promptId);
           if (additionalDetails) {
-            // Merge the additional details with the current prompt data
-            const updatedPrompt = {
+              const updatedPrompt = {
               ...promptData,
-              ...additionalDetails // Ensure this structure matches the expected prompt data structure
+              ...additionalDetails
             };
 
             prompts[promptIndex] = updatedPrompt;
-            promptArray.set(prompts); // Update the promptArray with the new data
+            promptArray.set(prompts);
           }
       } else {
         throw new Error('Prompt data is undefined');

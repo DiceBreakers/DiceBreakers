@@ -32,7 +32,7 @@
                 <button class="topMarginS btn btn-sm variant-filled-primary">Log out</button>
               </form>
         {:else}
-          <LoginMenu />
+          <LoginMenu on:closeMenu={toggleMenu} />
         {/if}
     </ul>
 </nav>

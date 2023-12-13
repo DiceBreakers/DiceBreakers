@@ -1,72 +1,107 @@
 <script lang="ts">
-  import { applyAction } from '$app/forms';
+  import { applyAction, enhance } from '$app/forms';
   import { pb } from '$lib/stores/pocketbase';
   import { TabGroup, Tab, TabAnchor } from '@skeletonlabs/skeleton';
   import ServerMessage from '$lib/components/serverMessage.svelte';
   import TOS from '../legal/tos.svelte';
-  import Privacy from '../legal/privacy.svelte';
   import Cookies from '../legal/cookies.svelte';
+  import { goto } from '$app/navigation';
 
   let tabSet: number = 0;
 
   let email = '';
   let password = '';
   let passwordConfirm = '';
-  let emailErrorMessage = '';
-  let passwordErrorMessage = '';
+  let emailErrorMessage = false;
+  let passwordMatchMessage = false;
+  let passwordBlankMessage = false;
   let TOSMessage = false;
+  let registrationSuccessMessage = false;
+  let passwordComplexityMessage = false;
   let tosChecked = false;
+  let eValid = false;
+  let pValid = false;
 
+  const handleRegister = async (event) => {
+    event.preventDefault();
 
-  const handleSubmit = async (event) => {
-    console.log('submit')
-    let isValid = true;
-
-    // Check if TOS is checked
     if (!tosChecked) {
       TOSMessage = true;
       setTimeout(() => TOSMessage = false, 1500);
-      isValid = false;
+      return;
     }
 
-    // Validate email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email || !emailRegex.test(email)) {
-      emailErrorMessage = 'Please enter a valid email address';
-      isValid = false;
+    if (email && emailRegex.test(email)) {
+      eValid = true;
+    } else {
+      emailErrorMessage = true;
+      setTimeout(() => emailErrorMessage = false, 1500);
+      return;
     }
 
-    // Check for blank password and password match
-    if (!password || !passwordConfirm) {
-      passwordErrorMessage = 'Password fields cannot be blank';
-      isValid = false;
-    } else if (password !== passwordConfirm) {
-      passwordErrorMessage = 'Passwords do not match';
-      isValid = false;
+    const passwordRegex = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-zA-Z]).{8,}$/;  
+    if (password && passwordConfirm && password === passwordConfirm) {
+    if (passwordRegex.test(password)) {
+      pValid = true;
+    } else {
+      passwordComplexityMessage = true;
+      setTimeout(() => passwordComplexityMessage = false, 4000);
+      return;
     }
+  } else {
+    passwordMatchMessage = true;
+    setTimeout(() => passwordMatchMessage = false, 1500);
+    return;
+  }
 
-    // Submit form if all validations pass
-    if (isValid) {
-      pb.authStore.loadFromCookie(document.cookie);
-      await applyAction(event.result);
+    if (eValid && pValid && tosChecked) {
+      try {
+        const formElement = document.getElementById('registerForm') as HTMLFormElement;
+        const formData = new FormData(formElement);
+        const response = await fetch('?/register', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error('Registration failed');
+        }
+
+        registrationSuccessMessage = true;
+        setTimeout(() => {
+          registrationSuccessMessage = false;
+          pb.authStore.loadFromCookie(document.cookie);
+          goto('/');
+        }, 1500);
+      } catch (error) {
+        console.error('Error:', error);
+      }
     }
   };
 
   function goToTermsOfService() {
     tabSet = 1;
   }
-
 </script>
+
 
 {#if TOSMessage}
   <ServerMessage isError={true} messageText="Must agree to our TOS" />
 {/if}
 {#if emailErrorMessage}
-  <ServerMessage isError={true} messageText={emailErrorMessage} />
+  <ServerMessage isError={true} messageText="That doesn't look like an email address" />
 {/if}
-{#if passwordErrorMessage}
-  <ServerMessage isError={true} messageText={passwordErrorMessage} />
+{#if passwordComplexityMessage}
+  <ServerMessage isError={true} messageText="Password must be at least 8 characters, with 1 number and 1 symbol" />
 {/if}
+{#if passwordMatchMessage}
+  <ServerMessage isError={true} messageText="Passwords do not match" />
+{/if}
+{#if registrationSuccessMessage}
+  <ServerMessage isError={false} messageText="Thank you for registering! Logging in now..." />
+{/if}
+
 
 <div class="card p-4">
   <div class="card p-4 variant-glass-secondary">
@@ -87,11 +122,7 @@
             </div>
             </form>            
           <h2>Or enter email and password to register:</h2>
-          <form
-            method="POST"
-            action="/register"
-            class="item"
-            on:submit={handleSubmit}>
+          <form id="registerForm" class="item">
             <input type="email" bind:value={email} name="email" placeholder="Email" class="input m2" />
             <input type="password" bind:value={password} name="password" placeholder="Password" class="input m2" />
             <input type="password" bind:value={passwordConfirm} name="passwordConfirm" placeholder="Confirm Password" class="input m2" />
@@ -106,7 +137,7 @@
                 <span class="link" on:click={goToTermsOfService} on:keydown={goToTermsOfService}
                   role="button" tabindex="0" title="Terms of Service">Terms of Service.</span>
             </label>
-            <button class="btn btn-sm variant-filled-primary">Register</button>
+            <button on:click={handleRegister} class="btn btn-sm variant-filled-primary">Register</button>
           </form>
         </div>
         {:else if tabSet === 1}

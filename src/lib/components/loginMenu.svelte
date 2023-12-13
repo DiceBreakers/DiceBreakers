@@ -1,13 +1,17 @@
 <script>
+	import { createEventDispatcher } from 'svelte';
 	import { applyAction, enhance } from '$app/forms'
     import { pb } from '$lib/stores/pocketbase'
 
-	export let showMenu = false;
+
+
+
+    const dispatch = createEventDispatcher();
 
     const closeMenu = () => {
-        showMenu = false;
-    }
-	
+        dispatch('closeMenu');
+    };
+
 </script>
 
 <div>
@@ -37,7 +41,7 @@
 	</form> 
 	
  	<div class="register btn btn-lg variant-filled-secondary">
-  		<a href="/register" title="Register Here"><strong>Click here to register!</strong></a>
+  		<a on:click={closeMenu} href="/register" title="Register Here"><strong>Click here to register!</strong></a>
 	</div>
 </div>
 
