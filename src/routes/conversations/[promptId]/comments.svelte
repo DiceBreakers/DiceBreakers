@@ -14,11 +14,8 @@
 
    // console.log(data)
 
-   
-
     const showReplyForm = writable(false);
 
-    
     let commentArray = writable<Comment[]>([]);
     let loading = true;
 

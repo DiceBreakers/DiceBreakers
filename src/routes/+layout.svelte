@@ -1,22 +1,26 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
+    import { pb, updateCurrentUser } from '$lib/stores/pocketbase';
+    import { page } from '$app/stores';
+    import { browser } from '$app/environment';
     import Menu from '$lib/components/menu.svelte';
     import '../app.postcss';
     import Analytics from '$lib/components/analytics.svelte'
     import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
     import { storePopup } from '@skeletonlabs/skeleton';
       storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
-          
-    let showMenu = false;
 
-    import { onMount } from 'svelte';
-    import { pb, updateCurrentUser } from '$lib/stores/pocketbase';
+    $: if (browser) { 
+      document.title = `Conversation Starters for Everyone - DiceBreakers.app${$page.url.pathname}`;
+    }
 
     onMount(() => {
-// On the client-side, once the module is loaded, you can check and update the current user
-    if (pb.authStore.isValid) {
-      updateCurrentUser();
-      }
-    });
+      if (pb.authStore.isValid) {
+        updateCurrentUser();
+        }
+      });
+
+    let showMenu = false;
 </script>
 
 

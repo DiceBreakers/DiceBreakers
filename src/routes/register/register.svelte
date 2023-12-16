@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { applyAction, enhance } from '$app/forms';
   import { pb } from '$lib/stores/pocketbase';
   import { TabGroup, Tab, TabAnchor } from '@skeletonlabs/skeleton';
   import ServerMessage from '$lib/components/serverMessage.svelte';
@@ -14,7 +13,6 @@
   let passwordConfirm = '';
   let emailErrorMessage = false;
   let passwordMatchMessage = false;
-  let passwordBlankMessage = false;
   let TOSMessage = false;
   let registrationSuccessMessage = false;
   let passwordComplexityMessage = false;

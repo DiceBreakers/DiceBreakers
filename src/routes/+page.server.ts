@@ -8,7 +8,6 @@ interface PocketBaseError {
 }
 
 export const load: PageServerLoad = async ({ locals }) => {
-  // Check if the user is logged in and has preferences
   if (!locals.user || typeof locals.user.preferences === 'undefined') {
   //  console.log('User not logged in or no preferences found');
     return { props: { preferences: null } };
