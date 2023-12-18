@@ -6,14 +6,6 @@
 	import ServerMessage from '$lib/components/serverMessage.svelte';
 	import { popup } from '@skeletonlabs/skeleton';
 	import { currentUser } from '$lib/stores/user';
-	import type { PopupSettings } from '@skeletonlabs/skeleton';
-	
-
-	const Hover: PopupSettings = {
-		event: 'hover',
-		target: 'popupHover',
-		placement: 'top'
-	};
  
 	type CatItem = {
 		value: string;
@@ -59,15 +51,6 @@
 	async function handleSubmit(event: Event) {
 		event.preventDefault();
 
-		if (!$currentUser?.verified) {
-            console.error('User is not verified.');
-            showVerifiedMessage = true;
-            setTimeout(() => {
-                showVerifiedMessage = false;
-            }, 3000);
-            return;
-        }
-  
 		const formData = new FormData();
 		formData.append('prompt', promptText);
   
@@ -109,6 +92,7 @@
 	}
 
 	onMount(() => {
+		console.log('currentUser:', $currentUser)
 		if (!$currentUser?.verified) {
             showVerifiedMessage = true;
         }
