@@ -17,6 +17,7 @@
 	let showSuccessMessage = false;
 	let showFailureMessage = false;
 	let showVerifiedMessage = false;
+	let showEmailSuccessMessage = false;
 	let promptText = '';
 	let selectedCategories = writable<CatItem[]>([]);
 	let primaryCategories = writable<CatItem[]>([]);
@@ -34,10 +35,10 @@
 
 		console.log('Verification Sent Successfully!');
 		showVerifiedMessage = false
-		showSuccessMessage = true;  
+		showEmailSuccessMessage = true;  
 		promptText = '';
 		setTimeout(() => {
-			showSuccessMessage = false;
+			showEmailSuccessMessage = false;
 		}, 1500);
     } catch (error) {
 		console.error('Something Went wrong.');
@@ -118,6 +119,10 @@
     <ServerMessage messageText="Thanks for contributing! You must verify your email before submitting though.">
         <button class="btn variant-filled-warning margin" on:click={sendVerificationEmail}>Resend Email</button>
     </ServerMessage>
+{/if}
+
+{#if showEmailSuccessMessage}
+	<ServerMessage messageText="Email Sent!" />
 {/if}
   
 
