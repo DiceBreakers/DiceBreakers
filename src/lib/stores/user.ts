@@ -1,4 +1,22 @@
-// user.ts
 import { writable } from 'svelte/store';
 
-export const currentUser = writable<Record<string, any> | null>(null);
+interface User {
+    created: string;
+    email: string;
+    emailVisibility: boolean;
+    favAuthors: string[];
+    hiddenAuthors: string[];
+    hiddenPrompts: string[];
+    id: string;
+    postPublic: boolean;
+    preferences: {
+        additionalCategories: string[];
+        primaryCategories: string[];
+        selectedFilter: string;
+    };
+    updated: string;
+    username: string;
+    verified: boolean;
+}
+
+export const currentUser = writable<User | null>(null);

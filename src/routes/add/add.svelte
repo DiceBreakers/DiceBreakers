@@ -5,7 +5,9 @@
 	import { writable } from 'svelte/store';
 	import ServerMessage from '$lib/components/serverMessage.svelte';
 	import { popup } from '@skeletonlabs/skeleton';
+	import { currentUser } from '$lib/stores/user';
 	import type { PopupSettings } from '@skeletonlabs/skeleton';
+	
 
 	const Hover: PopupSettings = {
 		event: 'hover',
@@ -13,7 +15,6 @@
 		placement: 'top'
 	};
  
-	// Define the type for catItem
 	type CatItem = {
 		value: string;
 		label: string;
@@ -23,13 +24,49 @@
   
 	let showSuccessMessage = false;
 	let showFailureMessage = false;
+	let showVerifiedMessage = false;
 	let promptText = '';
 	let selectedCategories = writable<CatItem[]>([]);
 	let primaryCategories = writable<CatItem[]>([]);
 	let additionalCategories = writable<CatItem[]>([]);
 
+
+	async function sendVerificationEmail() {
+    const formData = new FormData(); // Empty FormData
+
+    try {
+        const response = await fetch('/add?/verifyEmail', {
+            method: 'POST',
+            body: formData // Sending empty FormData
+        });
+
+		console.log('Verification Sent Successfully!');
+		showVerifiedMessage = false
+		showSuccessMessage = true;  
+		promptText = '';
+		setTimeout(() => {
+			showSuccessMessage = false;
+		}, 1500);
+    } catch (error) {
+		console.error('Something Went wrong.');
+				showFailureMessage = true;
+				setTimeout(() => {
+					showFailureMessage = false;
+				}, 1500);
+    }
+}
+
 	async function handleSubmit(event: Event) {
 		event.preventDefault();
+
+		if (!$currentUser?.verified) {
+            console.error('User is not verified.');
+            showVerifiedMessage = true;
+            setTimeout(() => {
+                showVerifiedMessage = false;
+            }, 3000);
+            return;
+        }
   
 		const formData = new FormData();
 		formData.append('prompt', promptText);
@@ -72,10 +109,13 @@
 	}
 
 	onMount(() => {
+		if (!$currentUser?.verified) {
+            showVerifiedMessage = true;
+        }
 		catList.subscribe((list: CatItem[]) => {
 			selectedCategories.set(list);
 			const categories = list;
-			primaryCategories.set(categories.slice(0, 5)); // Adjust the number as needed
+			primaryCategories.set(categories.slice(0, 5));
 			additionalCategories.set(categories.slice(5));
 		});
 	}
@@ -89,12 +129,18 @@
 {#if showFailureMessage}
 	<ServerMessage isError={true} messageText="Something is broken :-(" />
 {/if}
+
+{#if showVerifiedMessage}
+    <ServerMessage messageText="Thanks for contributing! You must verify your email before submitting though.">
+        <button class="btn variant-filled-warning margin" on:click={sendVerificationEmail}>Resend Email</button>
+    </ServerMessage>
+{/if}
   
 
 	<div class="card p-4">
 		<form on:submit={handleSubmit}>
 			<label class="label">
-				<div class="body padding"><h1>Add a Prompt:</h1></div>
+				<div class="body padding"><h1>Start a Conversation:</h1></div>
 				<textarea name="prompt" bind:value={promptText} class="textarea" rows="2" placeholder="Enter Prompt" />
 			</label>
 			<Accordion>

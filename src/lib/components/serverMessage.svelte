@@ -10,6 +10,7 @@
 
 <div class="server-message" class:success={isSuccess} class:error={isError} transition:fly="{{ x: 200, y: -200, duration: 600, easing: cubicInOut }}">
   {messageText}
+  <slot></slot>
 </div>
 
 <style>
