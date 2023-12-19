@@ -4,7 +4,7 @@
     <ul>
         <a href="/upcoming" title="Upcoming Changes">Upcoming Changes</a>
         <a href="/about" title="About"><i class="fa-regular fa-copyright" title="Copyright Dice Breakers"/>DiceBreakers</a>
-        <a href="mailto: Admin@DiceBreakers.app" class="fa-regular fa-envelope" title="Email Us"> </a>
+        <a href="mailto:Admin@DiceBreakers.app" class="fa-regular fa-envelope" title="Email Us"> </a>
         <a href="/legal" title="Terms of Service, Privacy Policy, and Cookies">Legal</a>
     </ul>
     </div>
@@ -41,7 +41,7 @@
 }
 
 .footer ul i {
-    margin: 0 10px;
+    margin: 0 2px;
 }
 
 </style>
