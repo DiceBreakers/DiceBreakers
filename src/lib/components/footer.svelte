@@ -1,10 +1,11 @@
 
 <div class="footer">
-    <div class="legal">
+    <div class="footerText">
     <ul>
-        <a href="/about" title="About"><i class="fa-regular fa-copyright" title="Copyright Dice Breakers"/> DiceBreakers</a>
+        <a href="/upcoming" title="Upcoming Changes">Upcoming Changes</a>
+        <a href="/about" title="About"><i class="fa-regular fa-copyright" title="Copyright Dice Breakers"/>DiceBreakers</a>
         <a href="mailto: Admin@DiceBreakers.app" class="fa-regular fa-envelope" title="Email Us"> </a>
-        <a href="/legal" title="Terms of Service, Privacy Policy, and Cookies">Legal Info</a>
+        <a href="/legal" title="Terms of Service, Privacy Policy, and Cookies">Legal</a>
     </ul>
     </div>
 </div>
@@ -35,7 +36,7 @@
     vertical-align: middle;
 }
 
-.legal {
+.footerText {
     margin-top: 60px;
 }
 
