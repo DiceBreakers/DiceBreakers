@@ -4,12 +4,12 @@
             <h2><b>Upcoming Changes:</b></h2>							
             <p>Hello, and thanks for your interest in upcoming changes to Dice Breakers! This site is in active development by a hobby developer. I have (or should say, had) no experience with web development, this is simply a passion project and I'm learning as I go. If you notice something that could be better, please email <a href="mailto:suggestions@DiceBreakers.app">Suggestions@DiceBreakers.app!</a></p>
             <h2><b>Coming Sooner:</b></h2>
-                My initial vision is coming together, but I have a several pieces of functionality I still need to build out.
+                My initial vision is coming together, but I have a several pieces of functionaulty I still need to build out.
                 <br> 
-                <li><b>Author Details -</b> Right now a conversation shows the author, but I want you to be able to click their name and view other conversations/comments by them. This should help identify authors you want to favorite.</li>
-                <li><b>Comment Functionality -</b> I want to build out the functionality on comments pages so people can like or hide comments, or view/follow authors, etc, from the comments section.</li>
-                <li><b>Dice Enhancement -</b> As much as I enjoy the little dice animation I found, I want to learn a little 3d modeling and create an interactive dice that you can roll/spin. It may not have any practical purpose, but I think it could be fun to build and hopefully people find it amusing!</li>
-                <li><b>Sort Options -</b> Currently, rolling is random outside of the filter options you see. But, ideally, the user base for this site grows and new conversations/likes allow me to do a “Recents” or “Best of” sort options. And as the stronger conversation starters get votes, I can use that info to hide the less engaging prompts. I'll leave a “random” option for people who want to ignore scores.</li>
+                <ul><b>Author Details -</b> Right now a conversation shows the author, but I want you to be able to click their name and view other conversations/comments by them. This should help identify authors you want to favorite.</ul>
+                <ul><b>Comment Functionality -</b> I want to build out the functionality on comments pages so people can like or hide comments, or view/follow authors, etc, from the comments section.</ul>
+                <ul><b>Dice Enhancement -</b> As much as I enjoy the little dice animation I found, I want to learn a little 3d modeling and create an interactive dice that you can roll/spin. It may not have any practical purpose, but I think it could be fun to build and hopefully people find it amusing!</ul>
+                <ul><b>Sort Options -</b> Currently, rolling is random outside of the filter options you see. But, ideally, the user base for this site grows and new conversations/likes allow me to do a “Recents” or “Best of” sort options. And as the stronger conversation starters get votes, I can use that info to hide the less engaging prompts. I'll leave a “random” option for people who want to ignore scores.</ul>
             <h2><b>Coming Later:</b></h2>
                 Once I finish my initial vision, I'd like to let the site's development be user-guided. I'll open up comments on this page and I'd like users to post their ideas and let the community vote and discuss their favorite suggestions. I've been on the Internet too long to say I'll do everything the Internet tells me to do - I don't want this site turning into the wild west - but within reason, I'd love to incorporate user's ideas. 
             <h2><b>In My Dreams:</b></h2>
@@ -21,8 +21,7 @@
 </div>
 
 <style>
-    li {
+    ul {
         margin-top: 5px;
-        margin-left: 5px;
     }
 </style>
