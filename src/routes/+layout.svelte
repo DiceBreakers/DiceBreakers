@@ -16,7 +16,9 @@
 
     onMount(() => {
       if (pb.authStore.isValid) {
+      //  console.log('preUpdate:', currentUser);
         updateCurrentUser();
+     //   console.log('postUpdate:', currentUser);
         }
       });
 

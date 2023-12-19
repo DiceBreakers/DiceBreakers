@@ -29,7 +29,7 @@
                     pb.authStore.clear()
                     await applyAction(result)}
                   }}>
-                <button class="topMarginS btn btn-sm variant-filled-primary">Log out</button>
+                <button on:click={toggleMenu} class="topMarginS btn btn-sm variant-filled-primary">Log out</button>
               </form>
         {:else}
           <LoginMenu on:closeMenu={toggleMenu} />

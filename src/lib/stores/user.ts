@@ -19,4 +19,4 @@ interface User {
     verified: boolean;
 }
 
-export const currentUser = writable<User | null>(null);
+export const currentUser = writable<User | Record<string, any> | null>(null);
