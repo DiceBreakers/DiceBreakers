@@ -19,17 +19,18 @@
   out:slide={{ delay:800, duration:800, axis:'x'}}>
     <ul class="item">
         {#if $currentUser}
+          <li><a href="/" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Play</a></li>
           <li><a href="/add" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Start a Conversation</a></li>
           <li><a href="/edit" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">View your Conversations</a></li>
-          <li><a href="/" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Play</a></li>
-          <li class="topMarginL"><a href="/profile/hidden" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">View Hidden Authors/Conversations</a></li>
+          <li><a href="/profile/hidden" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">View Hidden Authors/Conversations</a></li>
+          <li><a href="/upcoming" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Upcoming Changes</a></li>
           <li><a href="/profile" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Account Settings</a></li>
               <form method="POST" action="/logout" use:enhance={() => {
                   return async ({ result }) => {
                     pb.authStore.clear()
                     await applyAction(result)}
                   }}>
-                <button on:click={toggleMenu} class="topMarginS btn btn-sm variant-filled-primary">Log out</button>
+                <button on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Log out</button>
               </form>
         {:else}
           <LoginMenu on:closeMenu={toggleMenu} />
@@ -77,14 +78,6 @@
 
 .item {
   margin: 1rem;
-}
-
-.topMarginL {
-    margin-top: 90px;
-}
-
-.topMarginS {
-    margin-top: 20px;
 }
 
 .btn {

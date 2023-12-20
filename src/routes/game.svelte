@@ -101,7 +101,7 @@
         additionalCategories.set(preferences.additionalCategories);
       }
     } else {
-      console.log('Parsed preferences are null, using default values');
+      console.log('Preferences are null, using default values');
       // Set default values or handle the case where preferences are null
     }
   } catch (e) {
@@ -109,7 +109,7 @@
     // Handle the parsing error, possibly set defaults
   }
 } else {
-  console.log('No preferences found, using default categories');
+  console.log('Preferences are null, using default categories');
   // Handle the case where there are no preferences, possibly set defaults
 }
 	

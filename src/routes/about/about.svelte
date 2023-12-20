@@ -14,9 +14,7 @@
             I'm by no means an experienced developer, so I'm figuring things out as I go. I think I've done okay, but if you have suggestions, I'm very receptive to community input! 
             If you have any ideas for improving the site, please send them to me at <a href="mailto:suggestions@DiceBreakers.app">Suggestions@DiceBreakers.app!</a></p>
             <br>
-            <p>I'm getting way ahead of myself here, but I have two big goals in life. First, I'd like to not have to worry about money so I can build and tinker with whatever projects come to mind. 
-            And second, I want to be able to help people. I hope Dice Breakers can help me accomplish both these things, and have set up the Dice Breakers LLC to be equally committed to both goals. 
-            As such, Dice Breakers has pledged that a minimum of 50% of profit earned through this site will be donated to charity. Now I just need site traffic so that pledge is more than empty words...</p>
+            <p>Eventually I am going to enable ads on the site, and then offer a $1-2 monthly subscription for people who want to disable them. I know a lot of people hate ads, and a lot of people hate monthly subscriptions, so maybe I turn these on and I'm still burning money on hosting every month. But, this is my fantasy section, so let's assume people still come here and some people join... I really want two things in life - I want the time and resources that allow me to be creative, and I want to be able to help people. In light of these goals, Dice Breakers has pledged that 50% of any profits will be donated to charity. The National Alliance on Mental Illness will receive 20% of the charity funds, while Dice Breaker's members will have the oppurtunity to vote on how the remaining 80% is allocated.</p>
         </div>
     </div>
 </div>

@@ -81,14 +81,14 @@
 				showFailureMessage = true;
 				setTimeout(() => {
 					showFailureMessage = false;
-				}, 1500);
+				}, 6000);
 			}
 		} catch (error) {
 			console.error('An error occurred:', error);
 			showFailureMessage = true;
 			setTimeout(() => {
 					showFailureMessage = false;
-				}, 1500);
+				}, 6000);
 		}
 	}
 
@@ -96,6 +96,9 @@
 		console.log('currentUser:', $currentUser)
 		if (!$currentUser?.verified) {
             showVerifiedMessage = true;
+			setTimeout(() => {
+					showVerifiedMessage = false;
+				}, 5000);
         }
 		catList.subscribe((list: CatItem[]) => {
 			selectedCategories.set(list);
@@ -112,7 +115,9 @@
 {/if}
 
 {#if showFailureMessage}
-	<ServerMessage isError={true} messageText="Something is broken :-(" />
+	<ServerMessage isError={true} messageText="Something broke! Did you verify your email? If so, try logging out and back in.">
+		<button class="btn variant-filled-warning margin" on:click={sendVerificationEmail}>Send Verification Email</button>
+	</ServerMessage>
 {/if}
 
 {#if showVerifiedMessage}
