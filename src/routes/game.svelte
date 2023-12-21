@@ -5,6 +5,7 @@
 	import { fade } from 'svelte/transition';
 	import { popup } from '@skeletonlabs/skeleton';
   import { currentUser } from '$lib/stores/user';
+  import { authorFavorites } from '$lib/stores/authors';
   import { catList } from '$lib/components/catList.svelte';
   import DiceRoll from '$lib/components/diceRoll.svelte';
   import ServerMessage from '$lib/components/serverMessage.svelte';
@@ -40,8 +41,6 @@
 	let currentAuthor = '';
 	let currentAuthId = '';
 	let currentFav = false;
-  let liked = false;
-  let superLiked = false;
   let cCount = 0;
 	let promptIndex = 0;
 	let isRolling = false;
@@ -56,31 +55,6 @@
   let allPrimaryChecked = true;
   let allAdditionalChecked = false;
   let preferences;
-
-  $: allPrimaryChecked = $primaryCategories.every(cat => cat.checked);
-  $: allAdditionalChecked = $additionalCategories.every(cat => cat.checked);
-  $: score = $promptArray[promptIndex]?.score ?? 0;
-  $: cCount = $promptArray[promptIndex]?.cCount ?? 0;
-  $: bulbImage = $promptArray[promptIndex]?.superLiked ? 'bulb2.png' :
-                 $promptArray[promptIndex]?.liked ? 'bulb1.png' : 'bulb0.png';
-
-  $: if ($primaryCategories) {
-        updateSelectedCategories();
-    }
-
-  $: if ($additionalCategories) {
-        updateSelectedCategories();
-    }
-
-  $: if ($selectedFilter !== 'all') {
-    if (!$currentUser) {
-      $selectedFilter = 'all';
-      LoginMessage = true;
-      setTimeout(() => {
-        LoginMessage = false;
-      }, 2000);
-    }
-  }
 
   if (data.preferences) {
   try {
@@ -112,20 +86,6 @@
   console.log('Preferences are null, using default categories');
   // Handle the case where there are no preferences, possibly set defaults
 }
-	
-onMount(() => {
-  if (!preferences) {
-    //console.log('No preferences set, using default categories');
-    catList.subscribe((list: CatItem[]) => {
-      selectedCategories.set(list);
-      const categories = list;
-      primaryCategories.set(categories.slice(0, 5));
-      additionalCategories.set(categories.slice(5));
-    });
-  } else {
-    console.log('Preferences Set On Load');
-  }
-});
 
 async function generate(event?: Event) {
   if (event) event.preventDefault();
@@ -171,13 +131,17 @@ async function generate(event?: Event) {
         isSuper: obj.superLiked,
         isLiked: obj.liked,
         isFavAuthor: obj.isFavAuthor,
-        score: obj.score,
-        cCount: obj.cCount,
+        score: 1,
+        cCount: 0,
       };
     });
 
       promptArray.set(generatedPrompts);
       console.log('generatedPrompts', generatedPrompts)
+
+      generatedPrompts.forEach(prompt => {
+        authorFavorites.toggleFavorite(prompt.authorId);
+      });
 
       updatePrompt();
     } else {
@@ -198,23 +162,24 @@ async function updatePrompt() {
 
     try {
       if (promptData) {
-        let { prompt, promptId, author, authorId, isFavAuthor } = promptData;
+        const { prompt, promptId, author, authorId } = promptData;
         currentPrompt = prompt;
         currentPromptId = promptId;
         currentAuthor = author;
         currentAuthId = authorId;
-        currentFav = isFavAuthor;
 
-        const additionalDetails = await fetchPromptDetails(promptId);
-          if (additionalDetails) {
-              const updatedPrompt = {
-              ...promptData,
-              ...additionalDetails
-            };
+        const additionalDetails = await fetchPromptDetails(promptId, authorId);
+        if (additionalDetails) {
+          const updatedPrompt = {
+            ...promptData,
+            ...additionalDetails
+          };
 
-            prompts[promptIndex] = updatedPrompt;
-            promptArray.set(prompts);
-          }
+          prompts[promptIndex] = updatedPrompt;
+          promptArray.set(prompts);
+
+          currentFav = updatedPrompt.isFavAuthor;
+        }
       } else {
         throw new Error('Prompt data is undefined');
       }
@@ -225,25 +190,21 @@ async function updatePrompt() {
       currentPromptId = '';
       currentAuthId = '';
       currentFav = false;
-      liked = false;
-      superLiked = false;
-      score = 0;
     }
   } else {
     console.error('No more prompts to display.');
     currentPrompt = "Hmm. Either there was a server error, or the search was too narrow/you've managed to hide everyone. Change some settings and try again.";
     currentAuthor = "Womp Womp";
     currentFav = false;
-    liked = false;
-    superLiked = false;
-    score = 0;
   }
 }
 
-async function fetchPromptDetails(promptId) {
+
+async function fetchPromptDetails(promptId, authorId) {
   try {
     const formData = new FormData();
     formData.append('promptId', promptId);
+    formData.append('authorId', authorId)
 
     const response = await fetch('?/promptStatus', {
       method: 'POST',
@@ -289,8 +250,6 @@ async function saveSettings() {
       primaryCategories: $primaryCategories,
       additionalCategories: $additionalCategories
     };
-
-    console.log('SavingSettings:', preferences)
 
     formData.append('preferences', JSON.stringify(preferences));
 
@@ -359,20 +318,10 @@ async function favToggle() {
     return;
   }
 
-  if (!currentAuthId) return;
+  const currentAuthId = $promptArray[promptIndex]?.authorId;
 
-  const newFavStatus = !currentFav;
-  currentFav = newFavStatus;
-
-  promptArray.update(prompts => {
-      return prompts.map(prompt => {
-        if (prompt.authorId === currentAuthId) {
-          return { ...prompt, isFavAuthor: newFavStatus };
-        }
-        return prompt;
-      });
-    });
-
+  authorFavorites.toggleFavorite(currentAuthId);
+  
   const formData = new FormData();
   formData.append('authorId', currentAuthId);
 
@@ -384,6 +333,7 @@ async function favToggle() {
 
     if (response.ok) {
       console.log('Favorite Toggled Successfully');
+      currentFav = !currentFav
     } else {
       console.error('Something broke :-(');
       FailureMessage = true;
@@ -620,6 +570,46 @@ async function submitReport() {
         selectedCategories.set([...$primaryCategories, ...$additionalCategories]);
     }
 
+
+  $: allPrimaryChecked = $primaryCategories.every(cat => cat.checked);
+  $: allAdditionalChecked = $additionalCategories.every(cat => cat.checked);
+  $: score = $promptArray[promptIndex]?.score ?? 0;
+  $: cCount = $promptArray[promptIndex]?.cCount ?? 0;
+  $: bulbImage = $promptArray[promptIndex]?.superLiked ? 'bulb2.png' :
+                 $promptArray[promptIndex]?.liked ? 'bulb1.png' : 'bulb0.png';
+
+  $: if ($primaryCategories) {
+        updateSelectedCategories();
+    }
+
+  $: if ($additionalCategories) {
+        updateSelectedCategories();
+    }
+
+  $: if ($selectedFilter !== 'all') {
+    if (!$currentUser) {
+      $selectedFilter = 'all';
+      LoginMessage = true;
+      setTimeout(() => {
+        LoginMessage = false;
+      }, 2000);
+    }
+  }
+
+  onMount(() => {
+  if (!preferences) {
+    //console.log('No preferences set, using default categories');
+    catList.subscribe((list: CatItem[]) => {
+      selectedCategories.set(list);
+      const categories = list;
+      primaryCategories.set(categories.slice(0, 5));
+      additionalCategories.set(categories.slice(5));
+    });
+  } else {
+    console.log('Preferences Set On Load');
+  }
+});
+
 </script>
 
 {#if SuccessMessage}
@@ -737,7 +727,7 @@ async function submitReport() {
 	  </AccordionItem>
 	  <AccordionItem on:toggle={displayNextPrompt}>
 		<svelte:fragment slot="lead"><img src="favicon.png" alt="Dice Icon" width="21px" /></svelte:fragment>
-		<svelte:fragment slot="summary"><div class="rTD">Roll the Dice!</div></svelte:fragment>
+		<svelte:fragment slot="summary"><div class="startConvo">Start a Conversation!</div></svelte:fragment>
 		<svelte:fragment slot="content">
 			<div class="game">
 				{#if isRolling}
@@ -757,7 +747,7 @@ async function submitReport() {
 						  <div class="prompt">{currentPrompt}</div>
               <div class="author"><b>-{currentAuthor}</b> 
                 <button on:click={favToggle}>
-                  {#if $promptArray[promptIndex]?.isFavAuthor}
+                  {#if currentFav}
                     <i class="fa-solid fa-xl fa-star" style="color: #fecb0e;"></i>
                   {:else}
                     <i class="fa-regular fa-xl fa-star" style="color: #0d4576;"></i>
@@ -818,7 +808,7 @@ async function submitReport() {
   </div>
 
 <style>
-
+  
   .selectFilter {
       border-radius: 5px;
       margin-left: 5px;
@@ -846,7 +836,7 @@ async function submitReport() {
 		width: 70px;
 	}
 
-  .rTD {
+  .startConvo {
     text-align: center;
     font-weight: bold;
   }

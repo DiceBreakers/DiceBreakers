@@ -1,11 +1,13 @@
 <script lang="ts">
     import { currentUser } from '$lib/stores/user'
+    import { authorFavorites } from '$lib/stores/authors';
     import { createEventDispatcher } from 'svelte';
     
     export let promptId;
     export let parentId: string | null = null;
 
     const dispatch = createEventDispatcher();
+    
     let replyText = '';
 
     async function submitReply() {
@@ -25,21 +27,31 @@
             });
 
             if (response.ok) {
+                const responseBody = await response.json();
+
+      //          console.log ('responseBody:', responseBody)
+
+                const responseJson = JSON.parse(responseBody.data);
+
+      //          console.log ('responseJson:', responseJson)
+
+                const newCommentId = responseJson[5];
                 console.log('Reply submitted successfully');
-                dispatch('replySubmitted');
                 const newCommentData = {
+                    id: newCommentId,
                     text: replyText,
                     authName: $currentUser?.username,
+                    authId: $currentUser?.id,
                     parent: parentId,
                     isLiked: true,
                     isSuper: false,
                     score: 1,
-                    isFavAuth: $currentUser?.favAuthors?.includes($currentUser?.id) ?? false,
+                    isFavAuth: $authorFavorites[$currentUser?.id] || false,
                     children: [],
                 };
                 console.log('nCD:', newCommentData)
                 dispatch('commentAdded', { newComment: newCommentData });
-                cancelReply;
+                cancelReply();
             } else {
                 console.error('Failed to submit reply');
             }

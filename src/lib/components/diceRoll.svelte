@@ -35,9 +35,9 @@
 <style>
 .dice {  
   display: flex;
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
-  height: 100vh; /* Full viewport height */
+  justify-content: center; 
+  align-items: center; 
+  height: 100vh;
   z-index: 1000;
 }
 </style>

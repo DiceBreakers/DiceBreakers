@@ -4,9 +4,9 @@
     import { goto } from '$app/navigation';
     import { popup } from '@skeletonlabs/skeleton';
     import { fade } from 'svelte/transition';
-    import type { PopupSettings } from '@skeletonlabs/skeleton';
 	import ServerMessage from '$lib/components/serverMessage.svelte';
     import { currentUser } from '$lib/stores/user';
+    import { authorFavorites } from '$lib/stores/authors';
     import CommentItem from './CommentItem.svelte';
     import Reply from './Reply.svelte';
 	
@@ -14,13 +14,10 @@
 
    // console.log(data)
 
-    const showReplyForm = writable(false);
+    let showReplyForm = false;
 
     let commentArray = writable<Comment[]>([]);
     let loading = true;
-
-    let comment;
-    let promptId;
 
     let showRollButton = false;
     let SuccessMessage = false;
@@ -63,12 +60,8 @@
         isFavAuth: false,
         isLiked: false,
         isSuper: false,
-        score: 0
+        score: 1,
     });
-
-    $: bulbImage = $prompt?.isSuper ? '/bulb2.png' :
-                   $prompt?.isLiked ? '/bulb1.png' : '/bulb0.png';
-
 
     if (data && data.prompt) {
         try {
@@ -148,31 +141,23 @@ function organizeComments(commentsArray: Comment[]): Comment[] {
     return organizedComments;
 }
 
-    let organizedComments = organizeComments($commentArray);
-
-
-    $: organizedComments = organizeComments($commentArray);
-
-
-    function addNewComment(newComment: Comment) {
-    commentArray.update(currentComments => {
-        if (newComment.parent) {
-            const parentIndex = currentComments.findIndex(c => c.id === newComment.parent);
-            const parentComment = currentComments[parentIndex];
-
-            // Check if parentComment is defined
-            if (parentComment) {
-                // Ensure that children array is initialized
-                parentComment.children = parentComment.children || [];
-                parentComment.children.push(newComment);
+    function addNewComment(newComment) {
+        commentArray.update(currentComments => {
+            // Deep clone the current comments to ensure reactivity
+            let updatedComments = JSON.parse(JSON.stringify(currentComments));
+            
+            if (newComment.parent) {
+                const parentIndex = updatedComments.findIndex(c => c.id === newComment.parent);
+                if (parentIndex !== -1) {
+                    // Directly update the nested comments array
+                    updatedComments[parentIndex].children = [...(updatedComments[parentIndex].children || []), newComment];
+                }
+            } else {
+                updatedComments.push(newComment);
             }
-        } else {
-            currentComments.push(newComment);
-        }
-        return currentComments;
-    });
-}
-
+            return updatedComments;
+        });
+    }
 
 
 async function pVote() {
@@ -207,7 +192,7 @@ async function pVote() {
             return { ...current, score: newScore, isLiked: newIsLiked, isSuper: newIsSuper };
         });
 
-    console.log('pScore', $prompt.score)
+ //   console.log('pScore', $prompt.score)
 
     const formData = new FormData();
     formData.append('promptId', $prompt.id);
@@ -237,46 +222,39 @@ async function pVote() {
   }
 
   async function favToggle() {
-  if (!$currentUser) {
-    LoginMessage = true;
-    setTimeout(() => {
-      LoginMessage = false;
-    }, 1500);
-    return;
-  }
-
-  if (!$prompt.authId) return;
-
-    prompt.update(current => {
-        return { ...current, isFavAuth: !current.isFavAuth };
-    });
-
-  const formData = new FormData();
-  formData.append('authId', $prompt.authId);
-
-  try {
-    const response = await fetch('?/favAuth', {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (response.ok) {
-      console.log('Favorite Toggled Successfully');
-      console.log('prompt.isFavAuth:', $prompt.isFavAuth)
-    } else {
-      console.error('Something broke :-(');
-      FailureMessage = true;
-      setTimeout(() => {
-        FailureMessage = false;
-      }, 1500);
+    if (!$currentUser) {
+        LoginMessage = true;
+        setTimeout(() => {
+            LoginMessage = false;
+        }, 1500);
+        return;
     }
-  } catch (error) {
-    console.error('An error occurred:', error);
-    FailureMessage = true;
-    setTimeout(() => {
-      FailureMessage = false;
-    }, 1500);
-  }
+
+    if (!$prompt.authId) return;
+
+    authorFavorites.toggleFavorite($prompt.authId);
+
+    const formData = new FormData();
+    formData.append('authId', $prompt.authId);
+
+    try {
+        const response = await fetch('?/favAuth', {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error('Server response not OK');
+        }
+
+        console.log('Favorite Toggled Successfully');
+    } catch (error) {
+        console.error('An error occurred:', error);
+        FailureMessage = true;
+        setTimeout(() => {
+            FailureMessage = false;
+        }, 1500);
+    }
 }
 
 function toggleReplyForm() {
@@ -287,13 +265,19 @@ function toggleReplyForm() {
       }, 1500);
       return;
     }
-
-        showReplyForm.update(current => !current);
+    showReplyForm = !showReplyForm;
     }
 
 function navigateHome() {
     goto('/');
   }
+
+let organizedComments = organizeComments($commentArray);
+
+$: organizedComments = organizeComments($commentArray);
+$: isFavAuthor = $prompt.authId ? $authorFavorites[$prompt.authId] || false : false;  
+$: bulbImage = $prompt?.isSuper ? '/bulb2.png' :
+               $prompt?.isLiked ? '/bulb1.png' : '/bulb0.png';   
 
 onMount(() => {
     setTimeout(() => {
@@ -302,7 +286,6 @@ onMount(() => {
   });
 
 </script>
-
 
 <div class="card p-4">
     <div class="comments-container">
@@ -321,7 +304,7 @@ onMount(() => {
             <div class="author">
                 <b>-{$prompt.authName}</b> 
                 <button on:click={favToggle}>
-                    {#if $prompt.isFavAuth}
+                    {#if isFavAuthor}
                         <i class="fa-solid fa-xl fa-star" style="color: #fecb0e;"></i>
                     {:else}
                         <i class="fa-regular fa-xl fa-star" style="color: #0d4576;"></i>
@@ -338,15 +321,15 @@ onMount(() => {
                 </div>              
             {/if}
         </div>
-        <div class="button alignRight"><button on:click={toggleReplyForm} class="badge variant-filled-primary">Reply</button></div>
+        <div class="button alignRight replyButtonMargin"><button on:click={toggleReplyForm} class="badge variant-filled-primary">Reply</button></div>
+        {#if showReplyForm}
+            <Reply promptId={$prompt.id} on:cancelReply={toggleReplyForm} on:commentAdded={e => addNewComment(e.detail.newComment)}/>
+        {/if}
         {#each organizedComments as comment}
             <CommentItem comment={comment} promptId={$prompt.id} />
         {/each}
         {#if $commentArray.length === 0}
             <div>No comments yet... Be the first?</div>            
-            {#if $showReplyForm}
-                <Reply promptId={$prompt.id} on:cancelReply={toggleReplyForm} on:commentAdded={e => addNewComment(e.detail.newComment)}/>
-            {/if}
         {/if}
     </div>
 </div>
@@ -387,41 +370,43 @@ onMount(() => {
 
 
 <style>
-.author {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    margin-left: auto;
-    text-align: right;
-}
 
-.promptContainer {
-    display: flex;
-    align-items: center;
-    flex-direction: column; /* Stack items vertically */
-}
+    .author {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-left: auto;
+        text-align: right;
+    }
 
-.prompt {
-    text-align: center;
-    margin-top: 10px;
-    font-size:large;
-}
+    .promptContainer {
+        display: flex;
+        align-items: center;
+        flex-direction: column; /* Stack items vertically */
+    }
 
-.scoreContainer {
-    display: flex;
-    align-items: center; 
-    flex-direction: column;
-}
+    .prompt {
+        text-align: center;
+        margin-top: 10px;
+        font-size:large;
+    }
 
-.button {
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
+    .scoreContainer {
+        display: flex;
+        align-items: center; 
+        flex-direction: column;
+    }
 
-.alignRight {
-    text-align: right;
-}
+    .button {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
 
-.alignRight button {
-    margin-left: auto;
-}
+    .alignRight {
+        text-align: right;
+    }
+
+    .alignRight button {
+        margin-left: auto;
+    }
+
 </style>

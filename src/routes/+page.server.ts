@@ -158,8 +158,9 @@ export const actions = {
       // Extract the promptId from the request
       const data = await request.formData();
       const promptId = data.get('promptId');
+      const authorId = data.get('authorId');
   
-      let scoreData, commentCount, likeStatus;
+      let scoreData, commentCount, likeStatus, isFavAuthor;
   
       try {
         scoreData = await locals.pb.collection('pScore')
@@ -182,14 +183,20 @@ export const actions = {
         likeStatus = null;
       }
 
-      // console.log('likes:', likeStatus, 'comments:', commentCount, 'score:', scoreData)
+      console.log('authorId:', authorId)
+      console.log('localsFavs:', locals.user?.favAuthors)
+
+      isFavAuthor = locals.user?.favAuthors?.includes(`${authorId}`) || false;
   
       const promptAdditionalDetails = {
         liked: !!likeStatus,
         superLiked: !!likeStatus && likeStatus.super,
         score: scoreData.score,
         cCount: commentCount.cCount,
+        isFavAuthor,
       };
+
+      console.log('promptAdditionalDetails:', promptAdditionalDetails)
   
       return {
         details: JSON.stringify(promptAdditionalDetails),
@@ -210,13 +217,11 @@ export const actions = {
     const data = await request.formData();       
   //  console.log('data:', data)
 
-   // Retrieve 'preferences' from FormData and ensure it's a string before parsing
    const preferencesString = data.get('preferences');
    let preferences;
    if (typeof preferencesString === 'string') {
        preferences = JSON.parse(preferencesString);
    } else {
-       // Handle the case where preferencesString is not a string
        console.error("Preferences data is not a string");
        throw error(400, "Invalid preferences data");
    }

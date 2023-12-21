@@ -20,8 +20,8 @@
     <ul class="item">
         {#if $currentUser}
           <li><a href="/" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Play</a></li>
-          <li><a href="/add" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Start a Conversation</a></li>
-          <li><a href="/edit" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">View your Conversations</a></li>
+          <li><a href="/add" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Submit a Conversation Starter</a></li>
+          <li><a href="/edit" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">View your Conversation Starters</a></li>
           <li><a href="/profile/hidden" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">View Hidden Authors/Conversations</a></li>
           <li><a href="/upcoming" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Upcoming Changes</a></li>
           <li><a href="/profile" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Account Settings</a></li>

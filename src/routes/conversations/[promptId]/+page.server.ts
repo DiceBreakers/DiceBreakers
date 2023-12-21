@@ -47,12 +47,12 @@ export const load: PageServerLoad = async ({ params, locals }) => {
       }
     }
 
-    let score = 0;
+    let score = 1;
     try {
       // console.log(`Fetching prompt score for prompt ${promptId}`);
       const pScore = await locals.pb.collection('pScore')
         .getFirstListItem(`id="${promptId}"`);
-      score = pScore ? pScore.score : 0;
+      score = pScore ? pScore.score : 1;
     } catch (err: unknown) {
       const pbError = err as PocketBaseError;
       if (pbError.originalError && pbError.originalError.status === 404) {
@@ -82,7 +82,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
         console.log(`Fetching comment score for comment ${comment.id}`);
         const cScore = await locals.pb.collection('cScore')
           .getFirstListItem(`id="${comment.id}"`);
-        const score = cScore ? cScore.score : 0;
+        const score = cScore ? cScore.score : 1;
 
         return {
           ...comment,
@@ -99,7 +99,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
             isLiked: false,
             isSuper: false,
             isFavAuthor,
-            score: 0,
+            score: 1,
           };
         } else {
           throw err;
@@ -219,6 +219,58 @@ pVote: async ({ request, locals }) => {
     }
   },
 
+  cVote: async ({ request, locals }) => {
+    if (request.method !== 'POST') {
+      console.log('Error: Non-POST');
+      throw error(400, "The robots didn't like something about that...");
+    }
+  
+    const data = await request.formData();
+    const currentCommentId = data.get('commentId') ? String(data.get('commentId')) : '';
+    const userId = locals.user?.id;
+  
+    if (!userId) {
+      throw error(401, "You must be logged in to vote");
+    }
+  
+    try {
+      let existingVote;
+  
+      try {
+        existingVote = await locals.pb.collection('cVotes')
+          .getFirstListItem(`comment="${currentCommentId}"&&by="${userId}"`);
+      } catch (err: unknown) { 
+        const pbError = err as PocketBaseError; 
+        if (pbError.originalError && pbError.originalError.status === 404) {
+          existingVote = null;
+        } else {
+          throw err;
+        }
+      }
+  
+      if (existingVote) {
+        if (existingVote.super) {
+          await locals.pb.collection('cVotes').delete(existingVote.id);
+        } else {
+          const updateVote = { super: true };
+          await locals.pb.collection('cVotes').update(existingVote.id, updateVote);
+        }
+      } else {
+        const newVote = {
+          "comment": currentCommentId,
+          "by": userId,
+          "super": false
+        };
+        await locals.pb.collection('cVotes').create(newVote);
+      }
+  
+      return; 
+    } catch (err: unknown) {
+      console.log('Error: ', err);
+      throw error(500, "There was a problem processing your vote");
+    }
+  },
+
   submitReply: async ({ request, locals }) => {
     if (request.method !== 'POST') {
       console.log('Error: Non-POST');
@@ -247,7 +299,15 @@ pVote: async ({ request, locals }) => {
     try {      
       const record = await locals.pb.collection('comments').create(addComment);
 
-      return; 
+      const newVote = {
+        "comment": record.id,
+        "by": locals.user?.id,
+        "super": false
+      };
+
+      await locals.pb.collection('cVotes').create(newVote);
+
+      return (record); 
     } catch (err: unknown) {
       console.log('Error: ', err);
       throw error(500, "There was a problem submitting your comment.");
