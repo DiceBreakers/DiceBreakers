@@ -892,7 +892,7 @@ async function submitReport() {
 		padding: 0; 
 		margin: 0; 
 		display: flex;
-		gap: 1rem; 
+		gap: .5rem; 
     width: 100px;
     flex-direction: column;
     align-items: center;
