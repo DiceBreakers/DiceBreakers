@@ -608,6 +608,7 @@ async function submitReport() {
   } else {
     console.log('Preferences Set On Load');
   }
+  displayNextPrompt();
 });
 
 </script>
@@ -642,7 +643,7 @@ async function submitReport() {
 {/if}
 
 
-  <div class="container card p-4" transition:fade={{ delay: 1000, duration: 500 }}>
+  <div class="container card p-4 outsideContainer" transition:fade={{ delay: 1000, duration: 500 }}>
 	<Accordion autocollapse>
 	  <AccordionItem> 
 		<svelte:fragment slot="lead"><i class="fa-solid fa-lg fa-gear" style="color: #1673c5;"></i></svelte:fragment>
@@ -725,7 +726,7 @@ async function submitReport() {
 		</Accordion>
 	</svelte:fragment>
 	  </AccordionItem>
-	  <AccordionItem on:toggle={displayNextPrompt}>
+	  <AccordionItem open on:toggle={displayNextPrompt}>
 		<svelte:fragment slot="lead"><img src="favicon.png" alt="Dice Icon" width="21px" /></svelte:fragment>
 		<svelte:fragment slot="summary"><div class="startConvo">Start a Conversation!</div></svelte:fragment>
 		<svelte:fragment slot="content">
@@ -808,6 +809,10 @@ async function submitReport() {
   </div>
 
 <style>
+
+  .outsideContainer {
+    min-height:500px;
+  }
   
   .selectFilter {
       border-radius: 5px;
@@ -902,16 +907,6 @@ async function submitReport() {
     font-size: small;
   }
 
-	.gameBottom {
-    display: flex;
-    align-items: center; 
-    justify-content: space-between;
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 500px;
-    margin-top: 50px;
-	}
-
 	.gameTop {
 		display: flex;
 		flex-direction: column;
@@ -920,12 +915,24 @@ async function submitReport() {
 		height: 100%;
 	}
 
+  .gameBottom {
+    display: flex;
+    align-items: center; 
+    justify-content: space-between;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 500px;
+    margin-top: 50px;
+    padding-top: 50px;
+    margin-bottom: -75px;
+	}
+
 	.game {
 		position: relative;
 		display: flex;
     justify-content: center;
     align-items: center;
-    height: 40vh;
+    height: 45vh;
 	}
 
 	.prompt {
