@@ -7,7 +7,7 @@
 	import ServerMessage from '$lib/components/serverMessage.svelte';
     import { currentUser } from '$lib/stores/user';
     import { authorFavorites } from '$lib/stores/authors';
-    import CommentItem from '$lib/components/CommentItem.svelte';
+    import CommentItem from '$lib/components/CommentItem.svelte'
     import Reply from '$lib/components/Reply.svelte';
 	
     export let data;
@@ -289,48 +289,13 @@ onMount(() => {
 
 <div class="card p-4">
     <div class="comments-container">
-        <div class="promptContainer">
-            <div class="scoreContainer">
-                <button on:click={pVote}>
-                    <img alt="Bulb Rating" src={bulbImage} class="bulbImage">
-                </button>
-                <div class="score" use:popup={{ event: 'hover', target: 'scoreTT', placement: 'right'}}>
-                    ({$prompt.score})
-                </div>
-            </div>
-            <div class="prompt">
-                {$prompt.text}
-            </div>
-            <div class="author">
-                <b>-{$prompt.authName}</b> 
-                <button on:click={favToggle}>
-                    {#if isFavAuthor}
-                        <i class="fa-solid fa-xl fa-star" style="color: #fecb0e;"></i>
-                    {:else}
-                        <i class="fa-regular fa-xl fa-star" style="color: #0d4576;"></i>
-                    {/if}
-                </button>
-            </div>
-            {#if showRollButton}
-                <button in:fade={{ duration: 800 }} class="btn variant-filled-primary margin" on:click={navigateHome}>
-                Roll Again
-                </button>
-            {:else}
-                <div class="btn variant-filled-primary margin" style="visibility: hidden;">
-                  Uh. This is supposed to be hidden?
-                </div>              
-            {/if}
-        </div>
-        <div class="button alignRight replyButtonMargin"><button on:click={toggleReplyForm} class="badge variant-filled-primary">Reply</button></div>
+        <div class="button alignRight replyButtonMargin"><button on:click={toggleReplyForm} class="badge variant-filled-primary">Submit a Suggestion</button></div>
         {#if showReplyForm}
-            <Reply promptId={$prompt.id} on:cancelReply={toggleReplyForm} on:commentAdded={e => addNewComment(e.detail.newComment)}/>
+            <Reply promptId='s2ysozol9uv0dx6' on:cancelReply={toggleReplyForm} on:commentAdded={e => addNewComment(e.detail.newComment)}/>
         {/if}
         {#each organizedComments as comment}
-            <CommentItem comment={comment} promptId={$prompt.id} />
+            <CommentItem comment={comment} promptId='s2ysozol9uv0dx6' />
         {/each}
-        {#if $commentArray.length === 0}
-            <div>No comments yet... Be the first?</div>            
-        {/if}
     </div>
 </div>
 
@@ -370,31 +335,6 @@ onMount(() => {
 
 
 <style>
-
-    .author {
-        margin-top: 10px;
-        margin-bottom: 10px;
-        margin-left: auto;
-        text-align: right;
-    }
-
-    .promptContainer {
-        display: flex;
-        align-items: center;
-        flex-direction: column; /* Stack items vertically */
-    }
-
-    .prompt {
-        text-align: center;
-        margin-top: 10px;
-        font-size:large;
-    }
-
-    .scoreContainer {
-        display: flex;
-        align-items: center; 
-        flex-direction: column;
-    }
 
     .button {
         margin-top: 10px;

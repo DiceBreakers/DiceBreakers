@@ -1,8 +1,8 @@
 <script>
     import { currentUser } from '$lib/stores/user';
     import { authorFavorites } from '$lib/stores/authors';
-    import CommentItem from './CommentItem.svelte';
-    import Reply from './Reply.svelte';
+    import CommentItem from '$lib/components/CommentItem.svelte'
+    import Reply from '$lib/components/Reply.svelte';
 	import ServerMessage from '$lib/components/serverMessage.svelte';
 
     export let comment;

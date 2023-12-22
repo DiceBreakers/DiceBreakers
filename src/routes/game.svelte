@@ -48,6 +48,7 @@
 	let FailureMessage = false;
 	let ReportMessage = false;
 	let LoginMessage = false;
+  let CategoryMessage = false;
   let SettingsSaved = false;
 	let promptHiddenMessage = false;
 	let authorHiddenMessage = false;
@@ -100,11 +101,24 @@ async function generate(event?: Event) {
     });
   });
 
+//  let isCategorySelected = false;
+
   selectedCats.forEach(catItem => {
     if (catItem.checked) {
       formData.append('categories', catItem.value);
+//      isCategorySelected = true;
     }
   });
+
+  // Check if no category is selected
+////  if (!isCategorySelected) {
+///    console.log('noCats')
+//        CategoryMessage = true;
+ //       setTimeout(() => {
+ //         CategoryMessage = false;
+ //       }, 2000);
+ //   return;
+ // }
 
   formData.append('selectedFilter', $selectedFilter.toString());
 
@@ -613,36 +627,6 @@ async function submitReport() {
 
 </script>
 
-{#if SuccessMessage}
-	<ServerMessage />
-{/if}
-
-{#if ReportMessage}
-	<ServerMessage messageText="Thanks, we will review your report."/>
-{/if}
-
-{#if SettingsSaved}
-	<ServerMessage messageText="Settings Successfully Saved!"/>
-{/if}
-
-{#if promptHiddenMessage}
-	<ServerMessage messageText="Prompt Hidden!" />
-{/if}
-
-{#if authorHiddenMessage}
-	<ServerMessage messageText="Author Hidden!" />
-{/if}
-
-{#if FailureMessage}
-	<ServerMessage isError={true} messageText="Something is broken :-(" />
-{/if}
-
-
-{#if LoginMessage}
-  <ServerMessage isError={true} messageText="You'll need to log in first!" />
-{/if}
-
-
   <div class="container card p-4 outsideContainer" transition:fade={{ delay: 1000, duration: 500 }}>
 	<Accordion autocollapse>
 	  <AccordionItem> 
@@ -776,6 +760,40 @@ async function submitReport() {
 	  </AccordionItem>
 	</Accordion>
   </div>
+
+<!-- Server Messages -->
+
+  {#if SuccessMessage}
+    <ServerMessage />
+  {/if}
+
+  {#if ReportMessage}
+    <ServerMessage messageText="Thanks, we will review your report."/>
+  {/if}
+
+  {#if SettingsSaved}
+    <ServerMessage messageText="Settings Successfully Saved!"/>
+  {/if}
+
+  {#if promptHiddenMessage}
+    <ServerMessage messageText="Prompt Hidden!" />
+  {/if}
+
+  {#if authorHiddenMessage}
+    <ServerMessage messageText="Author Hidden!" />
+  {/if}
+
+  {#if FailureMessage}
+    <ServerMessage isError={true} messageText="Something is broken :-(" />
+  {/if}
+
+  {#if LoginMessage}
+    <ServerMessage isError={true} messageText="You'll need to log in first!" />
+  {/if}
+
+  {#if CategoryMessage}
+    <ServerMessage isError={true} messageText="Please select one or more categories." />
+  {/if}
 
   <!-- Popup Menus -->
 

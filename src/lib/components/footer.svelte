@@ -1,12 +1,16 @@
 
 <div class="footer">
-    <div class="footerText">
-    <ul>
-        <a href="/upcoming" title="Upcoming Changes">Upcoming Changes</a>
-        <a href="/about" title="About"><i class="fa-regular fa-copyright" title="Copyright Dice Breakers"/>DiceBreakers</a>
-        <a href="mailto:Admin@DiceBreakers.app" class="fa-regular fa-envelope" title="Email Us"> </a>
-        <a href="/legal" title="Terms of Service, Privacy Policy, and Cookies">Legal</a>
-    </ul>
+    <div class="footerTextTop">
+        <ul>
+            <a href="/upcoming" title="Upcoming Changes">Upcoming Changes</a>
+        </ul>
+    </div>
+    <div class="footerTextBottom">
+        <ul>
+            <a href="/about" title="About"><i class="fa-regular fa-copyright" title="Copyright Dice Breakers"/>DiceBreakers</a>
+            <a href="mailto:Admin@DiceBreakers.app" class="fa-regular fa-envelope" title="Email Us"> </a>
+            <a href="/legal" title="Terms of Service, Privacy Policy, and Cookies">Attribution and Legal</a>
+        </ul>
     </div>
 </div>
 
@@ -37,8 +41,8 @@
     vertical-align: middle;
 }
 
-.footerText {
-    margin-top: 60px;
+.footerTextBottom {
+    margin-top: 30px;
 }
 
 .footer ul i {
