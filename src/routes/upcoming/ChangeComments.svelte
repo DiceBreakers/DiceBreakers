@@ -275,9 +275,6 @@ function navigateHome() {
 let organizedComments = organizeComments($commentArray);
 
 $: organizedComments = organizeComments($commentArray);
-$: isFavAuthor = $prompt.authId ? $authorFavorites[$prompt.authId] || false : false;  
-$: bulbImage = $prompt?.isSuper ? '/bulb2.png' :
-               $prompt?.isLiked ? '/bulb1.png' : '/bulb0.png';   
 
 onMount(() => {
     setTimeout(() => {
@@ -299,15 +296,7 @@ onMount(() => {
     </div>
 </div>
 
-<!-- Popup Menus -->
-<div class="popup scoreTT" data-popup="scoreTT">
-    {#if $prompt.score==1}
-        Like
-    {:else}
-        Likes
-    {/if}
-</div>
-
+<!-- Server Messages -->
 
 {#if SuccessMessage}
 	<ServerMessage />

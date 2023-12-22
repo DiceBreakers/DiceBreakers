@@ -18,6 +18,13 @@
     }
 
     function toggleReplyForm() {
+        if (!$currentUser) {
+            LoginMessage = true;
+            setTimeout(() => {
+                LoginMessage = false;
+            }, 1500);
+            return;
+        }
         showReplyForComment = !showReplyForComment;
     }
 
@@ -192,8 +199,6 @@ async function cVote() {
                 <button on:click={toggleReplyForm} class="badge variant-filled-primary">Reply</button>
             {/if}
         </div>
-        
-
 
     {#if showReplyForComment}
         <Reply promptId={promptId} parentId={comment.id} on:cancelReply={toggleReplyForm} on:commentAdded={handleNewComment} />
