@@ -29,7 +29,7 @@
                                     <b>Suggestions:</b>
                                 </svelte:fragment>
                                 <svelte:fragment slot="content">
-                                    <ChangeComments {data} type="suggestions" />
+                                    <ChangeComments {data} type="suggestion" />
                                 </svelte:fragment>
                             </AccordionItem>
                             <AccordionItem>

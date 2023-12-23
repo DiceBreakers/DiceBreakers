@@ -53,17 +53,6 @@
         children?: Comment[];
     }
 
-    let prompt = writable<Prompt>({
-        text: '',
-        id: '',
-        authName: '',
-        authId: '',
-        isFavAuth: false,
-        isLiked: false,
-        isSuper: false,
-        score: 1,
-    });
-
     if (data && data.bugRecords) {
         try {
             const recordsArray = JSON.parse(data.bugRecords);
@@ -181,15 +170,17 @@ let bugComments = organizeComments($bugReportArray);
 
 $: organizedData = organizeComments(type === 'suggestion' ? $commentArray : $bugReportArray);
 
+$: buttonLabel = type === 'suggestion' ? 'Submit a Suggestion' : 'Submit Bug Report';
+
 </script>
 
 <div class="card p-4">
     <div class="comments-container">
-        <div class="button alignRight replyButtonMargin"><button on:click={toggleReplyForm} class="badge variant-filled-primary">Submit a Suggestion</button></div>
+        <div class="button alignRight replyButtonMargin"><button on:click={toggleReplyForm} class="badge variant-filled-primary">{buttonLabel}</button></div>
         {#if showReplyForm}
             <Reply promptId='{queryId}' on:cancelReply={toggleReplyForm} on:commentAdded={e => addNewComment(e.detail.newComment)}/>
         {/if}
-        {#each organizedComments as comment}
+        {#each organizedData as comment}
             <CommentItem comment={comment} promptId='{queryId}' />
         {/each}
     </div>
