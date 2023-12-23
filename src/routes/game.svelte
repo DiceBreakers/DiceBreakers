@@ -750,7 +750,7 @@ async function submitReport() {
                 </div>
                 <div class="hideText">(hide)</div>
 							</div>
-                <div class="comments"><a href="/conversations/{currentPromptId}">comments </a>({cCount})</div>
+              <div class="comments"><a href="/conversations/{currentPromptId}">comments </a>({cCount})</div>
               {/if}
 						</div>
 					</div>
@@ -939,7 +939,6 @@ async function submitReport() {
     justify-content: space-between;
     margin-left: auto;
     margin-right: auto;
-    max-width: 500px;
     margin-top: 50px;
     padding-top: 50px;
     margin-bottom: -75px;

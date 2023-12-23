@@ -16,16 +16,25 @@ export const load: PageServerLoad = async ({ locals }) => {
   
   try {
     // console.log(`Fetching comments for upcoming`);
-    let comments = await locals.pb.collection('comments').getFullList({
+    let suggestions = await locals.pb.collection('comments').getFullList({
       filter: "prompt='s2ysozol9uv0dx6'",
       expand: 'author,prompt',
       fields: 'expand.author.id,expand.author.username,text,id,parent',
       sort: '-created',
     });
 
-    console.log('initCommentsData:', comments)
+    console.log('initSuggestionsData:', suggestions)
 
-    const commentsData = await Promise.all(comments.map(async (comment) => {
+    let bugReports = await locals.pb.collection('comments').getFullList({
+      filter: "prompt='ck3i8l7k0zug11l'",
+      expand: 'author,prompt',
+      fields: 'expand.author.id,expand.author.username,text,id,parent',
+      sort: '-created',
+    });
+
+    console.log('initBugData:', bugReports)
+
+    const suggestData = await Promise.all(suggestions.map(async (comment) => {
       const isFavAuthor = locals.user?.favAuthors?.includes(comment.expand?.author.id) || false;
       
       try {
@@ -61,14 +70,53 @@ export const load: PageServerLoad = async ({ locals }) => {
       }
     }));
 
-     console.log('commentsData', commentsData);
+     console.log('suggestData', suggestData);
+
+     const bugData = await Promise.all(bugReports.map(async (comment) => {
+      const isFavAuthor = locals.user?.favAuthors?.includes(comment.expand?.author.id) || false;
+      
+      try {
+        console.log(`Fetching vote status for comment ${comment.id}`);
+        const voteStatus = await locals.pb.collection('cVotes')
+          .getFirstListItem(`comment="${comment.id}"&&by="${locals.user?.id}"`);
+
+        console.log(`Fetching comment score for comment ${comment.id}`);
+        const cScore = await locals.pb.collection('cScore')
+          .getFirstListItem(`id="${comment.id}"`);
+        const score = cScore ? cScore.score : 1;
+
+        return {
+          ...comment,
+          isLiked: !!voteStatus,
+          isSuper: !!voteStatus && voteStatus.super,
+          isFavAuthor,
+          score,
+        };
+      } catch (err: unknown) {
+        const pbError = err as PocketBaseError;
+        if (pbError.originalError && pbError.originalError.status === 404) {
+          return {
+            ...comment,
+            isLiked: false,
+            isSuper: false,
+            isFavAuthor,
+            score: 1,
+          };
+        } else {
+          throw err;
+        }
+      }
+    }));
+
+     console.log('bugData', bugData);
 
     return {
-      records: JSON.stringify(commentsData),
+      records: JSON.stringify(suggestData),
+      bugRecords: JSON.stringify(bugData),      
     };
   } catch (err) {
     console.error('Error: ', err);
-    throw error(500, "The robots didn't like something about that...");
+    throw error(500, "The robots couldn't get the suggestion data...");
   }
 };
 

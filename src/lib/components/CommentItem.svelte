@@ -41,40 +41,6 @@
 }
 
 
-    function addCommentToCorrectPlace(comments, newComment) {
-        // Set the favorite status for the new comment
-        newComment.isFavAuth = $authorFavorites[newComment.authId] || false;
-
-        if (newComment.parent) {
-            // If the new comment has a parent, find the parent and add the new comment to its children
-            for (let comment of comments) {
-                if (comment.id === newComment.parent) {
-                    comment.children = [...(comment.children || []), newComment];
-                    return;
-                }
-                if (comment.children) {
-                    addCommentToCorrectPlace(comment.children, newComment);
-                }
-            }
-        } else {
-            // If the new comment is a top-level comment, add it directly to the comments array
-            comments.push(newComment);
-        }
-    }
-
-    // Update nested comments recursively
-    function updateNestedComments(comments, newComment) {
-        for (let i = 0; i < comments.length; i++) {
-            if (comments[i].id === newComment.parent) {
-                comments[i].children = [...(comments[i].children || []), newComment];
-                return;
-            } else if (comments[i].children) {
-                updateNestedComments(comments[i].children, newComment);
-            }
-        }
-    }
-
-
 async function cVote() {
     if (!$currentUser) {
       LoginMessage = true;
@@ -219,7 +185,7 @@ async function cVote() {
 {/if}
 
 {#if LoginMessage}
-  <ServerMessage isError={true} messageText="You'll need to log in first!" />
+  <ServerMessage isError={true} messageText="You'll need to log for that!" />
 {/if}
 
 <style>
@@ -232,10 +198,10 @@ async function cVote() {
     .scoreContainer {
         display: flex;
         flex-direction: column;
-        align-items: center; /* Center items horizontally */
-        justify-content: center; /* Center items vertically */
-        float: left; /* Position to the left */
-        margin-right: 10px; /* Space between the scoreContainer and the comment text */
+        align-items: center;
+        justify-content: center; 
+        float: left; 
+        margin-right: 10px; 
     }
 
     .score {
@@ -252,7 +218,7 @@ async function cVote() {
         padding: 5px;
         margin-top: 5px;
         margin-left: 1px; 
-        border: 1px solid #ccc; 
+        border: 2px solid #0b3861; 
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
         border-radius: 5px;
     }

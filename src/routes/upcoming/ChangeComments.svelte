@@ -1,25 +1,26 @@
 <script lang="ts">
+    import { createEventDispatcher } from 'svelte';
     import { writable } from 'svelte/store';
-    import { onMount } from 'svelte';
-    import { goto } from '$app/navigation';
-    import { popup } from '@skeletonlabs/skeleton';
-    import { fade } from 'svelte/transition';
 	import ServerMessage from '$lib/components/serverMessage.svelte';
     import { currentUser } from '$lib/stores/user';
-    import { authorFavorites } from '$lib/stores/authors';
     import CommentItem from '$lib/components/CommentItem.svelte'
     import Reply from '$lib/components/Reply.svelte';
 	
     export let data;
+    export let type;
 
    // console.log(data)
+   // console.log(type)
 
-    let showReplyForm = false;
+    const dispatch = createEventDispatcher();
+
+    let queryId = type === 'suggestion' ? 's2ysozol9uv0dx6' : 'ck3i8l7k0zug11l';
 
     let commentArray = writable<Comment[]>([]);
-    let loading = true;
+    let bugReportArray = writable<Comment[]>([]);
 
-    let showRollButton = false;
+    let loading = true;
+    let showReplyForm = false;
     let SuccessMessage = false;
 	let FailureMessage = false;
 	let ReportMessage = false;
@@ -63,21 +64,23 @@
         score: 1,
     });
 
-    if (data && data.prompt) {
+    if (data && data.bugRecords) {
         try {
-            const promptData = JSON.parse(data.prompt);
-            console.log('promptData:', promptData)
-            prompt.set({
-                id: promptData.id,
-                text: promptData.prompt,
-                authName: promptData.expand.author.username,
-                authId: promptData.expand.author.id,
-                isFavAuth: promptData.isFavAuthor,
-                isLiked: promptData.isLiked,
-                isSuper: promptData.isSuper,
-                score: promptData.score
+            const recordsArray = JSON.parse(data.bugRecords);
+            const mappedComments = recordsArray.map(obj => {
+                return {
+                    authId: obj.expand.author.id,
+                    authName: obj.expand.author.username,
+                    id: obj.id,
+                    parent: obj.parent,
+                    text: obj.text,
+                    isLiked: obj.isLiked,
+                    isSuper: obj.isSuper,
+                    isFavAuth: obj.isFavAuthor,
+                    score: obj.score
+                };
             });
-            
+            bugReportArray.set(mappedComments);
             loading = false;
         } catch (e) {
             console.error("Error parsing data:", e);
@@ -114,7 +117,7 @@
     }
 
     console.log($commentArray);
-    
+    console.log($bugReportArray);    
 
 function organizeComments(commentsArray: Comment[]): Comment[] {
     let organizedComments: Comment[] = [];
@@ -141,121 +144,25 @@ function organizeComments(commentsArray: Comment[]): Comment[] {
     return organizedComments;
 }
 
-    function addNewComment(newComment) {
-        commentArray.update(currentComments => {
-            // Deep clone the current comments to ensure reactivity
-            let updatedComments = JSON.parse(JSON.stringify(currentComments));
-            
-            if (newComment.parent) {
-                const parentIndex = updatedComments.findIndex(c => c.id === newComment.parent);
-                if (parentIndex !== -1) {
-                    // Directly update the nested comments array
-                    updatedComments[parentIndex].children = [...(updatedComments[parentIndex].children || []), newComment];
-                }
-            } else {
-                updatedComments.push(newComment);
+function addNewComment(newComment) {
+    const arrayToUpdate = type === 'suggestion' ? commentArray : bugReportArray;
+
+    arrayToUpdate.update(currentEntries => {
+        let updatedEntries = JSON.parse(JSON.stringify(currentEntries));
+
+        if (newComment.parent) {
+            const parentIndex = updatedEntries.findIndex(entry => entry.id === newComment.parent);
+            if (parentIndex !== -1) {
+                updatedEntries[parentIndex].children = [...(updatedEntries[parentIndex].children || []), newComment];
             }
-            return updatedComments;
-        });
-    }
-
-
-async function pVote() {
-    if (!$currentUser) {
-      LoginMessage = true;
-      setTimeout(() => {
-        LoginMessage = false;
-      }, 1500);
-      return;
-    }
-
-    if (!$prompt.id) return;
-
-        prompt.update(current => {
-            let newScore = current.score;
-            let newIsLiked = current.isLiked;
-            let newIsSuper = current.isSuper;
-
-            if (current.isSuper) {
-                newIsLiked = false;
-                newIsSuper = false;
-                newScore -= 5;
-            } else if (current.isLiked) {
-                newIsSuper = true;
-                newIsLiked = false;
-                newScore += 4;
-            } else {
-                newIsLiked = true;
-                newScore += 1;
-            }
-
-            return { ...current, score: newScore, isLiked: newIsLiked, isSuper: newIsSuper };
-        });
-
- //   console.log('pScore', $prompt.score)
-
-    const formData = new FormData();
-    formData.append('promptId', $prompt.id);
-
-    try {
-      const response = await fetch('?/pVote', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (response.ok) {
-        console.log('Like Status Changed');
-      } else {
-        console.error('Something broke :-(');
-        FailureMessage = true;
-        setTimeout(() => {
-          FailureMessage = false;
-        }, 1500);
-      }
-    } catch (error) {
-      console.error('An error occurred:', error);
-      FailureMessage = true;
-      setTimeout(() => {
-        FailureMessage = false;
-      }, 1500);
-    }
-  }
-
-  async function favToggle() {
-    if (!$currentUser) {
-        LoginMessage = true;
-        setTimeout(() => {
-            LoginMessage = false;
-        }, 1500);
-        return;
-    }
-
-    if (!$prompt.authId) return;
-
-    authorFavorites.toggleFavorite($prompt.authId);
-
-    const formData = new FormData();
-    formData.append('authId', $prompt.authId);
-
-    try {
-        const response = await fetch('?/favAuth', {
-            method: 'POST',
-            body: formData,
-        });
-
-        if (!response.ok) {
-            throw new Error('Server response not OK');
+        } else {
+            updatedEntries.push(newComment);
         }
 
-        console.log('Favorite Toggled Successfully');
-    } catch (error) {
-        console.error('An error occurred:', error);
-        FailureMessage = true;
-        setTimeout(() => {
-            FailureMessage = false;
-        }, 1500);
-    }
+        return updatedEntries;
+    });
 }
+
 
 function toggleReplyForm() {
     if (!$currentUser) {
@@ -268,19 +175,11 @@ function toggleReplyForm() {
     showReplyForm = !showReplyForm;
     }
 
-function navigateHome() {
-    goto('/');
-  }
 
 let organizedComments = organizeComments($commentArray);
+let bugComments = organizeComments($bugReportArray);
 
-$: organizedComments = organizeComments($commentArray);
-
-onMount(() => {
-    setTimeout(() => {
-      showRollButton = true;
-    }, 1000);
-  });
+$: organizedData = organizeComments(type === 'suggestion' ? $commentArray : $bugReportArray);
 
 </script>
 
@@ -288,10 +187,10 @@ onMount(() => {
     <div class="comments-container">
         <div class="button alignRight replyButtonMargin"><button on:click={toggleReplyForm} class="badge variant-filled-primary">Submit a Suggestion</button></div>
         {#if showReplyForm}
-            <Reply promptId='s2ysozol9uv0dx6' on:cancelReply={toggleReplyForm} on:commentAdded={e => addNewComment(e.detail.newComment)}/>
+            <Reply promptId='{queryId}' on:cancelReply={toggleReplyForm} on:commentAdded={e => addNewComment(e.detail.newComment)}/>
         {/if}
         {#each organizedComments as comment}
-            <CommentItem comment={comment} promptId='s2ysozol9uv0dx6' />
+            <CommentItem comment={comment} promptId='{queryId}' />
         {/each}
     </div>
 </div>
