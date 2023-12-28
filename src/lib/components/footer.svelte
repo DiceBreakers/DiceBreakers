@@ -2,7 +2,8 @@
 <div class="footer">
     <div class="footerTextTop">
         <ul>
-            <a href="/upcoming" title="Guide Upcoming Changes">Upcoming Changes</a>
+            <a href="/upcoming" title="Support Dice Breakers">Support Dice Breakers</a>
+            <a href="https://shop.dicebreakers.app" title="Shop Dice Breakers">Shop</a>
             <a href="/charity" title="Charity Info">Charity Pledge</a>
         </ul>
     </div>
