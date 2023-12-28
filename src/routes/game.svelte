@@ -151,7 +151,7 @@ async function generate(event?: Event) {
     });
 
       promptArray.set(generatedPrompts);
-      console.log('generatedPrompts', generatedPrompts)
+   //   console.log('generatedPrompts', generatedPrompts)
 
       generatedPrompts.forEach(prompt => {
         authorFavorites.toggleFavorite(prompt.authorId);
@@ -234,7 +234,7 @@ async function fetchPromptDetails(promptId, authorId) {
       const dataArr = JSON.parse(jsonResponse.data);
       const additionalDetails = dataArr.length > 1 ? JSON.parse(dataArr[1]) : {};
 
-      console.log('additionalDetails:', additionalDetails);
+   //   console.log('additionalDetails:', additionalDetails);
 
       return additionalDetails;
     }
@@ -247,7 +247,7 @@ async function fetchPromptDetails(promptId, authorId) {
 }
 
 async function saveSettings() {
-  console.log('running Save Settings')
+//  console.log('running Save Settings')
   
 	if (!$currentUser) {
     LoginMessage = true;
@@ -267,7 +267,7 @@ async function saveSettings() {
 
     formData.append('preferences', JSON.stringify(preferences));
 
-    console.log('SavingSettings:', preferences)
+  //  console.log('SavingSettings:', preferences)
 
     try {
         const response = await fetch('?/saveSettings', {
@@ -346,7 +346,7 @@ async function favToggle() {
     });
 
     if (response.ok) {
-      console.log('Favorite Toggled Successfully');
+ //     console.log('Favorite Toggled Successfully');
       currentFav = !currentFav
     } else {
       console.error('Something broke :-(');
@@ -399,7 +399,7 @@ async function pVote() {
       return [...n];
     });
 
-    console.log('score', prompt.score)
+  //  console.log('score', prompt.score)
 
     if (!prompt.authorId) return;
 
@@ -413,7 +413,7 @@ async function pVote() {
       });
 
       if (response.ok) {
-        console.log('Like Status Changed');
+  //      console.log('Like Status Changed');
       } else {
         console.error('Something broke :-(');
         FailureMessage = true;
@@ -730,7 +730,7 @@ async function submitReport() {
                 </div>
                 {/if}
 						  <div class="prompt">{currentPrompt}</div>
-              <div class="author"><b>-{currentAuthor}</b> 
+              <div class="author"><a href="/user/{currentAuthor}"><b>-{currentAuthor}</b></a>
                 <button on:click={favToggle}>
                   {#if currentFav}
                     <i class="fa-solid fa-xl fa-star" style="color: #fecb0e;"></i>

@@ -183,8 +183,8 @@ export const actions = {
         likeStatus = null;
       }
 
-      console.log('authorId:', authorId)
-      console.log('localsFavs:', locals.user?.favAuthors)
+ //     console.log('authorId:', authorId)
+//      console.log('localsFavs:', locals.user?.favAuthors)
 
       isFavAuthor = locals.user?.favAuthors?.includes(`${authorId}`) || false;
   
@@ -196,7 +196,7 @@ export const actions = {
         isFavAuthor,
       };
 
-      console.log('promptAdditionalDetails:', promptAdditionalDetails)
+ //     console.log('promptAdditionalDetails:', promptAdditionalDetails)
   
       return {
         details: JSON.stringify(promptAdditionalDetails),
@@ -366,12 +366,12 @@ export const actions = {
   //  console.log('promptId:', promptId)
   
     if (hiddenPrompts.includes(promptId)) {
-      console.log('Prompt already hidden');
+ //     console.log('Prompt already hidden');
       throw error(400, "Prompt already hidden");
     }
   
     const updatedHiddenPrompts = [...hiddenPrompts, promptId];
-    console.log('updatedHiddenPrompts:', updatedHiddenPrompts)
+//    console.log('updatedHiddenPrompts:', updatedHiddenPrompts)
     const hiddenPromptsPackage = {
       hiddenPrompts: updatedHiddenPrompts,
     };
@@ -402,12 +402,12 @@ export const actions = {
    // console.log('authorId:', authorId)
   
     if (hiddenAuthors.includes(authorId)) {
-      console.log('Author already hidden');
+ //     console.log('Author already hidden');
       throw error(400, "Author already hidden");
     }
   
     const updatedHiddenAuthors = [...hiddenAuthors, authorId];
-    console.log('updatedHiddenAuthors:', updatedHiddenAuthors)
+ //   console.log('updatedHiddenAuthors:', updatedHiddenAuthors)
     const hiddenAuthorsUpdate = {
       hiddenAuthors: updatedHiddenAuthors,
     };

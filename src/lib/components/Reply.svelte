@@ -15,10 +15,13 @@
 
         const formData = new FormData();
         formData.append('text', replyText);
-        formData.append('promptId', promptId);
-        formData.append('parentId', parentId || '');
+  //          console.log('text:', replyText);
 
-        console.log('parentId:', parentId)
+        formData.append('promptId', promptId);
+ //           console.log('promptId:', promptId);
+
+        formData.append('parentId', parentId || '');
+ //           console.log('parentId:', parentId)
 
         try {
             const response = await fetch('?/submitReply', { 
@@ -28,15 +31,13 @@
 
             if (response.ok) {
                 const responseBody = await response.json();
-
-      //          console.log ('responseBody:', responseBody)
+ //               console.log ('responseBody:', responseBody)
 
                 const responseJson = JSON.parse(responseBody.data);
-
-      //          console.log ('responseJson:', responseJson)
+ //               console.log ('responseJson:', responseJson)
 
                 const newCommentId = responseJson[5];
-                console.log('Reply submitted successfully');
+   //             console.log('Reply submitted successfully');
                 const newCommentData = {
                     id: newCommentId,
                     text: replyText,
@@ -49,7 +50,7 @@
                     isFavAuth: $authorFavorites[$currentUser?.id] || false,
                     children: [],
                 };
-                console.log('nCD:', newCommentData)
+    //            console.log('nCD:', newCommentData)
                 dispatch('commentAdded', { newComment: newCommentData });
                 cancelReply();
             } else {

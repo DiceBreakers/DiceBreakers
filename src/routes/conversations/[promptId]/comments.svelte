@@ -66,7 +66,7 @@
     if (data && data.prompt) {
         try {
             const promptData = JSON.parse(data.prompt);
-            console.log('promptData:', promptData)
+   //         console.log('promptData:', promptData)
             prompt.set({
                 id: promptData.id,
                 text: promptData.prompt,
@@ -113,7 +113,7 @@
         loading = false;
     }
 
-    console.log($commentArray);
+//    console.log($commentArray);
     
 
 function organizeComments(commentsArray: Comment[]): Comment[] {
@@ -204,7 +204,7 @@ async function pVote() {
       });
 
       if (response.ok) {
-        console.log('Like Status Changed');
+   //     console.log('Like Status Changed');
       } else {
         console.error('Something broke :-(');
         FailureMessage = true;
@@ -247,7 +247,7 @@ async function pVote() {
             throw new Error('Server response not OK');
         }
 
-        console.log('Favorite Toggled Successfully');
+ //       console.log('Favorite Toggled Successfully');
     } catch (error) {
         console.error('An error occurred:', error);
         FailureMessage = true;
@@ -302,7 +302,7 @@ onMount(() => {
                 {$prompt.text}
             </div>
             <div class="author">
-                <b>-{$prompt.authName}</b> 
+                <a href="/user/{$prompt.authName}"><b>-{$prompt.authName}</b></a> 
                 <button on:click={favToggle}>
                     {#if isFavAuthor}
                         <i class="fa-solid fa-xl fa-star" style="color: #fecb0e;"></i>

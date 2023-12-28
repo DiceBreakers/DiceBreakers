@@ -1,21 +1,15 @@
 <script>
     import { currentUser } from '$lib/stores/user';
     import { authorFavorites } from '$lib/stores/authors';
-    import CommentItem from '$lib/components/CommentItem.svelte'
     import Reply from '$lib/components/Reply.svelte';
 	import ServerMessage from '$lib/components/serverMessage.svelte';
 
-    export let comment;
-    export let promptId;
+    export let prompt;
 
     let LoginMessage = false;
     let FailureMessage = false;
 
-    let showReplyForComment = false;
-
-    function hasChildren(comment) {
-        return comment.children && comment.children.length > 0;
-    }
+    let showReplyForPrompt = false;
 
     function toggleReplyForm() {
         if (!$currentUser) {
@@ -25,7 +19,7 @@
             }, 1500);
             return;
         }
-        showReplyForComment = !showReplyForComment;
+        showReplyForPrompt = !showReplyForPrompt;
     }
 
     function handleNewComment(event) {
@@ -34,14 +28,14 @@
     // Set the favorite status for the new comment
     newComment.isFavAuth = $authorFavorites[newComment.authId] || false;
 
-    if (comment.id === newComment.parent) {
+    if (prompt.id === newComment.parent) {
         // Add the new comment to the children of the current comment
-        comment.children = [...(comment.children || []), newComment];
+        prompt.children = [...(prompt.children || []), newComment];
     }
 }
 
 
-async function cVote() {
+async function pVote() {
     if (!$currentUser) {
       LoginMessage = true;
       setTimeout(() => {
@@ -50,17 +44,17 @@ async function cVote() {
       return;
     }
 
-    if (!comment.id) return;
+    if (!prompt.id) return;
 
-    let newScore = comment.score;
-    let newIsLiked = comment.isLiked;
-    let newIsSuper = comment.isSuper;
+    let newScore = prompt.score;
+    let newIsLiked = prompt.isLiked;
+    let newIsSuper = prompt.isSuper;
 
-    if (comment.isSuper) {
+    if (prompt.isSuper) {
         newIsLiked = false;
         newIsSuper = false;
         newScore -= 5;
-    } else if (comment.isLiked) {
+    } else if (prompt.isLiked) {
         newIsSuper = true;
         newIsLiked = false;
         newScore += 4;
@@ -69,21 +63,21 @@ async function cVote() {
         newScore += 1;
     }
 
-    comment = { ...comment, score: newScore, isLiked: newIsLiked, isSuper: newIsSuper };
+    prompt = { ...prompt, score: newScore, isLiked: newIsLiked, isSuper: newIsSuper };
 
- //   console.log('cScore', comment.score)
+ //   console.log('pScore', prompt.score)
 
     const formData = new FormData();
-    formData.append('commentId', comment.id);
+    formData.append('promptId', prompt.id);
 
     try {
-      const response = await fetch('?/cVote', {
+      const response = await fetch('?/pVote', {
         method: 'POST',
         body: formData,
       });
 
       if (response.ok) {
-  //      console.log('Like Status Changed');
+ //       console.log('Like Status Changed');
       } else {
         console.error('Something broke :-(');
         FailureMessage = true;
@@ -109,12 +103,12 @@ async function cVote() {
         return;
     }
 
-    if (!comment.authId) return;
+    if (!prompt.authId) return;
 
-    authorFavorites.toggleFavorite(comment.authId);
+    authorFavorites.toggleFavorite(prompt.authId);
 
     const formData = new FormData();
-    formData.append('authId', comment.authId);
+    formData.append('authId', prompt.authId);
 
     try {
         const response = await fetch('?/favAuth', {
@@ -136,22 +130,23 @@ async function cVote() {
     }
 }
 
-    $: isFavAuthor = $authorFavorites[comment.authId] || false;
-    $: bulbImage = comment.isSuper ? '/bulb2.png' :
-                   comment.isLiked ? '/bulb1.png' : '/bulb0.png';
+    $: isFavAuthor = $authorFavorites[prompt.authId] || false;
+    $: bulbImage = prompt.isSuper ? '/bulb2.png' :
+                   prompt.isLiked ? '/bulb1.png' : '/bulb0.png';
+
 
 </script>
 
-<div class="comment">
+<div class="prompt">
     <div class="scoreContainer">
-        <button on:click={cVote}>
+        <button on:click={pVote}>
             <img alt="Bulb Rating" src={bulbImage} class="bulbImage">
         </button>
-        <div class="score">({comment.score})</div>
+        <div class="score">({prompt.score})</div>
     </div>
-        <div class="comment-text"><a href="/conversations/{comment.promptId}">{comment.text}</a></div>
+        <div class="prompt-text"><a href="/conversations/{prompt.id}">{prompt.text}</a></div>
         <div class="flexRight">
-            <a href="/user/{comment.authName}"><b>-{comment.authName}</b></a> 
+            <a href="/user/{prompt.authName}"><b>-{prompt.authName}</b></a> 
             <button on:click={favToggle}>
                 {#if isFavAuthor}
                     <i class="fa-solid fa-xl fa-star" style="color: #fecb0e;"></i>
@@ -161,24 +156,16 @@ async function cVote() {
             </button>
         </div>
         <div class="flexRight replyButtonMargin">
-            {#if !showReplyForComment}
+            {#if !showReplyForPrompt}
                 <button on:click={toggleReplyForm} class="badge variant-filled-primary">Reply</button>
             {/if}
         </div>
 
-    {#if showReplyForComment}
-        <Reply promptId={comment.promptId} parentId={comment.id} on:cancelReply={toggleReplyForm} on:commentAdded={handleNewComment} />
+    {#if showReplyForPrompt}
+        <Reply promptId={prompt.id} on:cancelReply={toggleReplyForm} on:commentAdded={handleNewComment} />
     {/if}
 
-    {#if hasChildren(comment)}
-        <div class="child-comments">
-            {#each comment.children as childComment}
-                <CommentItem comment={childComment} promptId={promptId}/>
-            {/each}
-        </div>
-    {/if}
 </div>
-
 
 {#if FailureMessage}
 	<ServerMessage isError={true} messageText="Something is broken :-(" />
@@ -213,7 +200,7 @@ async function cVote() {
         margin-bottom: 1px;
     }
 
-    .comment {
+    .prompt {
         background-color: white;
         padding: 5px;
         margin-top: 5px;
@@ -228,10 +215,6 @@ async function cVote() {
         margin-bottom: 10px;
         margin-left: auto;
         text-align: right;
-    }
-
-    .child-comments {
-        position: relative;
     }
 
 </style>

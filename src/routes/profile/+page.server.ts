@@ -4,9 +4,10 @@ export const actions = {
 
     updateEmail: async ({ request, locals }) => {
       const data = Object.fromEntries(await request.formData());
+      let newEmail = data.email
   
       try {
-        await locals.pb.collection('users').requestEmailChange(data.email);
+        await locals.pb.collection('users').requestEmailChange(newEmail);
     } catch (err) {
         console.log('Error: ', err);
   

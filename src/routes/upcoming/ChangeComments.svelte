@@ -105,8 +105,8 @@
         loading = false;
     }
 
-    console.log($commentArray);
-    console.log($bugReportArray);    
+ //   console.log($commentArray);
+ //   console.log($bugReportArray);    
 
 function organizeComments(commentsArray: Comment[]): Comment[] {
     let organizedComments: Comment[] = [];
@@ -165,8 +165,6 @@ function toggleReplyForm() {
     }
 
 
-let organizedComments = organizeComments($commentArray);
-let bugComments = organizeComments($bugReportArray);
 
 $: organizedData = organizeComments(type === 'suggestion' ? $commentArray : $bugReportArray);
 
