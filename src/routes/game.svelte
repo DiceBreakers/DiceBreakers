@@ -941,7 +941,7 @@ async function submitReport() {
     margin-right: auto;
     margin-top: 50px;
     padding-top: 50px;
-    margin-bottom: -75px;
+    margin-bottom: -50px;
 	}
 
 	.game {
