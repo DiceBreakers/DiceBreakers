@@ -1,6 +1,6 @@
 <script lang="ts">
   import Header from '$lib/components/header.svelte'
-  import Changes from './Changes.svelte';
+  import Guide from './Guide.svelte';
   import Footer from '$lib/components/footer.svelte'
   import type { PageData } from './$types';
 	
@@ -12,7 +12,7 @@
 </div>
 
 <div class="bg_gradient">
-  <Changes {data} />
+  <Guide {data} />
 </div>
 
 <div class="bg_gradient_footer">
