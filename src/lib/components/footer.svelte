@@ -2,7 +2,8 @@
 <div class="footer">
     <div class="footerTextTop">
         <ul>
-            <a href="/upcoming" title="Upcoming Changes">Upcoming Changes</a>
+            <a href="/upcoming" title="Guide Upcoming Changes">Upcoming Changes</a>
+            <a href="/charity" title="Charity Info">Charity Pledge</a>
         </ul>
     </div>
     <div class="footerTextBottom">
@@ -41,12 +42,20 @@
     vertical-align: middle;
 }
 
+.footerTextTop {
+    justify-content: space-around;
+}
+
 .footerTextBottom {
     margin-top: 30px;
 }
 
 .footer ul i {
-    margin: 0 2px;
+    margin: 0 5px;
+}
+
+.footerTextTop ul a {
+    margin: 0 30px;
 }
 
 </style>

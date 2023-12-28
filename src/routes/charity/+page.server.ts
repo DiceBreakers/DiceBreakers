@@ -23,7 +23,7 @@ export const load: PageServerLoad = async ({ locals }) => {
       sort: '-created',
     });
 
- //   console.log('initSuggestionsData:', suggestions)
+    console.log('initSuggestionsData:', suggestions)
 
     let bugReports = await locals.pb.collection('comments').getFullList({
       filter: "prompt='ck3i8l7k0zug11l'",
@@ -32,17 +32,17 @@ export const load: PageServerLoad = async ({ locals }) => {
       sort: '-created',
     });
 
-//    console.log('initBugData:', bugReports)
+    console.log('initBugData:', bugReports)
 
     const suggestData = await Promise.all(suggestions.map(async (comment) => {
       const isFavAuthor = locals.user?.favAuthors?.includes(comment.expand?.author.id) || false;
       
       try {
-   //     console.log(`Fetching vote status for comment ${comment.id}`);
+        console.log(`Fetching vote status for comment ${comment.id}`);
         const voteStatus = await locals.pb.collection('cVotes')
           .getFirstListItem(`comment="${comment.id}"&&by="${locals.user?.id}"`);
 
- //       console.log(`Fetching comment score for comment ${comment.id}`);
+        console.log(`Fetching comment score for comment ${comment.id}`);
         const cScore = await locals.pb.collection('cScore')
           .getFirstListItem(`id="${comment.id}"`);
         const score = cScore ? cScore.score : 1;
@@ -70,17 +70,17 @@ export const load: PageServerLoad = async ({ locals }) => {
       }
     }));
 
-//     console.log('suggestData', suggestData);
+     console.log('suggestData', suggestData);
 
      const bugData = await Promise.all(bugReports.map(async (comment) => {
       const isFavAuthor = locals.user?.favAuthors?.includes(comment.expand?.author.id) || false;
       
       try {
- //       console.log(`Fetching vote status for comment ${comment.id}`);
+        console.log(`Fetching vote status for comment ${comment.id}`);
         const voteStatus = await locals.pb.collection('cVotes')
           .getFirstListItem(`comment="${comment.id}"&&by="${locals.user?.id}"`);
 
- //       console.log(`Fetching comment score for comment ${comment.id}`);
+        console.log(`Fetching comment score for comment ${comment.id}`);
         const cScore = await locals.pb.collection('cScore')
           .getFirstListItem(`id="${comment.id}"`);
         const score = cScore ? cScore.score : 1;
@@ -108,7 +108,7 @@ export const load: PageServerLoad = async ({ locals }) => {
       }
     }));
 
-//     console.log('bugData', bugData);
+     console.log('bugData', bugData);
 
     return {
       records: JSON.stringify(suggestData),
@@ -130,12 +130,12 @@ export const actions = {
     
       const favAuths = locals.user?.favAuthors || [];
 
- //     console.log('localfavs:', favAuths)
+      console.log('localfavs:', favAuths)
       
       const data = await request.formData();    
       const favId = String(data.get('authId')) || '';
 
-//      console.log('favId:', favId)
+      console.log('favId:', favId)
     
       if (favAuths.includes(favId)) {
         const updatedFavAuths = favAuths.filter((authId) => authId !== favId);
@@ -143,7 +143,7 @@ export const actions = {
           favAuthors: updatedFavAuths,
         };
 
- //       console.log('favUpdate:', favUpdate)
+        console.log('favUpdate:', favUpdate)
         
         try {
           const record = await locals.pb.collection('users').update(locals.user?.id, favUpdate);
@@ -239,7 +239,7 @@ export const actions = {
       'parent': parentId,
     };
 
- //   console.log('addComment:', addComment)
+    console.log('addComment:', addComment)
   
     if (!authorId) {
       throw error(401, "You must be logged in to comment");
