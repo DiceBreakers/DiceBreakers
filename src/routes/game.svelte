@@ -960,5 +960,6 @@ async function submitReport() {
   .bottom {
 		margin-top: 6px;
 	}
+  
 
 </style>
