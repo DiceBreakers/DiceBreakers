@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
-    import ChangeComments from './ChangeComments.svelte';
+    import GuideComments from './GuideComments.svelte';
 
     export let data;
     
@@ -21,7 +21,7 @@
                             <b>App Suggestions:</b>
                         </svelte:fragment>
                         <svelte:fragment slot="content">
-                            <ChangeComments {data} type="suggestion" />
+                            <GuideComments {data} type="suggestion" />
                         </svelte:fragment>
                     </AccordionItem>
                     <AccordionItem>
@@ -29,7 +29,7 @@
                             <b>Bug Report:</b>
                         </svelte:fragment>
                         <svelte:fragment slot="content">
-                            <ChangeComments {data} type="bugReport"/>
+                            <GuideComments {data} type="bugReport"/>
                         </svelte:fragment>
                     </AccordionItem>
                     <AccordionItem>
