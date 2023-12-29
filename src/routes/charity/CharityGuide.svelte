@@ -11,7 +11,7 @@
 	<div class="card p-4 variant-glass-tertiary">
 		<div class="card p-4">
             <div class="margin">
-                <p>Dice Breakers is committed to being a socially concious company and has pledged that a minimum of 50% of profits will be donated to various charities. Read below to find out how it works!</p>
+                <p>Dice Breakers is committed to being a socially concious company and has pledged that 50% of profits will be donated to various charities.</p>
             </div>
                 <Accordion>
                 <AccordionItem open>
