@@ -56,7 +56,7 @@
 }
 
 .footerTextTop ul a {
-    margin: 0 30px;
+    margin: 0 20px;
 }
 
 </style>
