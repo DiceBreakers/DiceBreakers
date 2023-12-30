@@ -29,39 +29,25 @@
                             <b>Bug Report:</b>
                         </svelte:fragment>
                         <svelte:fragment slot="content">
-                            <GuideComments {data} type="bugReport"/>
+                            <GuideComments {data} type="bugReport" />
                         </svelte:fragment>
                     </AccordionItem>
-                    <AccordionItem>
-                        <svelte:fragment slot="summary"><b>Charity Discussion:</b></svelte:fragment>
-                        <svelte:fragment slot="content">
-                            <Accordion>
-                                <AccordionItem>
-                                    <svelte:fragment slot="summary">
-                                        <b>Approved Charities (coming soon)</b>
-                                    </svelte:fragment>
-                                    <svelte:fragment slot="content">
-                                        Approved Charities Coming Soon!
-                                    </svelte:fragment>
-                                </AccordionItem>
-                                <AccordionItem>
-                                    <svelte:fragment slot="summary">
-                                        <b>Proposed Charities (coming soon)</b>
-                                    </svelte:fragment>
-                                    <svelte:fragment slot="content">
-                                        Proposed Charities Coming Soon!
-                                    </svelte:fragment>
-                                </AccordionItem>
-                            </Accordion>                        
-                        </svelte:fragment>
-                    </AccordionItem>
-                </Accordion>                        
+                </Accordion>
+                <div class="charity">
+                    <a href="/charity"><b>Charity Discussion:</b></a>
+                </div>                
         </div>
     </div>
 </div>
         
 
 <style>
+    .charity {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-left: 15px;
+    }
+
     .margin {
         margin: 20px;
     }

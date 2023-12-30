@@ -3,7 +3,7 @@
     import Basics from './Basics.svelte';
     import CharityComments from './CharityComments.svelte';
 
- //   export let data;
+    export let data;
     
 </script>
 
@@ -14,7 +14,7 @@
                 <p>Dice Breakers is committed to being a socially concious company and has pledged that 50% of profits will be donated to various charities.</p>
             </div>
                 <Accordion>
-                <AccordionItem open>
+                <AccordionItem>
                     <svelte:fragment slot="summary"><b>How Charities are Selected:</b></svelte:fragment>
                     <svelte:fragment slot="content">
                        <Basics />
@@ -26,18 +26,22 @@
                         <Accordion>
                             <AccordionItem>
                                 <svelte:fragment slot="summary">
-                                    <b>Approved Charities (coming soon)</b>
+                                    <b>Approved Charities Discussion:</b>
                                 </svelte:fragment>
                                 <svelte:fragment slot="content">
-                                    Approved Charities Coming Soon!
+                                    Here is where members can discuss the charities that will be in the end of year vote.
+                                    <CharityComments {data} type="approved" />
                                 </svelte:fragment>
                             </AccordionItem>
                             <AccordionItem>
                                 <svelte:fragment slot="summary">
-                                    <b>Proposed Charities (coming soon)</b>
+                                    <b>Proposed Charities Discussion:</b>
                                 </svelte:fragment>
                                 <svelte:fragment slot="content">
-                                    Proposed Charities Coming Soon!
+                                    <div>
+                                        Here is where members can propose and discuss the charities they want included in the end of year vote.
+                                    </div>
+                                    <CharityComments {data} type="proposed" />
                                 </svelte:fragment>
                             </AccordionItem>
                         </Accordion>                        

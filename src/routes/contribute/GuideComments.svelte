@@ -28,17 +28,6 @@
 	let promptHiddenMessage = false;
 	let authorHiddenMessage = false;
 
-    type Prompt = {
-        text: string;
-        id: string;
-        authName: string;
-        authId: string;
-        isFavAuth: boolean;
-        isLiked: boolean;
-        isSuper: boolean;
-        score: number;
-    }
-
     type Comment = {
         text: string;
         id: string;

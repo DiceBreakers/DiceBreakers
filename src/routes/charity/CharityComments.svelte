@@ -14,10 +14,10 @@
 
     const dispatch = createEventDispatcher();
 
-    let queryId = type === 'suggestion' ? 's2ysozol9uv0dx6' : 'ck3i8l7k0zug11l';
+    let queryId = type === 'approved' ? 'tr7djwhobfpudba' : '4537ifyx9pijbab';
 
-    let commentArray = writable<Comment[]>([]);
-    let bugReportArray = writable<Comment[]>([]);
+    let approvedArray = writable<Comment[]>([]);
+    let proposedArray = writable<Comment[]>([]);
 
     let loading = true;
     let showReplyForm = false;
@@ -27,17 +27,6 @@
 	let LoginMessage = false;
 	let promptHiddenMessage = false;
 	let authorHiddenMessage = false;
-
-    type Prompt = {
-        text: string;
-        id: string;
-        authName: string;
-        authId: string;
-        isFavAuth: boolean;
-        isLiked: boolean;
-        isSuper: boolean;
-        score: number;
-    }
 
     type Comment = {
         text: string;
@@ -53,9 +42,9 @@
         children?: Comment[];
     }
 
-    if (data && data.bugRecords) {
+    if (data && data.proposedRecords) {
         try {
-            const recordsArray = JSON.parse(data.bugRecords);
+            const recordsArray = JSON.parse(data.propsedRecords);
             const mappedComments = recordsArray.map(obj => {
                 return {
                     authId: obj.expand.author.id,
@@ -69,7 +58,7 @@
                     score: obj.score
                 };
             });
-            bugReportArray.set(mappedComments);
+            proposedArray.set(mappedComments);
             loading = false;
         } catch (e) {
             console.error("Error parsing data:", e);
@@ -79,9 +68,9 @@
         loading = false;
     }
 
-    if (data && data.records) {
+    if (data && data.approvedRecords) {
         try {
-            const recordsArray = JSON.parse(data.records);
+            const recordsArray = JSON.parse(data.approvedRecords);
             const mappedComments = recordsArray.map(obj => {
                 return {
                     authId: obj.expand.author.id,
@@ -95,7 +84,7 @@
                     score: obj.score
                 };
             });
-            commentArray.set(mappedComments);
+            approvedArray.set(mappedComments);
             loading = false;
         } catch (e) {
             console.error("Error parsing data:", e);
@@ -134,7 +123,7 @@ function organizeComments(commentsArray: Comment[]): Comment[] {
 }
 
 function addNewComment(newComment) {
-    const arrayToUpdate = type === 'suggestion' ? commentArray : bugReportArray;
+    const arrayToUpdate = type === 'approved' ? approvedArray : proposedArray;
 
     arrayToUpdate.update(currentEntries => {
         let updatedEntries = JSON.parse(JSON.stringify(currentEntries));
@@ -166,15 +155,17 @@ function toggleReplyForm() {
 
 
 
-$: organizedData = organizeComments(type === 'suggestion' ? $commentArray : $bugReportArray);
+$: organizedData = organizeComments(type === 'approved' ? $approvedArray : $proposedArray);
 
-$: buttonLabel = type === 'suggestion' ? 'Submit a Suggestion' : 'Submit Bug Report';
+$: buttonLabel = type === 'proposed' ? 'Submit Charity Suggestion' : 'Submit Bug Report';
 
 </script>
 
 <div class="card p-4">
     <div class="comments-container">
-        <div class="button alignRight replyButtonMargin"><button on:click={toggleReplyForm} class="badge variant-filled-primary">{buttonLabel}</button></div>
+        {#if type==="proposed"}
+            <div class="button alignRight replyButtonMargin"><button on:click={toggleReplyForm} class="badge variant-filled-primary">{buttonLabel}</button></div>
+        {/if}
         {#if showReplyForm}
             <Reply promptId='{queryId}' on:cancelReply={toggleReplyForm} on:commentAdded={e => addNewComment(e.detail.newComment)}/>
         {/if}

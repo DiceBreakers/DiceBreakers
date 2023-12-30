@@ -4,7 +4,7 @@
   import Footer from '$lib/components/footer.svelte'
   import type { PageData } from './$types';
 	
-//	export let data: PageData;
+	export let data: PageData;
 </script>
 
 <div class="bg_gradient">
@@ -12,7 +12,7 @@
 </div>
 
 <div class="bg_gradient">
-  <CharityGuide />
+  <CharityGuide {data} />
 </div>
 
 <div class="bg_gradient_footer">
