@@ -23,7 +23,7 @@
           <li><a href="/add" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Submit a Conversation Starter</a></li>
           <li><a href="/edit" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Edit your Conversation Starters</a></li>
           <li><a href="/profile/hidden" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">View Hidden Authors/Conversations</a></li>
-          <li><a href="/upcoming" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Upcoming Changes</a></li>
+          <li><a href="/contribute" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Help Guide Dice Breakers</a></li>
           <li><a href="/profile" on:click={toggleMenu} class="btn btn-sm variant-filled-primary">Account Settings</a></li>
               <form method="POST" action="/logout" use:enhance={() => {
                   return async ({ result }) => {
